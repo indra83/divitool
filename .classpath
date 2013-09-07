@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-ajp-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-annotations-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-client-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-continuation-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-deploy-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-io-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-jmx-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-jndi-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-overlay-deployer-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-plus-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-policy-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-rewrite-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-security-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-server-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-servlet-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-servlets-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-util-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-webapp-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-websocket-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-xml-8.1.12.v20130726.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/servlet-api-3.0.jar"/>
+	<classpathentry kind="src" path="tool"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
