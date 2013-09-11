@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -65,16 +65,22 @@ public class ToolServer extends JFrame implements ActionListener {
 		booksResHandler.setResourceBase(getBooksDir().getAbsolutePath());
 		ContextHandler booksHandler = new ContextHandler("/books");
 		booksHandler.setHandler(booksResHandler);
-
-		ContextHandler apiHandler = new ContextHandler("/api");
-		apiHandler.setHandler(resHandler);
+	
+	//	ContextHandler apiHandler = new ContextHandler("/api");
+	//	apiHandler.setHandler(resHandler);
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(staticHandler);
 		contexts.addHandler(booksHandler);
 		contexts.addHandler(new DefaultHandler());
 		server.setHandler(contexts);
-
+		
+		
+ServletContextHandler servletContextHandler = new ServletContextHandler(server,"/api",true,false);
+servletContextHandler.addServlet(CreateChapter.class, "/chapter");
+servletContextHandler.addServlet(CreateTopic.class, "/topic");
+servletContextHandler.addServlet(GetAndSaveFiles.class, "/files");
+servletContextHandler.addServlet(UploadFile.class, "/upload");
 		try {
 			server.start();
 			server.join();
