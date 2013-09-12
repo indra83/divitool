@@ -17,14 +17,13 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 
 public class ToolServer extends JFrame implements ActionListener {
 
@@ -58,20 +57,25 @@ public class ToolServer extends JFrame implements ActionListener {
 
 		ResourceHandler resHandler = new ResourceHandler();
 		resHandler.setResourceBase("tool");
+
 		ContextHandler staticHandler = new ContextHandler("/tool");
 		staticHandler.setHandler(resHandler);
 
 		ResourceHandler booksResHandler = new ResourceHandler();
 		booksResHandler.setResourceBase(getBooksDir().getAbsolutePath());
-		ContextHandler booksHandler = new ContextHandler("/books");
+		ContextHandler booksHandler = new ContextHandler("/getfiles");
 		booksHandler.setHandler(booksResHandler);
 
-		ContextHandler apiHandler = new ContextHandler("/api");
-		apiHandler.setHandler(resHandler);
+		// ContextHandler apiHandler = new ContextHandler("/api");
+		// apiHandler.setHandler(resHandler);
+
+		ServletContextHandler servletContextHandler = new ServletContextHandler(server, "/savefile", true, false);
+		servletContextHandler.addServlet(FileUploadServlet.class, "/*");
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(staticHandler);
 		contexts.addHandler(booksHandler);
+		contexts.addHandler(servletContextHandler);
 		contexts.addHandler(new DefaultHandler());
 		server.setHandler(contexts);
 
@@ -88,7 +92,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		prefs.put(PREF_BOOKS_DIR, booksDir.getPath());
 	}
 
-	private static File getBooksDir() {
+	public static File getBooksDir() {
 		Preferences prefs = Preferences.userNodeForPackage(ToolServer.class);
 		String booksDir = prefs.get(PREF_BOOKS_DIR, null);
 		if (booksDir != null) {
@@ -104,7 +108,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		if (getBooksDir() != null)
 			bookDir.setText(getBooksDir().toString());
 		booksPanel.add(bookDir);
-		selectBooksDir = new JButton("Select books directory");
+		selectBooksDir = new JButton("Select book directory");
 		selectBooksDir.setSize(100, 50);
 		selectBooksDir.addActionListener(this);
 		booksPanel.add(selectBooksDir);
@@ -128,7 +132,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		add(launchBrowser, BorderLayout.SOUTH);
 
 		setTitle("Simple example");
-		setSize(300, 200);
+		setSize(600, 300);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}

@@ -25,5 +25,7 @@
 	<classpathentry exported="true" kind="lib" path="libs/jetty-xml-8.1.12.v20130726.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/servlet-api-3.0.jar"/>
 	<classpathentry kind="src" path="tool"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-fileupload-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
