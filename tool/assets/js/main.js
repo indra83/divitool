@@ -39,7 +39,13 @@ $(function(){
 
 
 
+$('#sidebar').on('mouseover','.sortable',function(){
+    $(this).children('.inner-btn').show();
+});
 
+$('#sidebar').on('mouseout','.sortable',function(){
+    $(this).children('.inner-btn').hide();
+});
 
 
 

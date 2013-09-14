@@ -2,3 +2,7 @@
 	height: 800px;
 	overflow: auto;
 }
+
+.inner-btn{
+	display: none;
+}
