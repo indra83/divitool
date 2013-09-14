@@ -54,7 +54,7 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
 
 	$('#sidebar').on('click','.add-btn',function(){
-    var current_clicked=parseInt($(this).attr('xml_id'));
+    current_clicked=parseInt($(this).attr('xml_index'));
 		$('#dialog-add').dialog('open');
 		return false;
 	});

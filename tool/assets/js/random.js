@@ -106,7 +106,7 @@ $( "#dialog-heading" ).dialog({
 
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"header","data":val,"xml_id":(xml_id)});
+              topic_json[global_topic].push({"type":"header","data":val,"xml_id":(current_clicked)});
             }
 
 
@@ -145,7 +145,7 @@ $( "#dialog-sub-heading" ).dialog({
                 }
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id)});
+              topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(current_clicked)});
 
 
               refresh_dom();
@@ -202,7 +202,7 @@ $( "#dialog-image" ).dialog({
                 }
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(xml_id),"attribution":attr_text});
+              topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
 
 
 
@@ -308,12 +308,14 @@ $( "#dialog-audio" ).dialog({
 
             var current_topic=topic_json[global_topic];
               for(var i=0, len=current_topic.length; i < len; i++){
-                var temp=current_topic[i];
-                temp.xml_id = parseInt(temp.xml_id)+1;
-                current_topic[i]=temp;
+                if (i>=current_clicked) {
+                  var temp=current_topic[i];
+                  temp.xml_id = parseInt(temp.xml_id)+1;
+                  current_topic[i]=temp;
+                }
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(xml_id),"attribution":attr_text});
+              topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
 
 
 
@@ -383,9 +385,11 @@ $( "#dialog-video" ).dialog({
 
             var current_topic=topic_json[global_topic];
               for(var i=0, len=current_topic.length; i < len; i++){
-                var temp=current_topic[i];
-                temp.xml_id = parseInt(temp.xml_id)+1;
-                current_topic[i]=temp;
+                if (i>=current_clicked) {
+                  var temp=current_topic[i];
+                  temp.xml_id = parseInt(temp.xml_id)+1;
+                  current_topic[i]=temp;
+                }
               }
 
 
@@ -402,7 +406,7 @@ $( "#dialog-video" ).dialog({
 
 
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(xml_id),"attribution":attr_text,"thumb":file_name1});
+              topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1});
 
 
               // var deferred = new $.Deferred();
@@ -467,12 +471,14 @@ $( "#dialog-formula" ).dialog({
             i=i+1;
             var current_topic=topic_json[global_topic];
               for(var i=0, len=current_topic.length; i < len; i++){
-                var temp=current_topic[i];
-                temp.xml_id = parseInt(temp.xml_id)+1;
-                current_topic[i]=temp;
+                if (i>=current_clicked) {
+                  var temp=current_topic[i];
+                  temp.xml_id = parseInt(temp.xml_id)+1;
+                  current_topic[i]=temp;
+                }
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"formula","data":val,"xml_id":(xml_id)});
+              topic_json[global_topic].push({"type":"formula","data":val,"xml_id":(current_clicked)});
 
 
               refresh_dom();
@@ -514,12 +520,14 @@ $( "#dialog-html" ).dialog({
 
                 var current_topic=topic_json[global_topic];
                   for(var i=0, len=current_topic.length; i < len; i++){
-                    var temp=current_topic[i];
-                    temp.xml_id = parseInt(temp.xml_id)+1;
-                    current_topic[i]=temp;
+                    if (i>=current_clicked) {
+                      var temp=current_topic[i];
+                      temp.xml_id = parseInt(temp.xml_id)+1;
+                      current_topic[i]=temp;
+                    }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(xml_id)});
+                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked)});
 
 
 
@@ -749,7 +757,7 @@ function refresh_dom(){
 
     }
   }
-  side_bar.append('<button xml_index='+current_topic.length+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
+side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
   // $('#side_bar').sortable();
   // $( "#side_bar" ).disableSelection();
 }
