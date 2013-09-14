@@ -8,11 +8,50 @@ i=0;
 var editing_state=false;
 var master_json={}
 current_clicked=0;
-chapter_json={'id':'','name':'','topic':[]}
+chapter_json={'id':'','name':'','topic':[]};
+before_array=[];
+after_drop=[];
 
 
 $(function(){
-	$( "#sidebar" ).sortable();
+	$( "#sidebar" ).sortable({
+    start: function (e, ui) {
+      // alert("started");
+      before_array=$('.editable');
+
+    },
+    update: function(e,ui){
+      after_drop=$('.editable');
+      console.log(e);
+      console.log(ui);
+      console.log($(this).attr("xml_index"));
+    var xml_index= ui.item.children('button').attr('xml_index');
+
+    var bf_tn_array = before_array.map(function() {
+                    return $(this).attr("xml_index");
+                    });
+  var after_tn_array = after_drop.map(function() {
+                    return $(this).attr("xml_index");
+                    });
+
+    current_topic=topic_json[global_topic]
+    var temp_array=[]
+    for (var i = 0; i <current_topic.length ; i++) {
+      temp_array[i]=current_topic[parseInt(after_tn_array[i])];
+    };
+
+    current_topic=temp_array;
+
+    for (var i = 0; i <current_topic.length; i++) {
+      current_topic[i].xml_id=i;
+    };
+
+    topic_json[global_topic]=current_topic;
+
+    refresh_dom();
+
+    }
+  });
 
   var master=$.get('/getfiles/master.json');
   console.log(master);
@@ -26,12 +65,12 @@ $(function(){
     master_json=JSON.parse(data);
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
-      var link=$('<a>').append(master_json.chapters[i]['name'])
+      var link=$('<a>').append(master_json.chapters[i]['name']);
       a.append(link)
       $('#book-nav').prepend(a);
 
     };
-    })
+    });
   };
 
 
@@ -160,3 +199,7 @@ $('#sidebar').on('mouseout','.sortable',function(){
   });
 
 });
+
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return !(a.indexOf(i) > -1);});
+};
