@@ -1,22 +1,300 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
- <head>
- <title>XHTML 1.0 Strict Example</title>
- </head>
- <body>
- <p>This is an example of an
- <abbr title="Extensible HyperText Markup Language">XHTML</abbr> 1.0 Strict document.<br/>
- <img id="validation-icon"
-    src="http://www.w3.org/Icons/valid-xhtml10"
-    alt="Valid XHTML 1.0 Strict"/><br />
- </p>
- 
- <form action="/savefile/blah" enctype="multipart/form-data" method="POST">
-            <input type="text" name="filename"/> <br/>
-            <input type="file" name="file1"><br>
-            <input type="Submit" value="Submit"><br>
-        </form>
- </body>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Divi Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+
+
+When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
+$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+
+    <h1>Hello, world!</h1>
+
+    <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="row well well-lg">
+              <div class="row">
+                <div class="col-md-6">
+                  <button id="mod-chapter" type="button" class="btn btn-primary">Add Chapter</button>
+                </div>
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-primary">Add Topic</button>
+                </div>
+              </div>
+              <p>&nbsp;</p>
+              <div class="row">
+                <div class="col-md-12 well well-lg">
+                  Book Desc
+                </div>
+              </div>
+
+              <div class="row">
+                <div id="book-show" class="col-mod-12 well well-lg">
+                  <ul id="book-nav" class="nav nav-pills nav-stacked">
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-offset-1 col-md-8">
+            <div class="row well well-lg">
+              <div class="col-md-3 well well-lg side-scroll">
+                <div class="row">
+                  <div id="sidebar" class="col-md-12">
+                    <button xml_id="0" class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>
+
+                    <div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-md-9 well well-lg side-scroll">
+                <div id="preview" class=" col-md-12">
+
+                </div>
+              </div>
+            </div>
+            .col-md-6
+          </div>
+        </div>
+    </div>
+
+
+
+
+
+<!-- Dialog Elements  -->
+
+
+<div id="dialog-add" title="Add New Element">
+            <p class="validateTips">Add one of the following</p>
+            <div class="list-group">
+              <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Header</a>
+              <a href="#" id="mod-subheading" class="list-group-item plus mod-subheading" >Add Sub HEading</a>
+              <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a>
+              <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Image</a>
+              <a href="#" id="mod-video" class="list-group-item plus mod-video" >Add Video</a>
+              <a href="#" id="mod-audio" class="list-group-item plus mod-audio" >Add Audio</a>
+              <a href="#" id="mod-html" class="list-group-item plus mod-html" >Add HTML</a>
+            </div>
+
+</div>
+
+          <!-- HEADING -->
+
+          <div id="dialog-heading" title="Insert Heading">
+            <p class="validateTips">Insert Heading.</p>
+
+            <form>
+            <fieldset>
+              <label for="name">Heading </label>
+              <input type="text" name="name" id="header_text" class="text ui-widget-content ui-corner-all" />
+              <input type="hidden" class="header xml_id">
+
+
+            </fieldset>
+            </form>
+          </div>
+
+          <!-- SUB HEADING -->
+
+          <div id="dialog-sub-heading" title="Insert Sub HEading">
+
+            <form>
+            <fieldset>
+              <label for="name">Name</label>
+              <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" />
+
+
+            </fieldset>
+            </form>
+          </div>
+
+          <!-- END SUB HEADING -->
+
+          <!-- Image -->
+            <div id="dialog-image" title="Insert Image">
+
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST">
+              <fieldset>
+                <label for="name">File : </label>
+                <input type="file" name="file1" id="imagefilemod">
+                <textarea id="img-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+              </fieldset>
+              </form>
+            </div>
+          <!-- END OF IMAGE -->
+
+          <!-- SOUND -->
+            <div id="dialog-audio" title="Insert Sound">
+
+              <form>
+              <fieldset>
+                <label for="name">File : </label>
+                <input type="file" id="audiofilemod">
+                <textarea id="audio-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+              </fieldset>
+              </form>
+            </div>
+          <!-- END OF SOUND -->
+
+
+
+          <!-- EDITABLE DIV -->
+
+              <div id="dialog-html" title="Insert Image">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+                    <a id="bold" href=""><i class="icon-bold"></i></a> &nbsp&nbsp&nbsp <a id="italic" href=""><i class="icon-italic"></i></a>  &nbsp&nbsp&nbsp <a id="underline" href=""><i class="icon-underline"></i></a> &nbsp&nbsp&nbsp <a id="undo-header" href="">REMOVE STYLE</a> &nbsp&nbsp&nbsp <a href="#" ><i class="icon-cny"></i></a>
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea class="html_input"></textarea>
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+          <!-- END OF EDITABLE DIV -->
+
+
+
+
+          <!-- VIDEO -->
+            <div id="dialog-video" title="Insert Video">
+
+              <form>
+              <fieldset>
+                <label for="name">Name</label>
+                <p>Video File</p>
+                <input type="file" id="videofilemod">
+                <p>Thumbnail File</p>
+                <input type="file" id="thumbfilemod">
+                <textarea id="video-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+              </fieldset>
+              </form>
+            </div>
+          <!-- END OF VIDEO -->
+
+
+          <!-- FORMULA -->
+
+          <div id="dialog-formula" title="Insert Sub HEading">
+
+            <form>
+            <fieldset>
+              <label for="name">Name</label>
+              <input type="text" name="name" id="formula_text" class="text ui-widget-content ui-corner-all" />
+
+
+            </fieldset>
+            </form>
+          </div>
+
+          <!-- END FORMULA -->
+
+          <div id="dialog-chapter" title="Add Chapter">
+            <form>
+            <fieldset>
+
+              <label for="number">Number</label>
+              <input type="text" name="number" id="chapter_no" class="text ui-widget-content ui-corner-all" />
+
+              <label for="name">Name</label>
+              <input type="text" name="name" id="chapter_name" class="text ui-widget-content ui-corner-all" />
+
+
+            </fieldset>
+            </form>
+          </div>
+
+          <div id="dialog-topic" title="Add Topic">
+            <form>
+            <fieldset>
+              <label for="name">Name</label>
+              <select name="chapter" id="chapter_select">
+
+
+              </select>
+              <input type="text" name="name" id="chapter_text" class="text ui-widget-content ui-corner-all" />
+
+
+            </fieldset>
+            </form>
+          </div>
+
+
+<!-- End of Dialog Elements -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="assets/js/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="assets/js/jsxml.js"></script>
+    <script src="assets/js/random.js"></script>
+    <script src="assets/js/main.js"></script>
+
+
+
+    <script type="text/javascript">
+
+      $(function(){
+        // $('#book-show').select2();
+      });
+
+  </script>
+
+<script>
+        tinymce.init({selector:'textarea.html_input'});
+</script>
+
+
+  </body>
 </html>
