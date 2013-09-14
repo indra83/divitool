@@ -577,16 +577,16 @@ function refresh_dom(){
     switch(current_topic[i].type){
         case "header":
               preview_pane.append("<h1>"+current_topic[i].data+"</h1>");
-              side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
               side_bar.append(holder);
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
 
               break;
         case "subheader":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
-              side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">SUB HEADING</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">SUB HEADING</a>');
               side_bar.append(holder);
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
@@ -596,8 +596,8 @@ function refresh_dom(){
               console.log("HTML");
               preview_pane.append("div"+unescape(current_topic[i].data)+"</div>");
               // preview_pane.attr('contenteditable','false');
-              side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
               side_bar.append(holder);
 
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -633,8 +633,8 @@ function refresh_dom(){
               parent_div.appendChild(custom_text);
 
               preview_pane.append(parent_div);
-              side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">IMAGE</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">IMAGE</a>');
               side_bar.append(holder);
 
               // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -682,8 +682,8 @@ function refresh_dom(){
 
               preview_pane.append(parent_div);
 
-              side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">VIDEO</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">VIDEO</a>');
               side_bar.append(holder);
 
 
@@ -723,8 +723,8 @@ function refresh_dom(){
                   preview_pane.append(parent_div);
 
 
-                  side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">AUDIO</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">AUDIO</a>');
               side_bar.append(holder);
 
 
@@ -739,8 +739,8 @@ function refresh_dom(){
         case "formula":
                 preview_pane.append("<p>"+current_topic[i].data+"</p>");
                 MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
-                side_bar.append('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">FORMULA</a>');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">FORMULA</a>');
               side_bar.append(holder);
                 // loadImage('http://latex.codecogs.com/png.latex?'+current_topic[i].data,insert_formula,preview_pane);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
