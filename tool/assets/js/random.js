@@ -815,6 +815,11 @@ function refresh_dom(){
 
               child.setAttribute('src',current_topic[i].data);
 
+              ref=dom.createElement('references');
+              ref.textContent=attr_text;
+
+              child.appendChild(ref);
+
               dom.documentElement.appendChild(child);
 
               // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -870,6 +875,11 @@ function refresh_dom(){
 
               child.setAttribute('src',current_topic[i].data);
 
+              ref=dom.createElement('references');
+              ref.textContent=attr_text;
+
+              child.appendChild(ref);
+
               dom.documentElement.appendChild(child);
 
 
@@ -917,6 +927,11 @@ function refresh_dom(){
 
               child.setAttribute('src',current_topic[i].data);
 
+              ref=dom.createElement('references');
+              ref.textContent=attr_text;
+
+              child.appendChild(ref);
+
               dom.documentElement.appendChild(child);
 
 
@@ -940,6 +955,8 @@ function refresh_dom(){
                 child = dom.createElement('formula');
 
                 child.textContent=current_topic[i].data;
+
+
 
                 dom.documentElement.appendChild(child);
 
