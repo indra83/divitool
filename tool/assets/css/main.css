@@ -6,3 +6,7 @@
 .inner-btn{
 	display: none;
 }
+
+li a{
+	cursor: pointer;
+}

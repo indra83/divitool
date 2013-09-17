@@ -37,12 +37,12 @@ MathJax.Hub.Config({
                   <button id="mod-chapter" type="button" class="btn btn-primary">Add Chapter</button>
                 </div>
                 <div class="col-md-6">
-                  <button type="button" class="btn btn-primary">Add Topic</button>
+                  <button id="mod-topic" type="button" class="btn btn-primary">Add Topic</button>
                 </div>
               </div>
               <p>&nbsp;</p>
               <div class="row">
-                <div class="col-md-12 well well-lg">
+                <div id="book-desc" class="col-md-12 well well-lg">
                   Book Desc
                 </div>
               </div>
@@ -79,7 +79,7 @@ MathJax.Hub.Config({
                 </div>
               </div>
             </div>
-            .col-md-6
+
           </div>
         </div>
     </div>
@@ -239,6 +239,27 @@ MathJax.Hub.Config({
           <!-- END FORMULA -->
 
           <div id="dialog-chapter" title="Add Chapter">
+
+
+             <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+              <label for="chapterid" class="col-lg-2 control-label">Chapter Id</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="chapterid" placeholder="Chapter Id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="chapter_name" class="col-lg-2 control-label">Chapter Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="chapter_name" placeholder="Chapter Name">
+              </div>
+            </div>
+
+            </form>
+<!--
             <form>
             <fieldset>
 
@@ -250,21 +271,56 @@ MathJax.Hub.Config({
 
 
             </fieldset>
-            </form>
+            </form> -->
           </div>
 
           <div id="dialog-topic" title="Add Topic">
-            <form>
+            <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+              <label for="topicname" class="col-lg-2 control-label">Chapter</label>
+              <div class="col-lg-10">
+                <select class="form-control" name="chapter" id="chapter_select">
+              </select>
+              </div>
+            </div>
+
+
+              <div class="form-group">
+              <label for="topicnumber" class="col-lg-2 control-label">Topic Id</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="topicnumber" placeholder="Topic Id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="topicname" class="col-lg-2 control-label">Topic Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="topicname" placeholder="Topic Name">
+              </div>
+            </div>
+
+
+
+
+
+
+<!--
             <fieldset>
               <label for="name">Name</label>
-              <select name="chapter" id="chapter_select">
+
+              </fieldset>
+              <fieldset>
+              <label for="number">Number</label>
+              <input type="text" name="number" id="topic_num" class="text ui-widget-content ui-corner-all" />
+              </fieldset>
+              <fieldset>
+              <label for="name">Name</label>
+              <input type="text" name="name" id="topic_text" class="text ui-widget-content ui-corner-all" />
 
 
-              </select>
-              <input type="text" name="name" id="chapter_text" class="text ui-widget-content ui-corner-all" />
-
-
-            </fieldset>
+            </fieldset> -->
             </form>
           </div>
 

@@ -1,6 +1,6 @@
 topic_json=[];
-global_topic=0;
-global_chapter=1;
+global_topic=-1;
+global_chapter=-1;
 var clicked;
 var xml_id=0;
 var parent;
@@ -53,25 +53,64 @@ $(function(){
     }
   });
 
-  var master=$.get('/getfiles/master.json');
-  console.log(master);
-  if (master.status==404) {
-    master_json={'name':'default','chapters':[]};
-  }else{
+  $.ajax({
+      url: "/getfiles/master/master.json",
+    }).done(function(data) {
+      // $( this ).addClass( "done" );
+
     console.log("IN");
     // master_json=master.response_text;
-    master.success(function(data){
+    // master.success(function(data){
     console.log(data);
     master_json=JSON.parse(data);
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
       var link=$('<a>').append(master_json.chapters[i]['name']);
-      a.append(link)
+      link.attr('chapter-id',i);
+      a.append(link);
+
+      var top=$('<ul>');
+      if (master_json.chapters[i].topics != undefined) {
+        for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
+            var a1 = $('<li>');
+            var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
+            link1.addClass('topic_link');
+            link1.attr('chapter-id',i);
+            link1.attr('topic-id',j);
+            a1.append(link1);
+            top.prepend(a1);
+        }
+        a.append(top);
+      }
+
       $('#book-nav').prepend(a);
+      $('#book-desc').html(master_json['name']);
 
     };
+
+
+
+    }).fail(function(data){
+      console.log(data);
+      if (data.status==404) {
+        master_json={'name':'default book name','chapters':[]};
+        $('#book-desc').html(master_json['name']);
+      };
+
+
     });
-  };
+
+// try{
+//   var master=$.get('/getfiles/master/master.json');
+// }catch(err){
+
+// }
+//   console.log(master);
+//   if (master.status==404) {
+//     master_json={'name':'default','chapters':[]};
+//   }else{
+
+//   };
 
 
 
@@ -90,7 +129,95 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
 
 
+  $('#book-show').on('click','.topic_link',function(){
 
+    global_topic=parseInt($(this).attr('topic-id'),10);
+    global_chapter=parseInt($(this).attr('chapter-id'),10);
+    topic_json[global_topic]=[];
+
+    var xml_string="";
+
+    current_topic=topic_json[global_topic] || [];
+    $.ajax({
+      dataType:"xml",
+      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/topic.xml",
+    }).done(function(data) {
+
+      var iterate=data.childNodes[0];
+      for (var i = 0; i < iterate.children.length; i++) {
+        console.log(iterate.children[i]);
+        console.log(iterate.children[i].nodeName);
+        console.log(iterate.children[i].InnerText);
+
+        switch(iterate.children[i].nodeName){
+            case "header":
+
+              current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i})
+
+
+              break;
+        case "subheader":
+              current_topic.push({'type':'subheader','data':iterate.children[i].textContent,'xml_id':i})
+
+              break;
+
+        case "html":
+              s=(new XMLSerializer()).serializeToString(iterate.children[i])
+              current_topic.push({'type':'html','data':escape(s),'xml_id':i})
+              console.log("HTML");
+
+
+              break;
+
+        case "image":
+
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'description':iterate.children[i].getElementsByTagName('description')[0].textContent});
+
+              // var parent_div=document.createElement("div");
+
+              break;
+
+        case "video":
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb')})
+
+
+
+              break;
+
+        case "audio":
+              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'description':iterate.children[i].getElementsByTagName('description')[0].textContent});
+              //   var parent_div=document.createElement("div");
+
+
+                  break;
+
+
+
+        case "formula":
+              current_topic.push({'type':'formula','data':iterate.children[i].textContent,'xml_id':i});
+
+                break;
+        }
+
+      };
+      topic_json[global_topic]=current_topic;
+      refresh_dom();
+
+
+
+    }).fail(function(data){
+      console.log(data);
+      // if (data.status==404) {
+      //   master_json={'name':'default book name','chapters':[]};
+      //   $('#book-desc').html(master_json['name']);
+      // };
+
+
+    });
+
+
+    return false;
+  });
 
 	$('#sidebar').on('click','.add-btn',function(){
     current_clicked=parseInt($(this).attr('xml_index'));

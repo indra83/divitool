@@ -3,6 +3,103 @@ $('#mod-chapter').click(function(){
   $('#dialog-chapter').dialog('open');
 });
 
+$('#mod-topic').click(function(){
+  // Populate the option tags
+  $('#chapter_select').html('');
+  // var options=[];
+  for (var i = 0; i < master_json.chapters.length; i++) {
+    var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
+    $('#chapter_select').append(op);
+    // options.push(master_json.chapters[i]['name']);
+
+  };
+
+
+
+  $('#dialog-topic').dialog('open');
+});
+
+
+
+$('#dialog-topic').dialog({
+      autoOpen: false,
+      height: 300,
+      width: 400,
+      modal: true,
+      buttons: {
+        "Insert Topic": function() {
+            // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
+            // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
+              if (master_json.chapters[parseInt($('#chapter_select').val())]['topics'] == undefined) {
+                master_json.chapters[parseInt($('#chapter_select').val())]['topics']=[];
+              };
+                master_json.chapters[parseInt($('#chapter_select').val())]['topics'].push({'id':$('#topicnumber').val(),'name':$('#topicname').val()});
+            // }else{
+              // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+              // if (result) {
+                // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
+                    // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
+                // };
+                // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
+              // }
+            // };
+
+
+
+
+            var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
+            child = dom.createElement('topic');
+            child.setAttribute('id', $('#topicnumber').val());
+            dom.documentElement.appendChild(child);
+
+            window.URL = window.webkitURL || window.URL;
+            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+            file = new Blob([jsxml.toXml(dom)]);
+
+
+            file.name="topic.xml"
+            // file.append(master_json);
+            // var a = document.getElementById("downloadFile");
+            // a.hidden = '';
+            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+            // a.download = 'filename.txt';
+            // a.textContent = 'Download file!';
+
+
+            uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
+
+            window.URL = window.webkitURL || window.URL;
+            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+            file.name="master.json";
+
+            uploadFiles('/savefile/master',file);
+
+            refresh_chapters();
+
+
+
+
+
+            // $.post('/savefile/master.json', {file1:master_json}).done(function(data) {
+            //   console.log(data);
+            // });
+
+            refresh_chapters();
+
+            $( this ).dialog( "close" );
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#sub_header_text').val('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
 
 $('#dialog-chapter').dialog({
       autoOpen: false,
@@ -11,10 +108,30 @@ $('#dialog-chapter').dialog({
       modal: true,
       buttons: {
         "Insert Chapter": function() {
-            master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
+            // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
+            // if (master_json.chapters[parseInt($('#chapter_no').val())-1] != undefined) {
+                master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
+            // }else{
+              // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+              // if (result) {
+                // master_json.chapters[parseInt($('#chapter_no').val())-1]={'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())};
+              // }
+            // };
 
 
-            uploadJSON('/savefile/masteer.json',master_json,'maaster.json');
+            window.URL = window.webkitURL || window.URL;
+            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+            file.name="master.json";
+            // file.append(master_json);
+            // var a = document.getElementById("downloadFile");
+            // a.hidden = '';
+            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+            // a.download = 'filename.txt';
+            // a.textContent = 'Download file!';
+
+
+            uploadFiles('/savefile/master',file);
 
 
 
@@ -42,10 +159,29 @@ $('#dialog-chapter').dialog({
 
 function refresh_chapters(){
   $('#book-nav').html('');
-for (var i = master_json.chapters.length - 1; i > 0; i--) {
+for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
-      var link=$('<a>').append(master_json.chapters[i]['name'])
-      a.append(link)
+      var link=$('<a>').append(master_json.chapters[i]['name']);
+      link.attr('chapter-id',i);
+      a.append(link);
+
+
+       var top=$('<ul>');
+      if (master_json.chapters[i].topics != undefined) {
+        for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
+            var a1 = $('<li>');
+            var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
+            link1.addClass('topic_link');
+            link1.attr('chapter-id',i);
+            link1.attr('topic-id',j);
+            a1.append(link1);
+            top.prepend(a1);
+        }
+        a.append(top);
+      }
+
+
+
       $('#book-nav').prepend(a);
 
     };
@@ -208,7 +344,7 @@ $( "#dialog-image" ).dialog({
 
             for (var i = 0, f; f = files[i]; i++) {
             //    $.ajax({
-            //   url: '/savefile/'+global_chapter+"/"+global_topic,
+            //   url: '/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],
             //   type: 'POST',
             //   data:{file1:f},
             //   cache: false,
@@ -225,11 +361,11 @@ $( "#dialog-image" ).dialog({
             //           }
             // });
 
-            $('#image_form_submit').attr('action','/savefile/'+global_chapter+"/"+global_topic);
+            // $('#image_form_submit').attr('action','/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']);
 
             // $('#image_form_submit').submit();
 
-            uploadFiles('/savefile/'+global_chapter+"/"+global_topic,f)
+            uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
 
             // $('#image_form_submit').submit(function(){
 
@@ -320,7 +456,7 @@ $( "#dialog-audio" ).dialog({
 
 
             for (var i = 0, f; f = files[i]; i++) {
-              uploadFiles('/savefile/'+global_chapter+"/"+global_topic,f);
+              uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f);
             }
 
 
@@ -414,11 +550,11 @@ $( "#dialog-video" ).dialog({
               // defArray.push(deferred);
               // defArray.push(deferred1);
               for (var i = 0, f; f = files[i]; i++) {
-                uploadFiles('/savefile/'+global_chapter+"/"+global_topic,f)
+                uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
               }
 
             for (var i = 0, f; f = files1[i]; i++) {
-              uploadFiles('/savefile/'+global_chapter+"/"+global_topic,f)
+              uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
             }
 
             // $.when.apply($, defArray).then( function() {
@@ -581,6 +717,13 @@ function refresh_dom(){
     return parseInt(obj1.xml_id) - parseInt(obj2.xml_id);
   });
 
+      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic id="'+master_json.chapters[global_chapter].topics[global_topic]['id']+'"/>');
+
+      // child = dom.createElement('topic');
+      // child.setAttribute('id', master_json.chapters[global_chapter].topics[global_topic]['id']);
+      // dom.documentElement.appendChild(child);
+
+
   for(var i=0, len=current_topic.length; i < len; i++){
     switch(current_topic[i].type){
         case "header":
@@ -588,6 +731,15 @@ function refresh_dom(){
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
               side_bar.append(holder);
+
+
+              child = dom.createElement('header');
+
+              child.textContent=current_topic[i].data;
+
+              dom.documentElement.appendChild(child);
+
+
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
 
               break;
@@ -598,6 +750,13 @@ function refresh_dom(){
               side_bar.append(holder);
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
+
+              child = dom.createElement('subheader');
+
+              child.textContent=current_topic[i].data;
+
+              dom.documentElement.appendChild(child);
+
               break;
 
         case "html":
@@ -605,8 +764,14 @@ function refresh_dom(){
               preview_pane.append("div"+unescape(current_topic[i].data)+"</div>");
               // preview_pane.attr('contenteditable','false');
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HTML</a>');
               side_bar.append(holder);
+
+              child = dom.createElement('html');
+
+              child.textContent=current_topic[i].data;
+
+              dom.documentElement.appendChild(child);
 
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">HTML</a>');
@@ -622,7 +787,7 @@ function refresh_dom(){
               var attr_text = current_topic[i].attribution;
 
 
-              span.src = "/getfiles/"+global_chapter+"/"+global_topic+"/"+current_topic[i]['data'];
+              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
               console.log(span);
               // span.src = global_chapter+"/"+global_topic+"/"+"media/aram.png";
               span.width=320;
@@ -645,6 +810,13 @@ function refresh_dom(){
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">IMAGE</a>');
               side_bar.append(holder);
 
+
+              child = dom.createElement('image');
+
+              child.setAttribute('src',current_topic[i].data);
+
+              dom.documentElement.appendChild(child);
+
               // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Image</a>');
 
@@ -655,13 +827,13 @@ function refresh_dom(){
 
               var span = document.createElement("video");
 
-                  span.setAttribute('controls','')
+              span.setAttribute('controls','');
 
 
               var attr_text = current_topic[i].attribution;
 
 
-              span.src = "/getfiles/"+global_chapter+"/"+global_topic+"/"+current_topic[i]['data'];
+              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
               console.log(span);
               // span.src = global_chapter+"/"+global_topic+"/"+"media/aram.png";
               span.width=320;
@@ -679,8 +851,8 @@ function refresh_dom(){
                 custom_text.innerHTML=attr_text;
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
-                side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
-                side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Video</a>');
+                // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
+                // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Video</a>');
               // }else{
                 var span1 = document.createElement("img");
                 span1.src = "/getfiles/"+global_chapter+"/"+global_topic+"/"+current_topic[i]['thumb'];
@@ -694,6 +866,12 @@ function refresh_dom(){
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">VIDEO</a>');
               side_bar.append(holder);
 
+              child = dom.createElement('video');
+
+              child.setAttribute('src',current_topic[i].data);
+
+              dom.documentElement.appendChild(child);
+
 
               break;
 
@@ -702,13 +880,13 @@ function refresh_dom(){
 
                 var span = document.createElement("audio");
 
-                    span.setAttribute('controls','')
+                    span.setAttribute('controls','');
 
 
                 var attr_text = current_topic[i].attribution;
 
 
-                span.src = "/getfiles/"+global_chapter+"/"+global_topic+"/"+current_topic[i]['data'];
+                span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
                 // console.log(span);
                 // span.src = global_chapter+"/"+global_topic+"/"+"media/aram.png";
                 span.width=320;
@@ -726,14 +904,20 @@ function refresh_dom(){
                   custom_text.innerHTML=attr_text;
                   parent_div.appendChild(span);
                   parent_div.appendChild(custom_text);
-                  side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
-                  side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Video</a>');
+                  // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
+                  // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Video</a>');
                   preview_pane.append(parent_div);
 
 
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">AUDIO</a>');
               side_bar.append(holder);
+
+              child = dom.createElement('audio');
+
+              child.setAttribute('src',current_topic[i].data);
+
+              dom.documentElement.appendChild(child);
 
 
                   break;
@@ -753,13 +937,35 @@ function refresh_dom(){
                 // loadImage('http://latex.codecogs.com/png.latex?'+current_topic[i].data,insert_formula,preview_pane);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
                 // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Formula</a>');
+                child = dom.createElement('formula');
+
+                child.textContent=current_topic[i].data;
+
+                dom.documentElement.appendChild(child);
+
                 break;
 
     }
   }
 side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
+
   // $('#side_bar').sortable();
   // $( "#side_bar" ).disableSelection();
+  window.URL = window.webkitURL || window.URL;
+            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+            file = new Blob([jsxml.toXml(dom)]);
+
+
+            file.name="topic.xml"
+            // file.append(master_json);
+            // var a = document.getElementById("downloadFile");
+            // a.hidden = '';
+            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+            // a.download = 'filename.txt';
+            // a.textContent = 'Download file!';
+
+
+            uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],file);
 }
 
 
@@ -825,7 +1031,7 @@ function uploadFiles(url, file) {
   var formData = new FormData();
 
   // for (var i = 0, file; file = files[i]; ++i) {
-    formData.append(file, file);
+    formData.append(file.name, file,file.name);
   // }
 
   var xhr = new XMLHttpRequest();
