@@ -314,14 +314,16 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
 
   $(document).on('click','.testing1',function(e){
+    editing_state=true;
     console.log(xml_id);
     console.log($(this));
     parent=$(this);
     xml_id=parseInt($(this).attr("xml_index"));
+    $(".header.xml_id").attr('xml_id',xml_id);
     if (topic_json[global_topic]==undefined) {
       topic_json[global_topic]=[];
     };
-    $( "#dialog-form" ).dialog( "open" );
+    $( "#dialog-heading" ).dialog( "open" );
     e.preventDefault();
   });
 

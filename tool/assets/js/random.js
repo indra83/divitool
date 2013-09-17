@@ -219,7 +219,7 @@ $( "#dialog-heading" ).dialog({
             var current_topic=topic_json[global_topic];
 
             if (editing_state == true) {
-              xml_id=parseInt($(".header.xml_id").val());
+              xml_id=parseInt($(".header.xml_id").attr('xml_index'));
               editing_state=false;
 
               for(var i=0, len=current_topic.length; i < len; i++){
