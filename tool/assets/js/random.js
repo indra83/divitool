@@ -626,6 +626,31 @@ $( "#dialog-video" ).dialog({
             insert=true;
 
             var current_topic=topic_json[global_topic];
+
+            var files1=document.getElementById('thumbfilemod').files;
+            $("#overlay").show();
+
+            var file_name1=files1[0].name;
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".video.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=file_name;
+                  current_topic[i].thumb=file_name1;
+                  current_topic[i].attribution=attr_text;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
+
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (i>=current_clicked) {
                   var temp=current_topic[i];
@@ -637,19 +662,15 @@ $( "#dialog-video" ).dialog({
 
 
 
-
-
-            var files1=document.getElementById('thumbfilemod').files;
-            $("#overlay").show();
             var fslocation= global_chapter+"/"+global_topic+"/media";
             console.log(fslocation);
-            var file_name1=files1[0].name;
+
             insert=true;
 
 
               topic_json[global_topic]=current_topic;
               topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1});
-
+            }
 
               // var deferred = new $.Deferred();
               // var deferred1 = new $.Deferred();
