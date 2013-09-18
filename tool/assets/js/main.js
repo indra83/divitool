@@ -511,6 +511,32 @@ $('#sidebar').on('mouseout','.sortable',function(){
     e.preventDefault();
   });
 
+  $(document).on('click','.editing-html',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            // $('#sub_header_text').val(current_topic[i]['data']);
+            tinyMCE.activeEditor.setContent(unescape(current_topic[i]['data']));
+            break;
+      };
+    };
+
+
+    $(".html.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_topic]==undefined) {
+      topic_json[global_topic]=[];
+    };
+    $( "#dialog-html" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
 
 
 });

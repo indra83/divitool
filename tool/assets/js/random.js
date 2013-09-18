@@ -736,6 +736,23 @@ $( "#dialog-html" ).dialog({
 
 
                 var current_topic=topic_json[global_topic];
+
+
+                if (editing_state == true) {
+              xml_id=parseInt($(".html.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=val;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
                   for(var i=0, len=current_topic.length; i < len; i++){
                     if (i>=current_clicked) {
                       var temp=current_topic[i];
@@ -745,7 +762,7 @@ $( "#dialog-html" ).dialog({
                   }
                   topic_json[global_topic]=current_topic;
                   topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked)});
-
+                }
 
 
 
