@@ -383,6 +383,10 @@ $( "#dialog-image" ).dialog({
             //   topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id+1)});
 
             var attr_text=$('#img-attr').val();
+
+
+
+
             var files=document.getElementById('imagefilemod').files;
             $("#overlay").show();
             var fslocation= global_chapter+"/"+global_topic+"/media";
@@ -391,6 +395,26 @@ $( "#dialog-image" ).dialog({
             insert=true;
 
             var current_topic=topic_json[global_topic];
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".image.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=file_name;
+                  current_topic[i].attribution=attr_text;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
+
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (i>=current_clicked) {
                   var temp=current_topic[i];
@@ -401,7 +425,7 @@ $( "#dialog-image" ).dialog({
               topic_json[global_topic]=current_topic;
               topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
 
-
+            }
 
             for (var i = 0, f; f = files[i]; i++) {
             //    $.ajax({
@@ -504,6 +528,25 @@ $( "#dialog-audio" ).dialog({
             insert=true;
 
             var current_topic=topic_json[global_topic];
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".audio.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=file_name;
+                  current_topic[i].attribution=attr_text;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (i>=current_clicked) {
                   var temp=current_topic[i];
@@ -514,11 +557,13 @@ $( "#dialog-audio" ).dialog({
               topic_json[global_topic]=current_topic;
               topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
 
-
+            }
 
             for (var i = 0, f; f = files[i]; i++) {
               uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f);
             }
+
+            refresh_dom();
 
 
 

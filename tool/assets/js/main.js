@@ -537,6 +537,60 @@ $('#sidebar').on('mouseout','.sortable',function(){
   });
 
 
+  $(document).on('click','.editing-image',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+        $('#img-attr').val(current_topic[i]['attribution']);
+            $('#img-attr').val(current_topic[i]['attribution']);
+            break;
+      };
+    };
+
+
+    $(".image.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_topic]==undefined) {
+      topic_json[global_topic]=[];
+    };
+    $( "#dialog-image" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+
+
+$(document).on('click','.editing-audio',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            $('#audio-attr').val(current_topic[i]['attribution']);
+            break;
+      };
+    };
+
+
+    $(".audio.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_topic]==undefined) {
+      topic_json[global_topic]=[];
+    };
+    $( "#dialog-audio" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+
 
 
 });
