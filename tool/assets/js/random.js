@@ -261,16 +261,18 @@ $( "#dialog-heading" ).dialog({
             var current_topic=topic_json[global_topic];
 
             if (editing_state == true) {
-              xml_id=parseInt($(".header.xml_id").attr('xml_index'));
+              xml_id=parseInt($(".header.xml_id").attr('xml_id'));
               editing_state=false;
 
               for(var i=0, len=current_topic.length; i < len; i++){
-                if (xml_id == current_topic[i].xml_id) {
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=val;
                   topic_json[global_topic]=current_topic;
                   break;
                 };
               }
+
+              // $('#header_text').val()
 
             }else{
 
@@ -313,8 +315,25 @@ $( "#dialog-sub-heading" ).dialog({
       buttons: {
         "Insert Sub-Heading": function() {
             var val=$('#sub_header_text').val();
-            i=i+1;
+            // i=i+1;
             var current_topic=topic_json[global_topic];
+            if (editing_state == true) {
+              xml_id=parseInt($(".subheader.xml_id").attr('xml_id'));
+              editing_state=false;
+
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=val;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (i>=current_clicked) {
                   var temp=current_topic[i];
@@ -324,7 +343,7 @@ $( "#dialog-sub-heading" ).dialog({
               }
               topic_json[global_topic]=current_topic;
               topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(current_clicked)});
-
+            }
 
               refresh_dom();
 
@@ -788,7 +807,7 @@ function refresh_dom(){
         case "subheader":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">SUB HEADING</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB HEADING</a>');
               side_bar.append(holder);
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
@@ -806,7 +825,7 @@ function refresh_dom(){
               preview_pane.append("div"+unescape(current_topic[i].data)+"</div>");
               // preview_pane.attr('contenteditable','false');
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HTML</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>');
               side_bar.append(holder);
 
               child = dom.createElement('html');
@@ -849,7 +868,7 @@ function refresh_dom(){
 
               preview_pane.append(parent_div);
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">IMAGE</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>');
               side_bar.append(holder);
 
 
@@ -902,7 +921,7 @@ function refresh_dom(){
                 // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Video</a>');
               // }else{
                 var span1 = document.createElement("img");
-                span1.src = "/getfiles/"+global_chapter+"/"+global_topic+"/"+current_topic[i]['thumb'];
+                span1.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['thumb'];
                 span1.width=100;
                 parent_div.appendChild(span1);
               // };
@@ -910,17 +929,22 @@ function refresh_dom(){
               preview_pane.append(parent_div);
 
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">VIDEO</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-video header-d">VIDEO</a>');
               side_bar.append(holder);
 
               child = dom.createElement('video');
 
               child.setAttribute('src',current_topic[i].data);
 
+              // img1=dom.createElement('image');
+              child.setAttribute('thumb',current_topic[i]['thumb']);
+
               ref=dom.createElement('references');
               ref.textContent=attr_text;
 
               child.appendChild(ref);
+
+              // child.appendChild(img1);
 
               dom.documentElement.appendChild(child);
 
@@ -962,7 +986,7 @@ function refresh_dom(){
 
 
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">AUDIO</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-audio header-d">AUDIO</a>');
               side_bar.append(holder);
 
               child = dom.createElement('audio');
@@ -989,7 +1013,7 @@ function refresh_dom(){
                 preview_pane.append("<p>"+current_topic[i].data+"</p>");
                 MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">FORMULA</a>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-formula header-d">FORMULA</a>');
               side_bar.append(holder);
                 // loadImage('http://latex.codecogs.com/png.latex?'+current_topic[i].data,insert_formula,preview_pane);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');

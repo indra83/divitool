@@ -129,7 +129,7 @@ MathJax.Hub.Config({
             <fieldset>
               <label for="name">Name</label>
               <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" />
-
+              <input type="hidden" class="subheader xml_id">
 
             </fieldset>
             </form>
@@ -146,6 +146,7 @@ MathJax.Hub.Config({
                 <input type="file" name="file1" id="imagefilemod">
                 <textarea id="img-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                <input type="hidden" class="image xml_id">
 
 
               </fieldset>
@@ -162,6 +163,7 @@ MathJax.Hub.Config({
                 <input type="file" id="audiofilemod">
                 <textarea id="audio-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                <input type="hidden" class="audio xml_id">
 
 
               </fieldset>
@@ -187,6 +189,8 @@ MathJax.Hub.Config({
                     </div> -->
 
                     <textarea class="html_input"></textarea>
+
+                    <input type="hidden" class="html xml_id">
 
                   <!-- END EDITABLE DIV -->
 
@@ -214,6 +218,7 @@ MathJax.Hub.Config({
                 <input type="file" id="thumbfilemod">
                 <textarea id="video-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                <input type="hidden" class="video xml_id">
 
 
               </fieldset>
@@ -230,7 +235,7 @@ MathJax.Hub.Config({
             <fieldset>
               <label for="name">Name</label>
               <input type="text" name="name" id="formula_text" class="text ui-widget-content ui-corner-all" />
-
+              <input type="hidden" class="formula xml_id">
 
             </fieldset>
             </form>

@@ -302,7 +302,7 @@ $('#sidebar').on('mouseout','.sortable',function(){
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'thumb':iterate.children[i].getAttribute('thumb')})
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'thumb':iterate.children[i].getAttribute('thumb')});
 
 
 
@@ -350,13 +350,14 @@ $('#sidebar').on('mouseout','.sortable',function(){
 	});
 
 	$('#mod-heading').click(function(e){
-		console.log(xml_id);
+		  console.log(xml_id);
 	    console.log($(this));
 	    clicked=$(this);
 
 	    if (topic_json[global_topic]==undefined) {
 	      topic_json[global_topic]=[];
 	    };
+
 		$( "#dialog-heading" ).dialog( "open" );
 	    e.preventDefault();
 	});
@@ -443,6 +444,16 @@ $('#sidebar').on('mouseout','.sortable',function(){
     console.log($(this));
     parent=$(this);
     xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            $('#header_text').val(current_topic[i]['data']);
+            break;
+      };
+    };
+
+
     $(".header.xml_id").attr('xml_id',xml_id);
     if (topic_json[global_topic]==undefined) {
       topic_json[global_topic]=[];
@@ -451,7 +462,42 @@ $('#sidebar').on('mouseout','.sortable',function(){
     e.preventDefault();
   });
 
+  $(document).on('click','.editing-subheader',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            $('#sub_header_text').val(current_topic[i]['data']);
+            break;
+      };
+    };
+
+
+    $(".subheader.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_topic]==undefined) {
+      topic_json[global_topic]=[];
+    };
+    $( "#dialog-sub-heading" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
 });
+
+// editing-subheader
+// editing-html
+// editing-image
+// editing-video
+// editing-audio
+// editing-formula
+
+
+
 
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return !(a.indexOf(i) > -1);});
