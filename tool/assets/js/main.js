@@ -295,21 +295,21 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0])});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent});
 
               // var parent_div=document.createElement("div");
 
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0]),'thumb':iterate.children[i].getAttribute('thumb')});
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb')});
 
 
 
               break;
 
         case "audio":
-              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':(new XMLSerializer()).serializeToString(iterate.children[i].getElementsByTagName('references')[0])});
+              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent});
               //   var parent_div=document.createElement("div");
 
 
