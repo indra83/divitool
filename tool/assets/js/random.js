@@ -667,6 +667,26 @@ $( "#dialog-formula" ).dialog({
             var val=$('#formula_text').val();
             i=i+1;
             var current_topic=topic_json[global_topic];
+
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".formula.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=val;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
+
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (i>=current_clicked) {
                   var temp=current_topic[i];
@@ -676,7 +696,7 @@ $( "#dialog-formula" ).dialog({
               }
               topic_json[global_topic]=current_topic;
               topic_json[global_topic].push({"type":"formula","data":val,"xml_id":(current_clicked)});
-
+            }
 
               refresh_dom();
 

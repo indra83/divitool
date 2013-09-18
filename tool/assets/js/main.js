@@ -487,6 +487,32 @@ $('#sidebar').on('mouseout','.sortable',function(){
   });
 
 
+  $(document).on('click','.editing-formula',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_topic];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            $('#formula_text').val(current_topic[i]['data']);
+            break;
+      };
+    };
+
+
+    $(".formula.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_topic]==undefined) {
+      topic_json[global_topic]=[];
+    };
+    $( "#dialog-formula" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+
 });
 
 // editing-subheader
