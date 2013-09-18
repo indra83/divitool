@@ -286,8 +286,8 @@ $('#sidebar').on('mouseout','.sortable',function(){
               break;
 
         case "html":
-              s=(new XMLSerializer()).serializeToString(iterate.children[i])
-              current_topic.push({'type':'html','data':escape(s),'xml_id':i})
+              // s=(new XMLSerializer()).serializeToString(iterate.children[i])
+              current_topic.push({'type':'html','data':escape(iterate.children[i].textContent),'xml_id':i})
               console.log("HTML");
 
 

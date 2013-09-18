@@ -933,7 +933,7 @@ function refresh_dom(){
 
               child = dom.createElement('html');
 
-              child.textContent=current_topic[i].data;
+              child.textContent = unescape(current_topic[i].data);
 
               dom.documentElement.appendChild(child);
 
