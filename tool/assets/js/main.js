@@ -17,6 +17,7 @@ after_chapter=[];
 
 
 $(function(){
+  $.ajaxSetup({ cache: false });
 	$( "#sidebar" ).sortable({
     start: function (e, ui) {
       // alert("started");
@@ -348,6 +349,34 @@ $('#sidebar').on('mouseout','.sortable',function(){
 		$('#dialog-add').dialog('open');
 		return false;
 	});
+
+
+  $('#sidebar').on('click','.del-btn',function(){
+    current_clicked=parseInt($(this).attr('xml_index'),10);
+    // $('#dialog-add').dialog('open');
+    var result = confirm("Are you sure you want to delete this element?");
+
+    if (result) {
+      current_topic=topic_json[global_topic];
+      for (var i = 0; i < current_topic.length; i++) {
+        if (current_topic[i]['xml_id'] == current_clicked) {
+          current_topic.splice(i,1);
+          break;
+        }
+      }
+      topic_json[global_topic]=current_topic;
+      refresh_dom();
+    }
+    return false;
+  });
+
+
+
+
+
+
+
+
 
 	$('#mod-heading').click(function(e){
 		  console.log(xml_id);

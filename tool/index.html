@@ -143,7 +143,7 @@ MathJax.Hub.Config({
               <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST">
               <fieldset>
                 <label for="name">File : </label>
-                <input type="file" name="file1" id="imagefilemod">
+                <input type="file" name="file1" id="imagefilemod" ==>
                 <textarea id="img-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
                 <input type="hidden" class="image xml_id">
@@ -160,7 +160,7 @@ MathJax.Hub.Config({
               <form>
               <fieldset>
                 <label for="name">File : </label>
-                <input type="file" id="audiofilemod">
+                <input type="file" id="audiofilemod" accept ="audio/mpeg, audio/mp4, audio/basic, audio/ogg, audio/webm">
                 <textarea id="audio-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
                 <input type="hidden" class="audio xml_id">
@@ -213,9 +213,9 @@ MathJax.Hub.Config({
               <fieldset>
                 <label for="name">Name</label>
                 <p>Video File</p>
-                <input type="file" id="videofilemod">
+                <input type="file" id="videofilemod" accept="video/mpeg, video/mp4, video/ogg, video/webm, video/x-flv">
                 <p>Thumbnail File</p>
-                <input type="file" id="thumbfilemod">
+                <input type="file" id="thumbfilemod" accept ="image/png, image/gif,image/pjpeg, image/jpeg">
                 <textarea id="video-attr" class="text ui-widget-content ui-corner-all"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
                 <input type="hidden" class="video xml_id">
@@ -352,7 +352,7 @@ MathJax.Hub.Config({
   </script>
 
 <script>
-        tinymce.init({selector:'textarea.html_input'});
+        tinymce.init({selector:'textarea.html_input',paste_as_text: true});
 </script>
 
 
