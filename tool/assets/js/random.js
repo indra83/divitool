@@ -397,35 +397,10 @@ $( "#dialog-image" ).dialog({
             var current_topic=topic_json[global_topic];
 
 
-            if (editing_state == true) {
-              xml_id=parseInt($(".image.xml_id").attr('xml_id'));
-              editing_state=false;
+            var deferred
 
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                  current_topic[i].data=file_name;
-                  current_topic[i].attribution=attr_text;
-                  topic_json[global_topic]=current_topic;
-                  break;
-                };
-              }
+            // var deferred1
 
-              // $('#header_text').val()
-
-            }else{
-
-
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (i>=current_clicked) {
-                  var temp=current_topic[i];
-                  temp.xml_id = parseInt(temp.xml_id)+1;
-                  current_topic[i]=temp;
-                }
-              }
-              topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
-
-            }
 
             for (var i = 0, f; f = files[i]; i++) {
             //    $.ajax({
@@ -467,6 +442,39 @@ $( "#dialog-image" ).dialog({
             // });
 
             // $('#image_form_submit').submit();
+
+            }
+
+
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".image.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=file_name;
+                  current_topic[i].attribution=attr_text;
+                  topic_json[global_topic]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (i>=current_clicked) {
+                  var temp=current_topic[i];
+                  temp.xml_id = parseInt(temp.xml_id)+1;
+                  current_topic[i]=temp;
+                }
+              }
+              topic_json[global_topic]=current_topic;
+              topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
 
             }
 
@@ -1114,7 +1122,8 @@ function refresh_dom(){
 
 
         case "formula":
-                preview_pane.append("<p>"+current_topic[i].data+"</p>");
+
+                preview_pane.append('\\['+current_topic[i].data+'\\]');
                 MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-formula header-d">FORMULA</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1214,6 +1223,26 @@ function uploadJSON(url, file,name) {
   xhr.send(formData);  // multipart/form-data
 }
 
+
+
+function uploadVideoFiles(url, file) {
+  var formData = new FormData();
+
+  // for (var i = 0, file; file = files[i]; ++i) {
+    formData.append(file.name, file,file.name);
+  // }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', url, true);
+  xhr.onload = function(e) {
+    console.log(e);
+  };
+
+  xhr.send(formData);  // multipart/form-data
+
+}
+
+
 function uploadFiles(url, file) {
   var formData = new FormData();
 
@@ -1223,7 +1252,10 @@ function uploadFiles(url, file) {
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', url, true);
-  xhr.onload = function(e) { console.log(e) };
+  xhr.onload = function(e) {
+    console.log(e);
+  };
 
   xhr.send(formData);  // multipart/form-data
+
 }
