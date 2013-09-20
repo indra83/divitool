@@ -10,3 +10,16 @@
 li a{
 	cursor: pointer;
 }
+
+#overlay{
+	position: fixed;
+	height: 100%;
+	width:100%;
+	background-color: #666;
+	z-index: 10;
+	display:none;
+	filter: alpha(opacity=75); /* internet explorer */
+	-khtml-opacity: 0.75;      /* khtml, old safari */
+	-moz-opacity: 0.75;       /* mozilla, netscape */
+	opacity: 0.75;           /* fx, safari, opera */
+}

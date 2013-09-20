@@ -397,9 +397,16 @@ $( "#dialog-image" ).dialog({
             var current_topic=topic_json[global_topic];
 
 
-            var deferred
+            var deferred = new $.Deferred();
+              // var deferred1 = new $.Deferred();
+              defArray.push(deferred);
+              // defArray.push(deferred1);
 
             // var deferred1
+
+            var img_dlg=$(this);
+
+
 
 
             for (var i = 0, f; f = files[i]; i++) {
@@ -425,7 +432,7 @@ $( "#dialog-image" ).dialog({
 
             // $('#image_form_submit').submit();
 
-            uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
+            uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred)
 
             // $('#image_form_submit').submit(function(){
 
@@ -449,32 +456,53 @@ $( "#dialog-image" ).dialog({
 
 
             if (editing_state == true) {
-              xml_id=parseInt($(".image.xml_id").attr('xml_id'));
-              editing_state=false;
-
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                  current_topic[i].data=file_name;
-                  current_topic[i].attribution=attr_text;
-                  topic_json[global_topic]=current_topic;
-                  break;
-                };
-              }
 
               // $('#header_text').val()
+
+              $.when.apply($, defArray).then( function() {
+                xml_id=parseInt($(".image.xml_id").attr('xml_id'));
+                editing_state=false;
+              //this code is called after all the ajax calls are done
+                // sanitise_media();
+                 // topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+                 for(var i=0, len=current_topic.length; i < len; i++){
+                    if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                      current_topic[i].data=file_name;
+                      current_topic[i].attribution=attr_text;
+                      topic_json[global_topic]=current_topic;
+                      break;
+                    };
+                  }
+
+                 $("#overlay").hide();
+                refresh_dom();
+
+                img_dlg.dialog( "close" );
+
+              });
 
             }else{
 
 
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (i>=current_clicked) {
-                  var temp=current_topic[i];
-                  temp.xml_id = parseInt(temp.xml_id)+1;
-                  current_topic[i]=temp;
-                }
-              }
-              topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+
+              $.when.apply($, defArray).then( function() {
+                      for(var i=0, len=current_topic.length; i < len; i++){
+                          if (i>=current_clicked) {
+                            var temp=current_topic[i];
+                            temp.xml_id = parseInt(temp.xml_id)+1;
+                            current_topic[i]=temp;
+                          }
+                        }
+                        topic_json[global_topic]=current_topic;
+                //this code is called after all the ajax calls are done
+                // sanitise_media();
+                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+                $("#overlay").hide();
+                refresh_dom();
+
+                img_dlg.dialog( "close" );
+              });
+
 
             }
 
@@ -488,9 +516,7 @@ $( "#dialog-image" ).dialog({
               // }
 
 
-              refresh_dom();
 
-            $( this ).dialog( "close" );
 
         },
         Cancel: function() {
@@ -526,10 +552,23 @@ $( "#dialog-audio" ).dialog({
             //   }
             //   topic_json[global_topic]=current_topic;
             //   topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id+1)});
+              var audio_dialog=$(this);
+              var deferred = new $.Deferred();
+              // var deferred1 = new $.Deferred();
+              defArray.push(deferred);
 
-            var attr_text=$('#audio-attr').val();
+              var attr_text=$('#audio-attr').val();
             var files=document.getElementById('audiofilemod').files;
             $("#overlay").show();
+
+            for (var i = 0, f; f = files[i]; i++) {
+              uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred);
+            }
+
+            $.when.apply($, defArray).then( function() {
+
+
+
             var fslocation= global_chapter+"/"+global_topic+"/media";
             console.log(fslocation);
             var file_name=files[0].name;
@@ -567,12 +606,11 @@ $( "#dialog-audio" ).dialog({
 
             }
 
-            for (var i = 0, f; f = files[i]; i++) {
-              uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f);
-            }
+
 
             refresh_dom();
-
+            audio_dialog.dialog( "close" );
+          });
 
 
 
@@ -585,7 +623,7 @@ $( "#dialog-audio" ).dialog({
 
               // refresh_dom();
 
-            $( this ).dialog( "close" );
+
 
         },
         Cancel: function() {
@@ -624,7 +662,7 @@ $( "#dialog-video" ).dialog({
             //   }
             //   topic_json[global_topic]=current_topic;
             //   topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id+1)});
-
+            var vide_dialog = $(this);
             var attr_text=$('#video-attr').val();
             var files=document.getElementById('videofilemod').files;
             $("#overlay").show();
@@ -640,6 +678,20 @@ $( "#dialog-video" ).dialog({
 
             var file_name1=files1[0].name;
 
+              var deferred = new $.Deferred();
+              var deferred1 = new $.Deferred();
+              defArray.push(deferred);
+              defArray.push(deferred1);
+              for (var i = 0, f; f = files[i]; i++) {
+                uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred);
+              }
+
+            for (var i = 0, f; f = files1[i]; i++) {
+              uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred1);
+            }
+
+            $.when.apply($, defArray).then( function() {
+              $('#overlay').hide();
             if (editing_state == true) {
               xml_id=parseInt($(".video.xml_id").attr('xml_id'));
               editing_state=false;
@@ -680,24 +732,15 @@ $( "#dialog-video" ).dialog({
               topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1});
             }
 
-              // var deferred = new $.Deferred();
-              // var deferred1 = new $.Deferred();
-              // defArray.push(deferred);
-              // defArray.push(deferred1);
-              for (var i = 0, f; f = files[i]; i++) {
-                uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
-              }
 
-            for (var i = 0, f; f = files1[i]; i++) {
-              uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f)
-            }
 
             // $.when.apply($, defArray).then( function() {
               //this code is called after all the ajax calls are done
+              vide_dialog.dialog( "close" );
               refresh_dom();
             // });
 
-
+            });
 
 
 
@@ -711,7 +754,7 @@ $( "#dialog-video" ).dialog({
 
               // refresh_dom();
 
-            $( this ).dialog( "close" );
+
 
         },
         Cancel: function() {
@@ -1236,6 +1279,34 @@ function uploadVideoFiles(url, file) {
   xhr.open('POST', url, true);
   xhr.onload = function(e) {
     console.log(e);
+  };
+
+  xhr.send(formData);  // multipart/form-data
+
+}
+
+
+function uploadFilesImage(url, file,deferred) {
+  var formData = new FormData();
+
+  // for (var i = 0, file; file = files[i]; ++i) {
+    formData.append(file.name, file,file.name);
+  // }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', url, true);
+  xhr.onload = function(e) {
+
+    if (this.status == 200) {
+      $("#overlay").hide();
+      deferred.resolve();
+
+      // Note: .response instead of .responseText
+      // var blob = new Blob([this.response], {type: 'image/png'});
+    }else{
+      $("#overlay").hide();
+      deferred.reject();
+    }
   };
 
   xhr.send(formData);  // multipart/form-data
