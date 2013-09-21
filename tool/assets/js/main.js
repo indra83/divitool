@@ -288,7 +288,7 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
         case "html":
               // s=(new XMLSerializer()).serializeToString(iterate.children[i])
-              current_topic.push({'type':'html','data':escape(iterate.children[i].textContent),'xml_id':i})
+              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent})
               console.log("HTML");
 
 
@@ -296,21 +296,21 @@ $('#sidebar').on('mouseout','.sortable',function(){
 
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent});
 
               // var parent_div=document.createElement("div");
 
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb')});
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent});
 
 
 
               break;
 
         case "audio":
-              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent});
+              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent});
               //   var parent_div=document.createElement("div");
 
 

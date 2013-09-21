@@ -384,6 +384,8 @@ $( "#dialog-image" ).dialog({
 
             var attr_text=$('#img-attr').val();
 
+            var desc_text=$('#img-desc').val();
+
 
 
 
@@ -469,6 +471,7 @@ $( "#dialog-image" ).dialog({
                     if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                       current_topic[i].data=file_name;
                       current_topic[i].attribution=attr_text;
+                      current_topic[i].description=desc_text;
                       topic_json[global_topic]=current_topic;
                       break;
                     };
@@ -496,7 +499,7 @@ $( "#dialog-image" ).dialog({
                         topic_json[global_topic]=current_topic;
                 //this code is called after all the ajax calls are done
                 // sanitise_media();
-                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text});
                 $("#overlay").hide();
                 refresh_dom();
 
@@ -558,6 +561,7 @@ $( "#dialog-audio" ).dialog({
               defArray.push(deferred);
 
               var attr_text=$('#audio-attr').val();
+              var desc_text=$('#audio-desc').val();
             var files=document.getElementById('audiofilemod').files;
             $("#overlay").show();
 
@@ -585,6 +589,7 @@ $( "#dialog-audio" ).dialog({
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=file_name;
                   current_topic[i].attribution=attr_text;
+                  current_topic[i].description=desc_text;
                   topic_json[global_topic]=current_topic;
                   break;
                 };
@@ -602,7 +607,7 @@ $( "#dialog-audio" ).dialog({
                 }
               }
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+              topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text});
 
             }
 
@@ -664,6 +669,7 @@ $( "#dialog-video" ).dialog({
             //   topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id+1)});
             var vide_dialog = $(this);
             var attr_text=$('#video-attr').val();
+            var desc_text=$('#video-desc').val();
             var files=document.getElementById('videofilemod').files;
             $("#overlay").show();
             var fslocation= global_chapter+"/"+global_topic+"/media";
@@ -701,6 +707,7 @@ $( "#dialog-video" ).dialog({
                   current_topic[i].data=file_name;
                   current_topic[i].thumb=file_name1;
                   current_topic[i].attribution=attr_text;
+                  current_topic[i].description=desc_text;
                   topic_json[global_topic]=current_topic;
                   break;
                 };
@@ -729,7 +736,7 @@ $( "#dialog-video" ).dialog({
 
 
               topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1});
+              topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1,"description":desc_text});
             }
 
 
@@ -853,6 +860,7 @@ $( "#dialog-html" ).dialog({
 
 
                 var current_topic=topic_json[global_topic];
+                var attr_text=$('#html-attr').val();
 
 
                 if (editing_state == true) {
@@ -878,7 +886,7 @@ $( "#dialog-html" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked)});
+                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text});
                 }
 
 
@@ -978,6 +986,7 @@ function refresh_dom(){
         case "html":
               console.log("HTML");
               preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div>");
+              preview_pane.append("Reference : "+current_topic[i].attribution);
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -985,7 +994,18 @@ function refresh_dom(){
 
               child = dom.createElement('html');
 
-              child.textContent = unescape(current_topic[i].data);
+              // child.textContent = unescape(current_topic[i].data);
+
+              data1=dom.createElement('data');
+              ref.textContent=unescape(current_topic[i].data);
+
+              child.appendChild(data1);
+
+              ref=dom.createElement('references');
+              ref.textContent=current_topic[i].attribution;
+
+
+              child.appendChild(ref);
 
               dom.documentElement.appendChild(child);
 
@@ -1017,7 +1037,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML=attr_text;
+              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description;
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -1030,6 +1050,11 @@ function refresh_dom(){
               child = dom.createElement('image');
 
               child.setAttribute('src',current_topic[i].data);
+
+              desc=dom.createElement('description');
+              desc.textContent=current_topic[i].description;
+
+              child.appendChild(desc);
 
               ref=dom.createElement('references');
               ref.textContent=attr_text;
@@ -1069,7 +1094,7 @@ function refresh_dom(){
 
               // if (current_topic[i]['thumb1'] == undefined) {
                 var custom_text=document.createElement("p");
-                custom_text.innerHTML=attr_text;
+                custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description;
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1093,6 +1118,11 @@ function refresh_dom(){
 
               // img1=dom.createElement('image');
               child.setAttribute('thumb',current_topic[i]['thumb']);
+
+              desc=dom.createElement('description');
+              desc.textContent=current_topic[i].description;
+
+              child.appendChild(desc);
 
               ref=dom.createElement('references');
               ref.textContent=attr_text;
@@ -1132,7 +1162,7 @@ function refresh_dom(){
 
                 // if (current_topic[i]['thumb1'] == undefined) {
                   var custom_text=document.createElement("p");
-                  custom_text.innerHTML=attr_text;
+                  custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description;
                   parent_div.appendChild(span);
                   parent_div.appendChild(custom_text);
                   // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1147,6 +1177,11 @@ function refresh_dom(){
               child = dom.createElement('audio');
 
               child.setAttribute('src',current_topic[i].data);
+
+              desc=dom.createElement('description');
+              desc.textContent=current_topic[i].description;
+
+              child.appendChild(desc);
 
               ref=dom.createElement('references');
               ref.textContent=attr_text;
