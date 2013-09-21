@@ -651,7 +651,7 @@ var defArray=[];
 // VIDEO START
 $( "#dialog-video" ).dialog({
       autoOpen: false,
-      height: 300,
+      height: 500,
       width: 350,
       modal: true,
       buttons: {
