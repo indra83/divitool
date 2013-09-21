@@ -55,7 +55,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		connector.setPort(8080);
 		server.addConnector(connector);
 
-		String webDir = ToolServer.class.getClassLoader().getResource(".").toExternalForm();
+		String webDir = ToolServer.class.getClassLoader().getResource("tool").toExternalForm();
 		ResourceHandler resHandler = new ResourceHandler();
 		resHandler.setResourceBase(webDir);
 		
