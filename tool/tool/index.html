@@ -19,7 +19,10 @@
 
     <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
-  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+  "SVG": {
+    scale: 120
+  }
 });
 </script>
 
@@ -382,7 +385,7 @@ $(document).on('focusin', function(e) {
   }
 });
 
-        tinymce.init({selector:'textarea.html_input',paste_as_text: true, plugins:'diviformula'});
+        tinymce.init({selector:'textarea.html_input',paste_as_text: true, plugins:'diviformula',valid_elements : '*[*]'});
         tinymce.ScriptLoader.load('MathJax/MathJax.js?config=TeX-AMS-MML_SVG');
 
 </script>
