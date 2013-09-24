@@ -7,7 +7,7 @@
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
-<script type="text/javascript" src="MathJax/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -386,7 +386,7 @@ $(document).on('focusin', function(e) {
 });
 
         tinymce.init({selector:'textarea.html_input',paste_as_text: true, plugins:'diviformula',valid_elements : '*[*]'});
-        tinymce.ScriptLoader.load('MathJax/MathJax.js?config=TeX-AMS-MML_SVG');
+        tinymce.ScriptLoader.load('http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG');
 
 </script>
 
