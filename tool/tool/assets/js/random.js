@@ -863,7 +863,7 @@ $( "#dialog-html" ).dialog({
                 var attr_text=$('#html-attr').val();
 
 
-                if (editing_state == true) {
+            if (editing_state == true) {
               xml_id=parseInt($(".html.xml_id").attr('xml_id'));
               editing_state=false;
 
@@ -901,6 +901,7 @@ $( "#dialog-html" ).dialog({
               refresh_dom();
 
             tinyMCE.activeEditor.setContent('');
+            $('#html-attr').val('');
             $( this ).dialog( "close" );
 
         },
@@ -997,7 +998,7 @@ function refresh_dom(){
               // child.textContent = unescape(current_topic[i].data);
 
               data1=dom.createElement('data');
-              ref.textContent=unescape(current_topic[i].data);
+              data1.textContent=unescape(current_topic[i].data);
 
               child.appendChild(data1);
 
