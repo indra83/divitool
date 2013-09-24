@@ -13,8 +13,10 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -34,6 +36,19 @@ public class ToolServer extends JFrame implements ActionListener {
 	JFileChooser				chooser;
 	String						choosertitle;
 
+	SwingWorker					worker			= new SwingWorker<Void, Void>() {
+													@Override
+													public Void doInBackground() {
+														startServer();
+														return null;
+													}
+
+													@Override
+													public void done() {
+
+													}
+												};
+
 	public static void main(String[] args) {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -44,8 +59,6 @@ public class ToolServer extends JFrame implements ActionListener {
 			}
 		});
 		System.out.println("started UI...");
-
-		startServer();
 	}
 
 	private static void startServer() {
@@ -58,7 +71,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		String webDir = ToolServer.class.getClassLoader().getResource("tool").toExternalForm();
 		ResourceHandler resHandler = new ResourceHandler();
 		resHandler.setResourceBase(webDir);
-		
+
 		ContextHandler staticHandler = new ContextHandler("/tool");
 		staticHandler.setHandler(resHandler);
 
@@ -73,10 +86,14 @@ public class ToolServer extends JFrame implements ActionListener {
 		ServletContextHandler servletContextHandler = new ServletContextHandler(server, "/savefile", true, false);
 		servletContextHandler.addServlet(FileUploadServlet.class, "/*");
 
+		ServletContextHandler formulaContextHandler = new ServletContextHandler(server, "/saveformula", true, false);
+		formulaContextHandler.addServlet(FormulaServlet.class, "/*");
+
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(staticHandler);
 		contexts.addHandler(booksHandler);
 		contexts.addHandler(servletContextHandler);
+		contexts.addHandler(formulaContextHandler);
 		contexts.addHandler(new DefaultHandler());
 		server.setHandler(contexts);
 
@@ -95,6 +112,9 @@ public class ToolServer extends JFrame implements ActionListener {
 
 	public static File getBooksDir() {
 		Preferences prefs = Preferences.userNodeForPackage(ToolServer.class);
+		// DEBUG
+		// prefs.remove(PREF_BOOKS_DIR);
+		// END DEBUG
 		String booksDir = prefs.get(PREF_BOOKS_DIR, null);
 		if (booksDir != null) {
 			return new File(booksDir);
@@ -118,8 +138,14 @@ public class ToolServer extends JFrame implements ActionListener {
 		launchBrowser.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (getBooksDir() == null) {
+					JOptionPane.showMessageDialog(null, "Please select the book directory");
+					return;
+				}
+				selectBooksDir.setEnabled(false);
 				Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
 				if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+					worker.execute();
 					try {
 						desktop.browse(new URI("http://localhost:8080/tool/index.html"));
 					} catch (Exception ee) {
