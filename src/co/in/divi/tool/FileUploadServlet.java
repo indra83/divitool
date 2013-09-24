@@ -39,7 +39,11 @@ public class FileUploadServlet extends HttpServlet {
 				} else {
 					String name = fileItem.getName();
 					System.out.println("NAME:" + name);
-					File dirToUpload = new File(repository.getAbsolutePath(), request.getPathInfo());
+					File dirToUpload;
+					if (request.getPathInfo() != null && request.getPathInfo().length() > 0)
+						dirToUpload = new File(repository.getAbsolutePath(), request.getPathInfo());
+					else
+						dirToUpload = repository;
 					if (!dirToUpload.exists())
 						dirToUpload.mkdirs();
 					File uploadedFile = new File(dirToUpload, name);
