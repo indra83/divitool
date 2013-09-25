@@ -73,7 +73,7 @@ $('#dialog-topic').dialog({
             file = new Blob([JSON.stringify(master_json, undefined, 2)]);
             file.name="master.json";
 
-            uploadFiles('/savefile/master',file);
+            uploadFiles('/savefile/',file);
 
             refresh_chapters();
 
@@ -81,7 +81,7 @@ $('#dialog-topic').dialog({
 
 
 
-            // $.post('/savefile/master.json', {file1:master_json}).done(function(data) {
+            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
             //   console.log(data);
             // });
 
@@ -131,13 +131,76 @@ $('#dialog-chapter').dialog({
             // a.textContent = 'Download file!';
 
 
-            uploadFiles('/savefile/master',file);
+            uploadFiles('/savefile/',file);
 
 
 
 
 
-            // $.post('/savefile/master.json', {file1:master_json}).done(function(data) {
+            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
+            //   console.log(data);
+            // });
+
+            refresh_chapters();
+
+            $( this ).dialog( "close" );
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#sub_header_text').val('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
+
+$('#dialog-book').dialog({
+      autoOpen: false,
+      height: 450,
+      width: 350,
+      modal: true,
+      buttons: {
+        "Book Edit": function() {
+            // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
+            // if (master_json.chapters[parseInt($('#chapter_no').val())-1] != undefined) {
+                // master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
+            // }else{
+              // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+              // if (result) {
+                // master_json.chapters[parseInt($('#chapter_no').val())-1]={'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())};
+              // }
+            // };
+
+            master_json['bookname']=$('#bookname').val();
+            master_json['bookid']=$('#bookid').val();
+            master_json['courseid']=$('#courseid').val();
+            master_json['order']=$('#bookorder').val();
+            master_json['version']=$('#bookversion').val();
+            // master_json['']=
+
+
+            window.URL = window.webkitURL || window.URL;
+            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+            file.name="master.json";
+            // file.append(master_json);
+            // var a = document.getElementById("downloadFile");
+            // a.hidden = '';
+            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+            // a.download = 'filename.txt';
+            // a.textContent = 'Download file!';
+
+
+            uploadFiles('/savefile/',file);
+
+
+
+
+
+            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
             //   console.log(data);
             // });
 
@@ -159,6 +222,13 @@ $('#dialog-chapter').dialog({
 
 function refresh_chapters(){
   $('#book-nav').html('');
+
+        $('#bookname-cont').html(' Book Name : '+master_json['bookname']);
+        $('#bookid-cont').html(' Book ID : '+master_json['bookid']);
+        $('#courseid-cont').html(' Course ID : '+master_json['courseid']);
+        $('#bookorder-cont').html(' Book Order : '+master_json['order']);
+        $('#bookversion-cont').html(' Book Version : '+master_json['version']);
+
 for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
       var link=$('<a>').append(master_json.chapters[i]['name']);
@@ -172,10 +242,13 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
         for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
+            var del_btn=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
+            // <button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
             link1.addClass('topic_link');
             link1.attr('chapter-id',i);
             link1.attr('topic-id',j);
             a1.append(link1);
+            a1.append(del_btn);
             top.prepend(a1);
         }
         a.append(top);
@@ -186,6 +259,8 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       $('#book-nav').prepend(a);
 
     };
+
+
 
     $( ".sortchapters" ).sortable({
     start: function (e, ui) {
@@ -954,7 +1029,7 @@ function refresh_dom(){
         case "header":
               preview_pane.append("<h1>"+current_topic[i].data+"</h1>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
 
@@ -971,7 +1046,7 @@ function refresh_dom(){
         case "subheader":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
@@ -990,7 +1065,7 @@ function refresh_dom(){
               preview_pane.append("Reference : "+current_topic[i].attribution);
               // preview_pane.attr('contenteditable','false');
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
               child = dom.createElement('html');
@@ -1044,7 +1119,7 @@ function refresh_dom(){
 
               preview_pane.append(parent_div);
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
 
@@ -1110,7 +1185,7 @@ function refresh_dom(){
               preview_pane.append(parent_div);
 
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-video header-d">VIDEO</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-video header-d">VIDEO</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
               child = dom.createElement('video');
@@ -1172,7 +1247,7 @@ function refresh_dom(){
 
 
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-audio header-d">AUDIO</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-audio header-d">AUDIO</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
               child = dom.createElement('audio');
@@ -1205,7 +1280,7 @@ function refresh_dom(){
                 preview_pane.append('\\['+current_topic[i].data+'\\]');
                 // MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-formula header-d">FORMULA</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-formula header-d">FORMULA</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
                 // loadImage('http://latex.codecogs.com/png.latex?'+current_topic[i].data,insert_formula,preview_pane);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1222,7 +1297,7 @@ function refresh_dom(){
 
     }
   }
-side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>');
+side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
 
   // $('#side_bar').sortable();
   // $( "#side_bar" ).disableSelection();

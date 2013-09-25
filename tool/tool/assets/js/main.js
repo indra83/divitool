@@ -137,7 +137,7 @@ $( ".sortchapters" ).sortable({
 
 
   $.ajax({
-      url: "/getfiles/master/master.json",
+      url: "/getfiles/master.json",
     }).done(function(data) {
       // $( this ).addClass( "done" );
 
@@ -158,19 +158,29 @@ $( ".sortchapters" ).sortable({
         for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
+            var del_btn=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
+            var edit_btn=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
             link1.addClass('topic_link');
             link1.attr('chapter-id',i);
             link1.attr('topic-id',j);
+            a1.append(edit_btn).append('&nbsp;');
             a1.append(link1);
+            a1.append('&nbsp;').append(del_btn);
             top.prepend(a1);
         }
         a.append(top);
       }
 
       $('#book-nav').prepend(a);
-      $('#book-desc').html(master_json['name']);
+      // $('#book-desc').html(master_json['name']);
 
     };
+
+        $('#bookname-cont').html(' Book Name : '+master_json['bookname']);
+        $('#bookid-cont').html(' Book ID : '+master_json['bookid']);
+        $('#courseid-cont').html(' Course ID : '+master_json['courseid']);
+        $('#bookorder-cont').html(' Book Order : '+master_json['order']);
+        $('#bookversion-cont').html(' Book Version : '+master_json['version']);
 
     $( ".sortchapters" ).sortable({
     start: function (e, ui) {
@@ -218,15 +228,27 @@ $( ".sortchapters" ).sortable({
     }).fail(function(data){
       console.log(data);
       if (data.status==404) {
-        master_json={'name':'default book name','chapters':[]};
-        $('#book-desc').html(master_json['name']);
+        master_json={'bookname':'default book name','bookid':'bookid','courseid':'courseid','version':0,'order':0,'chapters':[]};
+        // $('#book-desc').html(master_json['name']);
+        $('#bookname-cont').append(' Book Name : '+master_json['bookname']);
+        $('#bookid-cont').append(' Book ID : '+master_json['bookid']);
+        $('#courseid-cont').append(' Course ID : '+master_json['courseid']);
+        $('#bookorder-cont').append(' Book Order : '+master_json['order']);
+        $('#bookversion-cont').append(' Book Version : '+master_json['version']);
       };
 
 
     });
 
+
+//     'bookId' - id (alpha numeric and '_')
+// 'courseId' - id
+// 'name' - String
+// 'version' - int
+// 'orderNo' - int
+
 // try{
-//   var master=$.get('/getfiles/master/master.json');
+//   var master=$.get('/getfiles/master.json');
 // }catch(err){
 
 // }
@@ -250,6 +272,16 @@ $('#sidebar').on('mouseout','.sortable',function(){
     $(this).children('.inner-btn').hide();
 });
 
+$(document).on('click','#bookedit',function(){
+  $('#bookname').val(master_json['bookname']);
+  $('#bookid').val(master_json['bookid']);
+  $('#courseid').val(master_json['courseid']);
+  $('#bookorder').val(master_json['order']);
+  $('#bookversion').val(master_json['version']);
+  $('#dialog-book').dialog('open');
+  return false;
+
+});
 
 
 
