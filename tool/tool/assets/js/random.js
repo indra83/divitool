@@ -1203,7 +1203,7 @@ function refresh_dom(){
         case "formula":
 
                 preview_pane.append('\\['+current_topic[i].data+'\\]');
-                MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
+                // MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-formula header-d">FORMULA</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);

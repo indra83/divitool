@@ -458,6 +458,8 @@ $('#sidebar').on('mouseout','.sortable',function(){
     console.log(xml_id);
     console.log($(this));
     clicked=$(this);
+    tinymce.activeEditor.chapterid=master_json.chapters[global_chapter]['id'];
+    tinymce.activeEditor.topic_id=master_json.chapters[global_chapter].topics[global_topic]['id'];
 
     if (topic_json[global_topic]==undefined) {
       topic_json[global_topic]=[];
