@@ -1,0 +1,43 @@
+
+              <fieldset>
+                <label for="name">File : </label>
+                <input type="file" name="file1" id="imagefilemod2">
+
+                <button class="btn" id='upl'>Upload</button>
+
+              </fieldset>
+
+
+              <script type="text/javascript">
+              var el = document.getElementById('upl');
+              el.addEventListener("click", uploadIn, false);
+
+              // $ = editor.getWin().parent.jQuery;
+
+              function uploadIn(){
+              	var files=document.getElementById('imagefilemod2').files;
+              	var formData = new FormData();
+              	file=files[0]
+
+			  // for (var i = 0, file; file = files[i]; ++i) {
+			    formData.append(file.name, file,file.name);
+			  // }
+
+			  var xhr = new XMLHttpRequest();
+			  xhr.open('POST', url, true);
+			  xhr.onload = function(e) {
+			    console.log(e);
+			    console.log(editor);
+			  };
+
+			  xhr.send(formData);  // multipart/form-data
+
+              	return false;
+              }
+
+
+
+
+
+              </script>
+
