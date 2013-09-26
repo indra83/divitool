@@ -516,39 +516,57 @@ $( "#dialog-sub-heading" ).dialog({
       buttons: {
         "Insert Sub-Heading": function() {
             var val=$('#sub_header_text').val();
-            // i=i+1;
-            var current_topic=topic_json[global_topic];
-            if (editing_state == true) {
-              xml_id=parseInt($(".subheader.xml_id").attr('xml_id'));
-              editing_state=false;
+            var id=$('#subheadingid').val();
+            i=i+1;
 
+            var uniqueness=true;
+            var regex=false;
 
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                  current_topic[i].data=val;
-                  topic_json[global_topic]=current_topic;
-                  break;
-                };
-              }
-
-              // $('#header_text').val()
-
-            }else{
-
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (i>=current_clicked) {
-                  var temp=current_topic[i];
-                  temp.xml_id = parseInt(temp.xml_id)+1;
-                  current_topic[i]=temp;
+            for (var i = 0; i < topic_json[global_topic].length; i++) {
+                if(topic_json[global_topic][i]['id'] == id){
+                  uniqueness=false;
                 }
+            };
+
+            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The ID is wrong. It can only include alpha numerals and (_)");
+            }else if(!uniqueness){
+              alert("The ID is not unique");
+            }else{
+                // i=i+1;
+                var current_topic=topic_json[global_topic];
+                if (editing_state == true) {
+                  xml_id=parseInt($(".subheader.xml_id").attr('xml_id'));
+                  editing_state=false;
+
+
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                      current_topic[i].data=val;
+                      topic_json[global_topic]=current_topic;
+                      break;
+                    };
+                  }
+
+                  // $('#header_text').val()
+
+                }else{
+
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (i>=current_clicked) {
+                      var temp=current_topic[i];
+                      temp.xml_id = parseInt(temp.xml_id)+1;
+                      current_topic[i]=temp;
+                    }
+                  }
+                  topic_json[global_topic]=current_topic;
+                  topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(current_clicked),"id":id});
+                }
+
+                  refresh_dom();
+
+                $( this ).dialog( "close" );
               }
-              topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(current_clicked)});
-            }
-
-              refresh_dom();
-
-            $( this ).dialog( "close" );
 
         },
         Cancel: function() {
@@ -557,6 +575,7 @@ $( "#dialog-sub-heading" ).dialog({
       },
       close: function() {
         $('#sub_header_text').val('');
+        $('#subheadingid').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -572,16 +591,6 @@ $( "#dialog-image" ).dialog({
       buttons: {
         "Insert Image": function() {
 
-            // var val=$('#sub_header_text').val();
-            // i=i+1;
-            // var current_topic=topic_json[global_topic];
-            //   for(var i=0, len=current_topic.length; i < len; i++){
-            //     var temp=current_topic[i];
-            //     temp.xml_id = parseInt(temp.xml_id)+1;
-            //     current_topic[i]=temp;
-            //   }
-            //   topic_json[global_topic]=current_topic;
-            //   topic_json[global_topic].push({"type":"subheader","data":val,"xml_id":(xml_id+1)});
 
             var attr_text=$('#img-attr').val();
 
@@ -589,130 +598,107 @@ $( "#dialog-image" ).dialog({
 
             var full_screen=$('#fullscheck').is(':checked');
 
+            var id=$('#headerid').val();
+            i=i+1;
 
+            var uniqueness=true;
+            var regex=false;
 
+            for (var i = 0; i < topic_json[global_topic].length; i++) {
+                if(topic_json[global_topic][i]['id'] == id){
+                  uniqueness=false;
+                }
+            };
 
-            var files=document.getElementById('imagefilemod').files;
-            $("#overlay").show();
-            var fslocation= global_chapter+"/"+global_topic+"/media";
-            console.log(fslocation);
-            var file_name=files[0].name;
-            insert=true;
-
-            var current_topic=topic_json[global_topic];
-
-
-            var deferred = new $.Deferred();
-              // var deferred1 = new $.Deferred();
-              defArray.push(deferred);
-              // defArray.push(deferred1);
-
-            // var deferred1
-
-            var img_dlg=$(this);
-
-
-
-
-            for (var i = 0, f; f = files[i]; i++) {
-            //    $.ajax({
-            //   url: '/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],
-            //   type: 'POST',
-            //   data:{file1:f},
-            //   cache: false,
-            //   contentType:false,
-            //   processData: false,
-            //   data: master_json,
-            //   //dataType: "jsonP",
-            //   success: function(jsonData) {alert('POST alert'); console.log(jsonData) ; },
-            //   error : function(XMLHttpRequest, textStatus, errorThrown) {
-            //             console.log('An Ajax error was thrown.');
-            //             console.log(XMLHttpRequest);
-            //             console.log(textStatus);
-            //             console.log(errorThrown);
-            //           }
-            // });
-
-            // $('#image_form_submit').attr('action','/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']);
-
-            // $('#image_form_submit').submit();
-
-            uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred)
-
-            // $('#image_form_submit').submit(function(){
-
-            //     // Maybe show a loading indicator...
-
-            //     $.post($(this).attr('action'), $(this).serialize(), function(res){
-            //         // Do something with the response `res`
-            //         console.log(res);
-            //         // Don't forget to hide the loading indicator!
-            //     });
-
-            //     return false; // prevent default action
-
-            // });
-
-            // $('#image_form_submit').submit();
-
-            }
-
-
-
-
-            if (editing_state == true) {
-
-              // $('#header_text').val()
-
-              $.when.apply($, defArray).then( function() {
-                xml_id=parseInt($(".image.xml_id").attr('xml_id'));
-                editing_state=false;
-              //this code is called after all the ajax calls are done
-                // sanitise_media();
-                 // topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
-                 for(var i=0, len=current_topic.length; i < len; i++){
-                    if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                      current_topic[i].data=file_name;
-                      current_topic[i].attribution=attr_text;
-                      current_topic[i].description=desc_text;
-                      current_topic[i].allowFullscreen=full_screen;
-                      topic_json[global_topic]=current_topic;
-                      break;
-                    };
-                  }
-
-                 $("#overlay").hide();
-                refresh_dom();
-
-                img_dlg.dialog( "close" );
-
-              });
-
+            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The ID is wrong. It can only include alpha numerals and (_)");
+            }else if(!uniqueness){
+              alert("The ID is not unique");
             }else{
 
 
+                  var files=document.getElementById('imagefilemod').files;
+                  $("#overlay").show();
+                  var fslocation= global_chapter+"/"+global_topic+"/media";
+                  console.log(fslocation);
+                  var file_name=files[0].name;
+                  insert=true;
 
-              $.when.apply($, defArray).then( function() {
-                      for(var i=0, len=current_topic.length; i < len; i++){
-                          if (i>=current_clicked) {
-                            var temp=current_topic[i];
-                            temp.xml_id = parseInt(temp.xml_id)+1;
-                            current_topic[i]=temp;
-                          }
+                  var current_topic=topic_json[global_topic];
+
+
+                  var deferred = new $.Deferred();
+                    // var deferred1 = new $.Deferred();
+                    defArray.push(deferred);
+                    // defArray.push(deferred1);
+
+                  // var deferred1
+
+                  var img_dlg=$(this);
+
+
+
+
+                  for (var i = 0, f; f = files[i]; i++) {
+                    uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id'],f,deferred);
+                  }
+
+
+
+
+                  if (editing_state == true) {
+
+                    // $('#header_text').val()
+
+                    $.when.apply($, defArray).then( function() {
+                      xml_id=parseInt($(".image.xml_id").attr('xml_id'));
+                      editing_state=false;
+                    //this code is called after all the ajax calls are done
+                      // sanitise_media();
+                       // topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+                       for(var i=0, len=current_topic.length; i < len; i++){
+                          if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                            current_topic[i].data=file_name;
+                            current_topic[i].attribution=attr_text;
+                            current_topic[i].description=desc_text;
+                            current_topic[i].allowFullscreen=full_screen;
+                            topic_json[global_topic]=current_topic;
+                            break;
+                          };
                         }
-                        topic_json[global_topic]=current_topic;
-                //this code is called after all the ajax calls are done
-                // sanitise_media();
-                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen});
-                $("#overlay").hide();
-                refresh_dom();
 
-                img_dlg.dialog( "close" );
-              });
+                       $("#overlay").hide();
+                      refresh_dom();
+
+                      img_dlg.dialog( "close" );
+
+                    });
+
+                  }else{
 
 
+
+                    $.when.apply($, defArray).then( function() {
+                            for(var i=0, len=current_topic.length; i < len; i++){
+                                if (i>=current_clicked) {
+                                  var temp=current_topic[i];
+                                  temp.xml_id = parseInt(temp.xml_id)+1;
+                                  current_topic[i]=temp;
+                                }
+                              }
+                              topic_json[global_topic]=current_topic;
+                      //this code is called after all the ajax calls are done
+                      // sanitise_media();
+                      topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen});
+                      $("#overlay").hide();
+                      refresh_dom();
+
+                      img_dlg.dialog( "close" );
+                    });
+
+
+                  }
             }
-
 
 
 
@@ -1165,6 +1151,7 @@ function refresh_dom(){
 
 
               child = dom.createElement('header');
+              child.setAttribute('id',current_topic[i].id);
 
               child.textContent=current_topic[i].data;
 
@@ -1183,6 +1170,7 @@ function refresh_dom(){
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
 
               child = dom.createElement('subheader');
+              child.setAttribute('id',current_topic[i].id);
 
               child.textContent=current_topic[i].data;
 
@@ -1257,6 +1245,7 @@ function refresh_dom(){
 
 
               child = dom.createElement('image');
+              child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
               child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
@@ -1323,6 +1312,7 @@ function refresh_dom(){
               side_bar.append(holder);
 
               child = dom.createElement('video');
+              child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
 
@@ -1385,6 +1375,7 @@ function refresh_dom(){
               side_bar.append(holder);
 
               child = dom.createElement('audio');
+              child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
 
@@ -1420,6 +1411,7 @@ function refresh_dom(){
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
                 // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Formula</a>');
                 child = dom.createElement('formula');
+                child.setAttribute('id',current_topic[i].id);
 
                 child.textContent=current_topic[i].data;
 
