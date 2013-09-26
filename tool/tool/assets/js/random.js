@@ -233,6 +233,10 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
       var link=$('<a>').append(master_json.chapters[i]['name']);
       link.attr('chapter-id',i);
+      var del_btn_ch=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
+      var edit_btn_ch=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
+      link.prepend(edit_btn_ch);
+      link.append(del_btn_ch);
       a.append(link);
 
 
@@ -440,7 +444,7 @@ $( "#dialog-sub-heading" ).dialog({
 // IMAGE START
 $( "#dialog-image" ).dialog({
       autoOpen: false,
-      height: 300,
+      height: 500,
       width: 350,
       modal: true,
       buttons: {
@@ -1004,6 +1008,8 @@ function refresh_dom(){
   var side_bar=$('#sidebar');
   side_bar.html('');
 
+  preview_pane.append("<h1>"+master_json.chapters[global_chapter].topics[global_topic]['id']+"<small> is being editted </small></h1>");
+
 
   // var current_topic=topic_json[global_topic];
 
@@ -1027,7 +1033,7 @@ function refresh_dom(){
   for(var i=0, len=current_topic.length; i < len; i++){
     switch(current_topic[i].type){
         case "header":
-              preview_pane.append("<h1>"+current_topic[i].data+"</h1>");
+              preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
@@ -1044,7 +1050,7 @@ function refresh_dom(){
 
               break;
         case "subheader":
-              preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
+              preview_pane.append("<h4>"+current_topic[i].data+"</h4>");
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);

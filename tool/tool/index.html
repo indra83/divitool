@@ -156,21 +156,52 @@ MathJax.Hub.Config({
           <!-- Image -->
             <div id="dialog-image" title="Insert Image">
 
-              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST">
-              <fieldset>
-                <label for="name">File : </label>
-                <input type="file" name="file1" id="imagefilemod" >
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
 
-                <label for=img-desc>Description</label>
-                <textarea id="img-desc" class="text ui-widget-content ui-corner-all"></textarea>
+              <div class="form-group">
 
+
+                <div class="col-lg-10">
+                  <input type="file"  class="form-control" name="file1" id="imagefilemod" >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="imageid">Image ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="imageid" placeholder="Image ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="img-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="img-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
                 <label for="img-attr">Attribution/Source : </label>
-                <textarea id="img-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <div class="col-lg-10">
+                <textarea id="img-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Allow Fulscreen
+                    </label>
+                  </div>
+                </div>
+              </div>
+
                 <input type="hidden" class="image xml_id">
 
 
-              </fieldset>
+
               </form>
             </div>
           <!-- END OF IMAGE -->

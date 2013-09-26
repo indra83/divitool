@@ -16,7 +16,13 @@ before_chapter=[];
 after_chapter=[];
 
 
-$(function(){
+// $(function(){
+//   $('input').blur(function(event) {
+//     event.target.checkValidity();
+// }).bind('invalid', function(event) {
+//     setTimeout(function() { $(event.target).focus();}, 50);
+// });
+
   $.ajaxSetup({ cache: false });
 	$( "#sidebar" ).sortable({
     start: function (e, ui) {
@@ -148,14 +154,21 @@ $( ".sortchapters" ).sortable({
     master_json=JSON.parse(data);
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
+      var del_btn_ch=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
+      var edit_btn_ch=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
+
       var link=$('<a>').append(master_json.chapters[i]['name']);
       link.attr('chapter-id',i);
+      link.prepend(edit_btn_ch);
+      link.append(del_btn_ch);
       a.append(link);
 
       var top=$('<ul>');
       top.addClass('sortchapters');
       if (master_json.chapters[i].topics != undefined) {
         for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
+
+
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
             var del_btn=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
@@ -174,7 +187,7 @@ $( ".sortchapters" ).sortable({
       $('#book-nav').prepend(a);
       // $('#book-desc').html(master_json['name']);
 
-    };
+    }
 
         $('#bookname-cont').html(' Book Name : '+master_json['bookname']);
         $('#bookid-cont').html(' Book ID : '+master_json['bookid']);
@@ -682,7 +695,7 @@ $(document).on('click','.editing-video',function(e){
 
 
 
-});
+
 
 // editing-subheader
 // editing-html

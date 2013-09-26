@@ -7,7 +7,7 @@
 	display: none;
 }
 
-li a{
+li .topic_link{
 	cursor: pointer;
 }
 
