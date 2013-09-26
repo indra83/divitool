@@ -241,7 +241,7 @@ $( ".sortchapters" ).sortable({
     }).fail(function(data){
       console.log(data);
       if (data.status==404) {
-        master_json={'bookname':'default book name','bookid':'bookid','courseid':'courseid','version':0,'order':0,'chapters':[]};
+        master_json={'name':'default book name','bookId':'bookid','courseId':'courseid','version':0,'orderNo':0,'chapters':[]};
         // $('#book-desc').html(master_json['name']);
         $('#bookname-cont').append(' Book Name : '+master_json['name']);
         $('#bookid-cont').append(' Book ID : '+master_json['bookId']);
