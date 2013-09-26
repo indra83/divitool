@@ -336,10 +336,10 @@ $('#dialog-book').dialog({
             }else if($('#bookversion').val().match('^[0-9]+$') == null){
               alert("The Book Versions is wrong. It can only include numbers");
             }else{
-                master_json['name']=$('#name').val();
-                master_json['bookId']=$('#bookId').val();
-                master_json['courseId']=$('#courseId').val();
-                master_json['orderNo']=$('#orderNo').val();
+                master_json['name']=$('#bookname').val();
+                master_json['bookId']=$('#bookid').val();
+                master_json['courseId']=$('#courseid').val();
+                master_json['orderNo']=$('#bookorder').val();
                 master_json['version']=$('#bookversion').val();
                 // master_json['']=
 
