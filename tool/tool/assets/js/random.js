@@ -336,10 +336,10 @@ $('#dialog-book').dialog({
             }else if($('#bookversion').val().match('^[0-9]+$') == null){
               alert("The Book Versions is wrong. It can only include numbers");
             }else{
-                master_json['bookname']=$('#bookname').val();
-                master_json['bookid']=$('#bookid').val();
-                master_json['courseid']=$('#courseid').val();
-                master_json['order']=$('#bookorder').val();
+                master_json['name']=$('#name').val();
+                master_json['bookId']=$('#bookId').val();
+                master_json['courseId']=$('#courseId').val();
+                master_json['orderNo']=$('#orderNo').val();
                 master_json['version']=$('#bookversion').val();
                 // master_json['']=
 
@@ -394,10 +394,10 @@ $('#dialog-book').dialog({
 function refresh_chapters(){
   $('#book-nav').html('');
 
-        $('#bookname-cont').html(' Book Name : '+master_json['bookname']);
-        $('#bookid-cont').html(' Book ID : '+master_json['bookid']);
-        $('#courseid-cont').html(' Course ID : '+master_json['courseid']);
-        $('#bookorder-cont').html(' Book Order : '+master_json['order']);
+        $('#bookname-cont').html(' Book Name : '+master_json['name']);
+        $('#bookid-cont').html(' Book ID : '+master_json['bookId']);
+        $('#courseid-cont').html(' Course ID : '+master_json['courseId']);
+        $('#bookorder-cont').html(' Book Order : '+master_json['orderNo']);
         $('#bookversion-cont').html(' Book Version : '+master_json['version']);
 
 for (var i = master_json.chapters.length - 1; i >= 0; i--) {

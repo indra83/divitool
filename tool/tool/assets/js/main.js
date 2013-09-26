@@ -189,10 +189,10 @@ $( ".sortchapters" ).sortable({
 
     }
 
-        $('#bookname-cont').html(' Book Name : '+master_json['bookname']);
-        $('#bookid-cont').html(' Book ID : '+master_json['bookid']);
-        $('#courseid-cont').html(' Course ID : '+master_json['courseid']);
-        $('#bookorder-cont').html(' Book Order : '+master_json['order']);
+        $('#bookname-cont').html(' Book Name : '+master_json['name']);
+        $('#bookid-cont').html(' Book ID : '+master_json['bookId']);
+        $('#courseid-cont').html(' Course ID : '+master_json['courseId']);
+        $('#bookorder-cont').html(' Book Order : '+master_json['orderNo']);
         $('#bookversion-cont').html(' Book Version : '+master_json['version']);
 
     $( ".sortchapters" ).sortable({
@@ -243,10 +243,10 @@ $( ".sortchapters" ).sortable({
       if (data.status==404) {
         master_json={'bookname':'default book name','bookid':'bookid','courseid':'courseid','version':0,'order':0,'chapters':[]};
         // $('#book-desc').html(master_json['name']);
-        $('#bookname-cont').append(' Book Name : '+master_json['bookname']);
-        $('#bookid-cont').append(' Book ID : '+master_json['bookid']);
-        $('#courseid-cont').append(' Course ID : '+master_json['courseid']);
-        $('#bookorder-cont').append(' Book Order : '+master_json['order']);
+        $('#bookname-cont').append(' Book Name : '+master_json['name']);
+        $('#bookid-cont').append(' Book ID : '+master_json['bookId']);
+        $('#courseid-cont').append(' Course ID : '+master_json['courseId']);
+        $('#bookorder-cont').append(' Book Order : '+master_json['orderNo']);
         $('#bookversion-cont').append(' Book Version : '+master_json['version']);
       };
 
@@ -302,10 +302,10 @@ $('#book-show').on('mouseout','.sortchapters li',function(){
 });
 
 $(document).on('click','#bookedit',function(){
-  $('#bookname').val(master_json['bookname']);
-  $('#bookid').val(master_json['bookid']);
-  $('#courseid').val(master_json['courseid']);
-  $('#bookorder').val(master_json['order']);
+  $('#bookname').val(master_json['name']);
+  $('#bookid').val(master_json['bookId']);
+  $('#courseid').val(master_json['courseId']);
+  $('#bookorder').val(master_json['orderNo']);
   $('#bookversion').val(master_json['version']);
   $('#dialog-book').dialog('open');
   return false;
