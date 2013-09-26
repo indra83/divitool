@@ -540,6 +540,7 @@ $(document).on('click','#bookedit',function(){
     current_topic=topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
+            $('#headerid').val(current_topic[i]['id']);
             $('#header_text').val(current_topic[i]['data']);
             break;
       };
@@ -564,6 +565,7 @@ $(document).on('click','#bookedit',function(){
     current_topic=topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
+            $('#subheadingid').val(current_topic[i]['id']);
             $('#sub_header_text').val(current_topic[i]['data']);
             break;
       };
@@ -640,6 +642,7 @@ $(document).on('click','#bookedit',function(){
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
         $('#img-attr').val(current_topic[i]['attribution']);
+            $('#imageid').val(current_topic[i]['id']);
             $('#img-attr').val(current_topic[i]['attribution']);
             break;
       };
@@ -667,6 +670,7 @@ $(document).on('click','.editing-audio',function(e){
     current_topic=topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
+          $('#audioid').val(current_topic[i]['id']);
             $('#audio-attr').val(current_topic[i]['attribution']);
             break;
       };
@@ -693,6 +697,7 @@ $(document).on('click','.editing-video',function(e){
     current_topic=topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
+            $('#videoid').val(current_topic[i]['id']);
             $('#video-attr').val(current_topic[i]['attribution']);
             break;
       };
