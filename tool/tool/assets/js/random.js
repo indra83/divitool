@@ -1210,6 +1210,8 @@ function refresh_dom(){
 
               var attr_text = current_topic[i].attribution;
 
+              var full_screen = current_topic[i].allowFullscreen;
+
 
               span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
               console.log(span);
@@ -1225,7 +1227,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description;
+              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen;
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -1238,6 +1240,7 @@ function refresh_dom(){
               child = dom.createElement('image');
 
               child.setAttribute('src',current_topic[i].data);
+              child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
 
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;
