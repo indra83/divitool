@@ -568,6 +568,8 @@ $( "#dialog-image" ).dialog({
 
             var desc_text=$('#img-desc').val();
 
+            var full_screen=$('#fullscheck').is(':checked');
+
 
 
 
@@ -654,6 +656,7 @@ $( "#dialog-image" ).dialog({
                       current_topic[i].data=file_name;
                       current_topic[i].attribution=attr_text;
                       current_topic[i].description=desc_text;
+                      current_topic[i].allowFullscreen=full_screen;
                       topic_json[global_topic]=current_topic;
                       break;
                     };
@@ -681,7 +684,7 @@ $( "#dialog-image" ).dialog({
                         topic_json[global_topic]=current_topic;
                 //this code is called after all the ajax calls are done
                 // sanitise_media();
-                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text});
+                topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen});
                 $("#overlay").hide();
                 refresh_dom();
 
