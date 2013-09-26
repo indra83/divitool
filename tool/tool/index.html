@@ -121,14 +121,25 @@
           <div id="dialog-heading" title="Insert Heading">
             <p class="validateTips">Insert Heading.</p>
 
-            <form>
-            <fieldset>
+            <form class="form-horizontal" role="form">
+
+              <div class="form-group">
+                <label for="headerid">Heading3 ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="headerid" placeholder="Heading3 ID">
+                </div>
+              </div>
+
+              <div class="form-group">
               <label for="name">Heading </label>
-              <input type="text" name="name" id="header_text" class="text ui-widget-content ui-corner-all" />
+              <div class="col-lg-10">
+              <input type="text" name="name" id="header_text" class="text ui-widget-content ui-corner-all form-control" />
+              </div>
+              </div>
               <input type="hidden" class="header xml_id">
 
 
-            </fieldset>
+
             </form>
           </div>
 
@@ -136,13 +147,25 @@
 
           <div id="dialog-sub-heading" title="Insert Sub HEading">
 
-            <form>
-            <fieldset>
-              <label for="name">Name</label>
-              <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" />
+            <form class="form-horizontal" role="form">
+
+              <div class="form-group">
+                <label for="subheadingid">Sub Heading ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="subheadingid" placeholder="Sub Heading ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+              <label for="name">Sub Heading</label>
+              <div class="col-lg-10">
+              <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all form-control" />
+              </div>
+              </div>
+
               <input type="hidden" class="subheader xml_id">
 
-            </fieldset>
+
             </form>
           </div>
 
@@ -204,25 +227,46 @@
           <!-- SOUND -->
             <div id="dialog-audio" title="Insert Sound">
 
-              <form>
-              <fieldset>
-                <label for="name">File : </label>
-                <input type="file" id="audiofilemod" accept ="audio/mpeg, audio/mp4, audio/basic, audio/ogg, audio/webm">
 
-                <label for=audio-desc>Description</label>
-                <textarea id="audio-desc" class="text ui-widget-content ui-corner-all"></textarea>
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
 
+              <div class="form-group">
+
+
+                <div class="col-lg-10">
+                  <input type="file" id="audiofilemod" accept ="audio/mpeg, audio/mp4, audio/basic, audio/ogg, audio/webm">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="audioid">Audio ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="audioid" placeholder="Audio ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="audio-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="audio-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
                 <label for="audio-attr">Attribution/Source : </label>
-                <textarea id="audio-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <div class="col-lg-10">
+                <textarea id="audio-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
 
 
 
                 <input type="hidden" class="audio xml_id">
 
 
-              </fieldset>
-              </form>
+
+
             </div>
           <!-- END OF SOUND -->
 
@@ -268,25 +312,56 @@
           <!-- VIDEO -->
             <div id="dialog-video" title="Insert Video">
 
-              <form>
-              <fieldset>
-                <label for="name">Name</label>
-                <p>Video File</p>
-                <input type="file" id="videofilemod" accept="video/mpeg, video/mp4, video/ogg, video/webm, video/x-flv">
-                <p>Thumbnail File</p>
-                <input type="file" id="thumbfilemod" accept ="image/png, image/gif,image/pjpeg, image/jpeg">
 
-                <label for=audio-desc>Description</label>
-                <textarea id="video-desc" class="text ui-widget-content ui-corner-all"></textarea>
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
 
+              <div class="form-group">
+
+                <label for="videofilemod">Video File</label>
+                <div class="col-lg-10">
+                  <input type="file" id="videofilemod" accept="video/mpeg, video/mp4, video/ogg, video/webm, video/x-flv">
+                </div>
+              </div>
+
+
+
+              <div class="form-group">
+
+                <label for="thumbfilemod">Thumbnail File</label>
+                <div class="col-lg-10">
+                    <input type="file" id="thumbfilemod" accept ="image/png, image/gif,image/pjpeg, image/jpeg">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="videoid">Image ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="videoid" placeholder="Image ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="video-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="video-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
                 <label for="video-attr">Attribution/Source : </label>
-                <textarea id="video-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                <div class="col-lg-10">
+                <textarea id="video-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
                 <input type="hidden" class="video xml_id">
 
 
-              </fieldset>
+
               </form>
+
+
             </div>
           <!-- END OF VIDEO -->
 
