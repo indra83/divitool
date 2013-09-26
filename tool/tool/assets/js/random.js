@@ -1,7 +1,80 @@
 
+
+$(document).on('click','.edit-chp',function(e){
+
+    var chapterid=$(this).attr('chapterid');
+    var chaptername="";
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+              chaptername=master_json.chapters[i]['name'];
+              break;
+            }
+            // master_json.chapters[i]
+    }
+
+    $('#chapterid').val(chapterid);
+    $('#chapterid').attr('disabled','disabled');
+    $('#chapter_name').val(chaptername);
+    editing_state=true;
+
+  $('#dialog-chapter').dialog('open');
+
+ e.preventDefault();
+});
+
+
 $('#mod-chapter').click(function(){
+  $("#chapterid").removeAttr("disabled");
   $('#dialog-chapter').dialog('open');
 });
+
+
+
+
+$(document).on('click','.edit-tpc',function(e){
+
+    var chapterid=$(this).attr('chapterid');
+    var chaptername="";
+    var topicid=$(this).attr('topicid');
+    var topicname="";
+
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+
+              for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
+                if (master_json.chapters[i].topics[j]['id'] == topicid) {
+                    topicname=master_json.chapters[i].topics[j]['name'];
+                    break;
+                };
+              };
+
+              chaptername=master_json.chapters[i]['name'];
+              break;
+            }
+            // master_json.chapters[i]
+    }
+
+    $('#chapter_select').val(chapterid);
+    $('#chapter_select').attr('disabled','disabled');
+    $('#topicnumber').val(topicid);
+    $('#topicnumber').attr('disabled','disabled');
+    $('#topicname').val(topicname);
+    editing_state=true;
+
+  for (var i = 0; i < master_json.chapters.length; i++) {
+    var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
+    $('#chapter_select').append(op);
+    // options.push(master_json.chapters[i]['name']);
+
+  };
+
+
+
+  $('#dialog-topic').dialog('open');
+
+ e.preventDefault();
+});
+
 
 $('#mod-topic').click(function(){
   // Populate the option tags
@@ -233,8 +306,8 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
       var link=$('<a>').append(master_json.chapters[i]['name']);
       link.attr('chapter-id',i);
-      var del_btn_ch=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
-      var edit_btn_ch=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
+      var del_btn_ch=$('<button>').addClass('btn del-chp btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+      var edit_btn_ch=$('<button>').addClass('btn edit-chp btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
       link.prepend(edit_btn_ch);
       link.append(del_btn_ch);
       a.append(link);
@@ -246,13 +319,14 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
         for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
-            var del_btn=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
-            // <button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            var del_btn=$('<button>').addClass('btn del-tpc btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+            var edit_btn=$('<button>').addClass('btn edit-tpc btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
             link1.addClass('topic_link');
             link1.attr('chapter-id',i);
             link1.attr('topic-id',j);
+            a1.append(edit_btn).append('&nbsp;');
             a1.append(link1);
-            a1.append(del_btn);
+            a1.append('&nbsp;').append(del_btn);
             top.prepend(a1);
         }
         a.append(top);

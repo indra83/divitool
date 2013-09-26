@@ -154,8 +154,8 @@ $( ".sortchapters" ).sortable({
     master_json=JSON.parse(data);
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
-      var del_btn_ch=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
-      var edit_btn_ch=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
+      var del_btn_ch=$('<button>').addClass('btn del-chp btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+      var edit_btn_ch=$('<button>').addClass('btn edit-chp btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
 
       var link=$('<a>').append(master_json.chapters[i]['name']);
       link.attr('chapter-id',i);
@@ -171,8 +171,8 @@ $( ".sortchapters" ).sortable({
 
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
-            var del_btn=$('<button>').addClass('btn btn-danger btn-xs').append($('<span>').addClass('glyphicon glyphicon-trash'));
-            var edit_btn=$('<button>').addClass('btn btn-warning btn-xs').append($('<span>').addClass('glyphicon glyphicon-edit'));
+            var del_btn=$('<button>').addClass('btn del-tpc btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+            var edit_btn=$('<button>').addClass('btn edit-tpc btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
             link1.addClass('topic_link');
             link1.attr('chapter-id',i);
             link1.attr('topic-id',j);
@@ -690,6 +690,61 @@ $(document).on('click','.editing-video',function(e){
     $( "#dialog-video" ).dialog( "open" );
     e.preventDefault();
   });
+
+$(document).on('click','.del-chp',function(e){
+  var result=confirm("Are you Sure you want to delete this chapter?")
+  if (result == true) {
+    var chapterid=$(this).attr('chapterid');
+
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+              master_json.chapters.splice(i,1);
+              break;
+            };
+            // master_json.chapters[i]
+    };
+    window.URL = window.webkitURL || window.URL;
+    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+    file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+    file.name="master.json";
+
+    uploadFiles('/savefile/',file);
+
+    refresh_chapters();
+  };
+ e.preventDefault();
+});
+
+
+$(document).on('click','.del-tpc',function(e){
+  var result=confirm("Are you Sure you want to delete this chapter?")
+  if (result == true) {
+    var chapterid=$(this).attr('chapterid');
+    var topicid=$(this).attr('topicid');
+
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+              for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
+                if (master_json.chapters[i].topics[j]['id'] == topicid) {
+                    master_json.chapters[i].topics.splice(j,1);
+                    break;
+                };
+              };
+              break;
+            };
+            // master_json.chapters[i]
+    };
+    window.URL = window.webkitURL || window.URL;
+    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+    file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+    file.name="master.json";
+
+    uploadFiles('/savefile/',file);
+
+    refresh_chapters();
+  };
+ e.preventDefault();
+});
 
 
 
