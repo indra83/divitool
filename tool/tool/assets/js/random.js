@@ -183,13 +183,20 @@ $('#dialog-chapter').dialog({
         "Insert Chapter": function() {
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_no').val())-1] != undefined) {
+              if (editing_state==true) {
+                editing_state=false;
+                for (var i = 0; i < master_json.chapters.length; i++) {
+                  if (master_json.chapters[i]['id']==$('#chapterid').val()) {
+                    master_json.chapters[i]['name']=$('#chapter_name').val();
+                    break;
+                  }
+
+                };
+              }else{
                 master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
-            // }else{
-              // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
-              // if (result) {
-                // master_json.chapters[parseInt($('#chapter_no').val())-1]={'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())};
-              // }
-            // };
+              }
+
+
 
 
             window.URL = window.webkitURL || window.URL;
