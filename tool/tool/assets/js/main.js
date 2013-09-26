@@ -154,8 +154,8 @@ $( ".sortchapters" ).sortable({
     master_json=JSON.parse(data);
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
       var a = $('<li>');
-      var del_btn_ch=$('<button>').addClass('btn del-chp btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
-      var edit_btn_ch=$('<button>').addClass('btn edit-chp btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
+      var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+      var edit_btn_ch=$('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
 
       var link=$('<a>').append(master_json.chapters[i]['name']);
       link.attr('chapter-id',i);
@@ -171,8 +171,8 @@ $( ".sortchapters" ).sortable({
 
             var a1 = $('<li>');
             var link1=$('<a>').append(master_json.chapters[i].topics[j]['name']);
-            var del_btn=$('<button>').addClass('btn del-tpc btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
-            var edit_btn=$('<button>').addClass('btn edit-tpc btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
+            var del_btn=$('<button>').addClass('btn del-tpc sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+            var edit_btn=$('<button>').addClass('btn edit-tpc sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('topicid',master_json.chapters[i].topics[j]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
             link1.addClass('topic_link');
             link1.attr('chapter-id',i);
             link1.attr('topic-id',j);
@@ -283,6 +283,22 @@ $('#sidebar').on('mouseover','.sortable',function(){
 
 $('#sidebar').on('mouseout','.sortable',function(){
     $(this).children('.inner-btn').hide();
+});
+
+$('#book-show').on('mouseover','#book-nav li',function(){
+    $(this).find('.sidebar-btn').show();
+});
+
+$('#book-show').on('mouseout','#book-nav li',function(){
+    $(this).find('.sidebar-btn').hide();
+});
+
+$('#book-show').on('mouseover','.sortchapters li',function(){
+    $(this).find('.sidebar-btn').show();
+});
+
+$('#book-show').on('mouseout','.sortchapters li',function(){
+    $(this).find('.sidebar-btn').hide();
 });
 
 $(document).on('click','#bookedit',function(){

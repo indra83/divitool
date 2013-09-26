@@ -27,3 +27,8 @@ li .topic_link{
 .sortchapters li{
 	padding: 4px;
 }
+
+.sidebar-btn{
+	display: none;
+	margin: 4px;
+}
