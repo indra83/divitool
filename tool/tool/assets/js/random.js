@@ -37,6 +37,7 @@ $(document).on('click','.edit-tpc',function(e){
     var chaptername="";
     var topicid=$(this).attr('topicid');
     var topicname="";
+    var dropval=0;
 
     for (var i = 0; i < master_json.chapters.length; i++) {
             if (master_json.chapters[i]['id'] == chapterid) {
@@ -44,6 +45,7 @@ $(document).on('click','.edit-tpc',function(e){
               for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
                 if (master_json.chapters[i].topics[j]['id'] == topicid) {
                     topicname=master_json.chapters[i].topics[j]['name'];
+                    dropval=i;
                     break;
                 };
               };
@@ -54,7 +56,7 @@ $(document).on('click','.edit-tpc',function(e){
             // master_json.chapters[i]
     }
 
-    $('#chapter_select').val(chapterid);
+
     $('#chapter_select').attr('disabled','disabled');
     $('#topicnumber').val(topicid);
     $('#topicnumber').attr('disabled','disabled');
@@ -68,7 +70,7 @@ $(document).on('click','.edit-tpc',function(e){
 
   };
 
-
+$('#chapter_select').val(dropval);
 
   $('#dialog-topic').dialog('open');
 
@@ -79,6 +81,8 @@ $(document).on('click','.edit-tpc',function(e){
 $('#mod-topic').click(function(){
   // Populate the option tags
   $('#chapter_select').html('');
+  $("#chapter_select").removeAttr("disabled");
+  $("#topicnumber").removeAttr("disabled");
   // var options=[];
   for (var i = 0; i < master_json.chapters.length; i++) {
     var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
@@ -103,43 +107,61 @@ $('#dialog-topic').dialog({
         "Insert Topic": function() {
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
-              if (master_json.chapters[parseInt($('#chapter_select').val())]['topics'] == undefined) {
-                master_json.chapters[parseInt($('#chapter_select').val())]['topics']=[];
-              };
-                master_json.chapters[parseInt($('#chapter_select').val())]['topics'].push({'id':$('#topicnumber').val(),'name':$('#topicname').val()});
-            // }else{
-              // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
-              // if (result) {
-                // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
-                    // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
+
+
+              if (editing_state == true) {
+                editing_state=false;
+                for (var i = 0; i < master_json.chapters[parseInt($('#chapter_select').val())].topics.length; i++) {
+                  if (master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['id'] == $('#topicnumber').val()){
+                    master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['name'] = $('#topicname').val();
+                    break;
+                  }
+                }
+
+              }else{
+
+                  if (master_json.chapters[parseInt($('#chapter_select').val())]['topics'] == undefined) {
+                    master_json.chapters[parseInt($('#chapter_select').val())]['topics']=[];
+                  };
+                    master_json.chapters[parseInt($('#chapter_select').val())]['topics'].push({'id':$('#topicnumber').val(),'name':$('#topicname').val()});
+                // }else{
+                  // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+                  // if (result) {
+                    // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
+                        // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
+                    // };
+                    // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
+                  // }
                 // };
-                // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
-              // }
-            // };
 
 
 
 
-            var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
-            child = dom.createElement('topic');
-            child.setAttribute('id', $('#topicnumber').val());
-            dom.documentElement.appendChild(child);
+                var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
+                child = dom.createElement('topic');
+                child.setAttribute('id', $('#topicnumber').val());
+                dom.documentElement.appendChild(child);
 
-            window.URL = window.webkitURL || window.URL;
-            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-            file = new Blob([jsxml.toXml(dom)]);
-
-
-            file.name="topic.xml"
-            // file.append(master_json);
-            // var a = document.getElementById("downloadFile");
-            // a.hidden = '';
-            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
-            // a.download = 'filename.txt';
-            // a.textContent = 'Download file!';
+                window.URL = window.webkitURL || window.URL;
+                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                file = new Blob([jsxml.toXml(dom)]);
 
 
-            uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
+                file.name="topic.xml"
+                // file.append(master_json);
+                // var a = document.getElementById("downloadFile");
+                // a.hidden = '';
+                // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+                // a.download = 'filename.txt';
+                // a.textContent = 'Download file!';
+
+
+                uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
+
+              }
+
+
+
 
             window.URL = window.webkitURL || window.URL;
             window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
