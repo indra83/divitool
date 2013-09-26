@@ -276,39 +276,58 @@ $('#dialog-book').dialog({
               // }
             // };
 
-            master_json['bookname']=$('#bookname').val();
-            master_json['bookid']=$('#bookid').val();
-            master_json['courseid']=$('#courseid').val();
-            master_json['order']=$('#bookorder').val();
-            master_json['version']=$('#bookversion').val();
-            // master_json['']=
+            val id_check=true;
+            val course_check=true;
+            val version_check=true;
+            val order_check=true;
+
+            if ($('#bookid').val().match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The Book ID is wrong. It can only include alpha numerals and (_)");
+            }else if($('#courseid').val().match('^[_a-zA-Z0-9]+$') == null){
+              alert("The Course ID is wrong. It can only include alpha numerals and (_)");
+            }else if($('#bookorder').val().match('^[0-9]+$') == null){
+              alert("The Book Order is wrong. It can only include numbers");
+            }else if($('#bookversion').val().match('^[0-9]+$') == null){
+              alert("The Book Versions is wrong. It can only include numbers");
+            }else{
+                master_json['bookname']=$('#bookname').val();
+                master_json['bookid']=$('#bookid').val();
+                master_json['courseid']=$('#courseid').val();
+                master_json['order']=$('#bookorder').val();
+                master_json['version']=$('#bookversion').val();
+                // master_json['']=
 
 
-            window.URL = window.webkitURL || window.URL;
-            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
-            file.name="master.json";
-            // file.append(master_json);
-            // var a = document.getElementById("downloadFile");
-            // a.hidden = '';
-            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
-            // a.download = 'filename.txt';
-            // a.textContent = 'Download file!';
+                window.URL = window.webkitURL || window.URL;
+                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+                file.name="master.json";
+                // file.append(master_json);
+                // var a = document.getElementById("downloadFile");
+                // a.hidden = '';
+                // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+                // a.download = 'filename.txt';
+                // a.textContent = 'Download file!';
 
 
-            uploadFiles('/savefile/',file);
+                uploadFiles('/savefile/',file);
 
 
 
 
 
-            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
-            //   console.log(data);
-            // });
+                // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
+                //   console.log(data);
+                // });
 
-            refresh_chapters();
+                refresh_chapters();
 
-            $( this ).dialog( "close" );
+                $( this ).dialog( "close" );
+
+            }
+
+
+
 
         },
         Cancel: function() {
@@ -316,7 +335,11 @@ $('#dialog-book').dialog({
         }
       },
       close: function() {
-        $('#sub_header_text').val('');
+        $('#bookname').val('');
+        $('#bookid').val('');
+        $('#courseid').val('');
+        $('#bookorder').val('');
+        $('#bookversion').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
