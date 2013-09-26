@@ -47,8 +47,8 @@ $(document).on('click','.edit-tpc',function(e){
                     topicname=master_json.chapters[i].topics[j]['name'];
                     dropval=i;
                     break;
-                };
-              };
+                }
+              }
 
               chaptername=master_json.chapters[i]['name'];
               break;
@@ -68,7 +68,7 @@ $(document).on('click','.edit-tpc',function(e){
     $('#chapter_select').append(op);
     // options.push(master_json.chapters[i]['name']);
 
-  };
+  }
 
 $('#chapter_select').val(dropval);
 
@@ -89,7 +89,7 @@ $('#mod-topic').click(function(){
     $('#chapter_select').append(op);
     // options.push(master_json.chapters[i]['name']);
 
-  };
+  }
 
 
 
@@ -120,9 +120,9 @@ $('#dialog-topic').dialog({
                 for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
                   if (master_json.chapters[i].topics[j]['id'] == chp_id) {
                     uniqueness=false;
-                  };
-                };
-              };
+                  }
+                }
+              }
 
               if ($('#topicnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
                 alert("The ID is wrong. It can only include alpha numerals and (_)");
@@ -261,7 +261,7 @@ $('#dialog-chapter').dialog({
 
                       };
                     }else{
-                      master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
+                      master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val(),'topics':[]});
                     }
 
 
@@ -325,10 +325,7 @@ $('#dialog-book').dialog({
               // }
             // };
 
-            val id_check=true;
-            val course_check=true;
-            val version_check=true;
-            val order_check=true;
+
 
             if ($('#bookid').val().match('^[_a-zA-Z0-9]+$') == null) {
               alert("The Book ID is wrong. It can only include alpha numerals and (_)");
