@@ -435,46 +435,64 @@ $( "#dialog-heading" ).dialog({
       buttons: {
         "Insert Heading": function() {
             var val=$('#header_text').val();
+            var id=$('#headerid').val();
             i=i+1;
 
+            var uniqueness=true;
+            var regex=false;
 
+            for (var i = 0; i < topic_json[global_topic].length; i++) {
+                if(topic_json[global_topic][i]['id'] == id){
+                  uniqueness=false;
+                }
+            };
 
-
-            var current_topic=topic_json[global_topic];
-
-            if (editing_state == true) {
-              xml_id=parseInt($(".header.xml_id").attr('xml_id'));
-              editing_state=false;
-
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                  current_topic[i].data=val;
-                  topic_json[global_topic]=current_topic;
-                  break;
-                };
-              }
-
-              // $('#header_text').val()
-
+            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The ID is wrong. It can only include alpha numerals and (_)");
+            }else if(!uniqueness){
+              alert("The ID is not unique");
             }else{
+                  var current_topic=topic_json[global_topic];
 
-              console.log("EDIT FALSE");
-              for(var i=0, len=current_topic.length; i < len; i++){
-                if (i>=current_clicked) {
-                    var temp=current_topic[i];
-                    temp.xml_id = parseInt(temp.xml_id)+1;
-                    current_topic[i]=temp;
-                };
+                if (editing_state == true) {
+                  xml_id=parseInt($(".header.xml_id").attr('xml_id'));
+                  editing_state=false;
 
-              }
-              topic_json[global_topic]=current_topic;
-              topic_json[global_topic].push({"type":"header","data":val,"xml_id":(current_clicked)});
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                      current_topic[i].data=val;
+                      topic_json[global_topic]=current_topic;
+                      break;
+                    };
+                  }
+
+                  // $('#header_text').val()
+
+                }else{
+
+                  console.log("EDIT FALSE");
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (i>=current_clicked) {
+                        var temp=current_topic[i];
+                        temp.xml_id = parseInt(temp.xml_id)+1;
+                        current_topic[i]=temp;
+                    };
+
+                  }
+                  topic_json[global_topic]=current_topic;
+                  topic_json[global_topic].push({"type":"header","data":val,"xml_id":(current_clicked),"id":id});
+                }
+
+
+                  refresh_dom();
+
+                $( this ).dialog( "close" );
             }
 
 
-              refresh_dom();
 
-            $( this ).dialog( "close" );
+
+
 
         },
         Cancel: function() {
@@ -483,6 +501,7 @@ $( "#dialog-heading" ).dialog({
       },
       close: function() {
         $('#header_text').val('');
+        $('#headerid').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
