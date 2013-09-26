@@ -16,7 +16,7 @@ li .topic_link{
 	height: 100%;
 	width:100%;
 	background-color: #666;
-	z-index: 10;
+	z-index: 100000;
 	display:none;
 	filter: alpha(opacity=75); /* internet explorer */
 	-khtml-opacity: 0.75;      /* khtml, old safari */
