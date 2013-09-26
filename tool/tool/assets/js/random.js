@@ -598,7 +598,7 @@ $( "#dialog-image" ).dialog({
 
             var full_screen=$('#fullscheck').is(':checked');
 
-            var id=$('#headerid').val();
+            var id=$('#imageid').val();
             i=i+1;
 
             var uniqueness=true;
