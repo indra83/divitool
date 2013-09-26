@@ -108,81 +108,103 @@ $('#dialog-topic').dialog({
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
 
+              var uniqueness=true;
+              var chp_id=$('#topicnumber').val();
 
-              if (editing_state == true) {
-                editing_state=false;
-                for (var i = 0; i < master_json.chapters[parseInt($('#chapter_select').val())].topics.length; i++) {
-                  if (master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['id'] == $('#topicnumber').val()){
-                    master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['name'] = $('#topicname').val();
-                    break;
-                  }
-                }
+              for (var i = 0; i < master_json.chapters.length; i++) {
 
+                if (master_json.chapters[i]['id'] == chp_id) {
+                  uniqueness=false;
+                };
+
+                for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
+                  if (master_json.chapters[i].topics[j]['id'] == chp_id) {
+                    uniqueness=false;
+                  };
+                };
+              };
+
+              if ($('#topicnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
+                alert("The ID is wrong. It can only include alpha numerals and (_)");
+              }else if(!uniqueness){
+                alert("The ID is not unique through the book.");
               }else{
 
-                  if (master_json.chapters[parseInt($('#chapter_select').val())]['topics'] == undefined) {
-                    master_json.chapters[parseInt($('#chapter_select').val())]['topics']=[];
-                  };
-                    master_json.chapters[parseInt($('#chapter_select').val())]['topics'].push({'id':$('#topicnumber').val(),'name':$('#topicname').val()});
-                // }else{
-                  // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
-                  // if (result) {
-                    // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
-                        // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
-                    // };
-                    // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
-                  // }
-                // };
+                        if (editing_state == true) {
+                          editing_state=false;
+                          for (var i = 0; i < master_json.chapters[parseInt($('#chapter_select').val())].topics.length; i++) {
+                            if (master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['id'] == $('#topicnumber').val()){
+                              master_json.chapters[parseInt($('#chapter_select').val())].topics[i]['name'] = $('#topicname').val();
+                              break;
+                            }
+                          }
+
+                        }else{
+
+                            if (master_json.chapters[parseInt($('#chapter_select').val())]['topics'] == undefined) {
+                              master_json.chapters[parseInt($('#chapter_select').val())]['topics']=[];
+                            };
+                              master_json.chapters[parseInt($('#chapter_select').val())]['topics'].push({'id':$('#topicnumber').val(),'name':$('#topicname').val()});
+                          // }else{
+                            // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+                            // if (result) {
+                              // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
+                                  // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
+                              // };
+                              // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
+                            // }
+                          // };
 
 
 
 
-                var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
-                child = dom.createElement('topic');
-                child.setAttribute('id', $('#topicnumber').val());
-                dom.documentElement.appendChild(child);
+                          var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
+                          child = dom.createElement('topic');
+                          child.setAttribute('id', $('#topicnumber').val());
+                          dom.documentElement.appendChild(child);
 
-                window.URL = window.webkitURL || window.URL;
-                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-                file = new Blob([jsxml.toXml(dom)]);
-
-
-                file.name="topic.xml"
-                // file.append(master_json);
-                // var a = document.getElementById("downloadFile");
-                // a.hidden = '';
-                // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
-                // a.download = 'filename.txt';
-                // a.textContent = 'Download file!';
+                          window.URL = window.webkitURL || window.URL;
+                          window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                          file = new Blob([jsxml.toXml(dom)]);
 
 
-                uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
+                          file.name="topic.xml"
+                          // file.append(master_json);
+                          // var a = document.getElementById("downloadFile");
+                          // a.hidden = '';
+                          // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+                          // a.download = 'filename.txt';
+                          // a.textContent = 'Download file!';
 
-              }
 
+                          uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
 
-
-
-            window.URL = window.webkitURL || window.URL;
-            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
-            file.name="master.json";
-
-            uploadFiles('/savefile/',file);
-
-            refresh_chapters();
+                        }
 
 
 
 
+                      window.URL = window.webkitURL || window.URL;
+                      window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                      file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+                      file.name="master.json";
 
-            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
-            //   console.log(data);
-            // });
+                      uploadFiles('/savefile/',file);
 
-            refresh_chapters();
+                      refresh_chapters();
 
-            $( this ).dialog( "close" );
+
+
+
+
+                      // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
+                      //   console.log(data);
+                      // });
+
+                      refresh_chapters();
+
+                      $( this ).dialog( "close" );
+                }
 
         },
         Cancel: function() {
@@ -205,47 +227,74 @@ $('#dialog-chapter').dialog({
         "Insert Chapter": function() {
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_no').val())-1] != undefined) {
-              if (editing_state==true) {
-                editing_state=false;
-                for (var i = 0; i < master_json.chapters.length; i++) {
-                  if (master_json.chapters[i]['id']==$('#chapterid').val()) {
-                    master_json.chapters[i]['name']=$('#chapter_name').val();
-                    break;
-                  }
 
+              var uniqueness=true;
+              var chp_id=$('#chapterid').val();
+
+              for (var i = 0; i < master_json.chapters.length; i++) {
+
+                if (master_json.chapters[i]['id'] == chp_id) {
+                  uniqueness=false;
                 };
+
+                for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
+                  if (master_json.chapters[i].topics[j]['id'] == chp_id) {
+                    uniqueness=false;
+                  };
+                };
+              };
+
+              if ($('#chapterid').val().match('^[_a-zA-Z0-9]+$') == null) {
+                alert("The ID is wrong. It can only include alpha numerals and (_)");
+              }else if(!uniqueness){
+                alert("The ID is not unique through the book.");
               }else{
-                master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
+
+
+                    if (editing_state==true) {
+                      editing_state=false;
+                      for (var i = 0; i < master_json.chapters.length; i++) {
+                        if (master_json.chapters[i]['id']==$('#chapterid').val()) {
+                          master_json.chapters[i]['name']=$('#chapter_name').val();
+                          break;
+                        }
+
+                      };
+                    }else{
+                      master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val()});
+                    }
+
+
+
+
+                  window.URL = window.webkitURL || window.URL;
+                  window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                  file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+                  file.name="master.json";
+                  // file.append(master_json);
+                  // var a = document.getElementById("downloadFile");
+                  // a.hidden = '';
+                  // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+                  // a.download = 'filename.txt';
+                  // a.textContent = 'Download file!';
+
+
+                  uploadFiles('/savefile/',file);
+
+
+
+
+
+                  // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
+                  //   console.log(data);
+                  // });
+
+                  refresh_chapters();
+
+                  $( this ).dialog( "close" );
+
               }
 
-
-
-
-            window.URL = window.webkitURL || window.URL;
-            window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-            file = new Blob([JSON.stringify(master_json, undefined, 2)]);
-            file.name="master.json";
-            // file.append(master_json);
-            // var a = document.getElementById("downloadFile");
-            // a.hidden = '';
-            // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
-            // a.download = 'filename.txt';
-            // a.textContent = 'Download file!';
-
-
-            uploadFiles('/savefile/',file);
-
-
-
-
-
-            // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
-            //   console.log(data);
-            // });
-
-            refresh_chapters();
-
-            $( this ).dialog( "close" );
 
         },
         Cancel: function() {
