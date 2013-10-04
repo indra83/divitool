@@ -186,12 +186,12 @@ $( ".sortchapters" ).sortable({
 
         for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
           // master_json.chapters[i].assessments[k]
-          var test_el=$('<li style="background-color:wheat;">');
+          var test_el=$('<li style="background-color:wheat;padding:2px;">');
           var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
           link.attr('chapter-id',i);
           link.attr('assessmentid',k);
           var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-trash'));
-          var edit_btn_ch=$('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
+          var edit_btn_ch=$('<button>').addClass('btn edit-assessment sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
           link.prepend(edit_btn_ch);
           link.append(del_btn_ch);
           test_el.append(link);

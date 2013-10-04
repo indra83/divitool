@@ -44,7 +44,7 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <button id="mod-test" type="button" class="btn btn-primary">Add Test</button>
+                  <button id="mod-test" type="button" class="btn btn-primary">Add Assessment</button>
                 </div>
                 <div class="col-md-6">
 
@@ -461,7 +461,7 @@
           <!-- ADD ASSESSMENT -->
 
 
-          <div id="dialog-test" title="Add Test">
+          <div id="dialog-test" title="Add Assessment">
             <form class="form-horizontal" role="form">
 
 
@@ -489,16 +489,18 @@
             </div>
 
             <div class="form-group">
-                <label for="testtype" class="col-lg-2 control-label">Chapter</label>
+                <label for="testtype" class="col-lg-2 control-label">Type</label>
                 <div class="col-lg-10">
                   <select class="form-control" name="type" id="testtype">
-                    <option value="mcq">MCQ</option>
+                    <option value="mcq">Test</option>
+                    <option value="mcq">Assigment</option>
+                    <option value="mcq">Quiz</option>
                 </select>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="testdifficulty" class="col-lg-2 control-label">Chapter</label>
+                <label for="testdifficulty" class="col-lg-2 control-label">Difficult</label>
                 <div class="col-lg-10">
                   <select class="form-control" name="diff" id="testdifficulty">
                     <option value="mcq">Easy</option>

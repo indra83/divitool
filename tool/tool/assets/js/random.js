@@ -244,7 +244,7 @@ $('#dialog-test').dialog({
       width: 500,
       modal: true,
       buttons: {
-        "Insert Topic": function() {
+        "Insert Assessment": function() {
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
 
@@ -577,7 +577,7 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
 
         for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
           // master_json.chapters[i].assessments[k]
-          var test_el=$('<li style="background-color:wheat;">');
+          var test_el=$('<li style="background-color:wheat;padding:2px;">');
           var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
           link.attr('chapter-id',i);
           link.attr('assessmentid',k);
