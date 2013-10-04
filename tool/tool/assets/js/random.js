@@ -1435,7 +1435,9 @@ function refresh_dom(){
               // child.textContent = unescape(current_topic[i].data);
 
               data1=dom.createElement('data');
-              data1.textContent=unescape(current_topic[i].data);
+
+              cdata=dom.createCDATASection(unescape(current_topic[i].data));
+              data1.appendChild(cdata);
 
               child.appendChild(data1);
 
