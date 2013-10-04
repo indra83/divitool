@@ -39,6 +39,7 @@
                 <div class="col-md-6">
                   <button id="mod-topic" type="button" class="btn btn-primary">Add Topic</button>
                 </div>
+
               </div>
               <p>&nbsp;</p>
               <div class="row">
@@ -107,20 +108,30 @@
             <div class="list-group">
               <a href="#" id="mod-html" class="list-group-item plus mod-html" >Add HTML</a>
               <a href="#" id="mod-opt" class="list-group-item plus mod-opt" >Add Option</a>
+              <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Match Image</a>
 
-              <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Header</a>
+
+              <!-- <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Header</a>
               <a href="#" id="mod-subheading" class="list-group-item plus mod-subheading" >Add Sub HEading</a>
               <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a>
               <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Image</a>
               <a href="#" id="mod-video" class="list-group-item plus mod-video" >Add Video</a>
-              <a href="#" id="mod-audio" class="list-group-item plus mod-audio" >Add Audio</a>
+              <a href="#" id="mod-audio" class="list-group-item plus mod-audio" >Add Audio</a> -->
 
             </div>
 
 </div>
 
-          <!-- HEADING -->
+<div id="dialog-canvas">
+  <canvas id="image-ppt" ></canvas>
+  <div id="status"></div>
+  <input type="hidden" id="canvas_xml">
+  <input type="hidden" id="canvas_x">
+  <input type="hidden" id="canvas_y">
+</div>
 
+          <!-- HEADING -->
+<!--
           <div id="dialog-heading" title="Insert Heading">
             <p class="validateTips">Insert Heading.</p>
 
@@ -144,11 +155,11 @@
 
 
             </form>
-          </div>
+          </div> -->
 
           <!-- SUB HEADING -->
 
-          <div id="dialog-sub-heading" title="Insert Sub HEading">
+          <!-- <div id="dialog-sub-heading" title="Insert Sub HEading">
 
             <form class="form-horizontal" role="form">
 
@@ -170,12 +181,12 @@
 
 
             </form>
-          </div>
+          </div> -->
 
           <!-- END SUB HEADING -->
 
           <!-- Image -->
-            <div id="dialog-image" title="Insert Image">
+             <div id="dialog-image" title="Insert Image">
 
               <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
 
@@ -205,7 +216,7 @@
                 <label for="img-attr">Attribution/Source : </label>
                 <div class="col-lg-10">
                 <textarea id="img-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
-                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
                 </div>
               </div>
 
@@ -224,11 +235,11 @@
 
 
               </form>
-            </div>
+            </div> -->
           <!-- END OF IMAGE -->
 
           <!-- SOUND -->
-            <div id="dialog-audio" title="Insert Sound">
+           <!--  <div id="dialog-audio" title="Insert Sound">
 
 
               <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
@@ -259,7 +270,7 @@
                 <label for="audio-attr">Attribution/Source : </label>
                 <div class="col-lg-10">
                 <textarea id="audio-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
-                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
                 </div>
               </div>
 
@@ -270,7 +281,7 @@
 
 
 
-            </div>
+            </div> -->
           <!-- END OF SOUND -->
 
 
@@ -349,7 +360,7 @@
 
 
           <!-- VIDEO -->
-            <div id="dialog-video" title="Insert Video">
+            <!-- <div id="dialog-video" title="Insert Video">
 
 
               <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
@@ -390,7 +401,7 @@
                 <label for="video-attr">Attribution/Source : </label>
                 <div class="col-lg-10">
                 <textarea id="video-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
-                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
                 </div>
               </div>
 
@@ -401,13 +412,13 @@
               </form>
 
 
-            </div>
+            </div> -->
           <!-- END OF VIDEO -->
 
 
           <!-- FORMULA -->
 
-          <div id="dialog-formula" title="Insert Sub HEading">
+          <!-- <div id="dialog-formula" title="Insert Sub HEading">
 
             <form>
             <fieldset>
@@ -417,7 +428,7 @@
 
             </fieldset>
             </form>
-          </div>
+          </div> -->
 
           <!-- END FORMULA -->
 
@@ -447,7 +458,7 @@
 
 
 
-          <div id="dialog-topic" title="Add Topic">
+          <!-- <div id="dialog-topic" title="Add Topic">
             <form class="form-horizontal" role="form">
 
 
@@ -475,12 +486,12 @@
             </div>
 
             </form>
-          </div>
+          </div> -->
 
 
           <!-- Book Dialog -->
 
-          <div id="dialog-book" title="Book">
+         <!--  <div id="dialog-book" title="Book">
             <form class="form-horizontal" role="form">
 
 
@@ -524,7 +535,7 @@
             </div>
 
             </form>
-          </div>
+          </div> -->
 
 
 

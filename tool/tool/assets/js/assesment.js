@@ -17,6 +17,8 @@ after_drop=[];
 before_chapter=[];
 after_chapter=[];
 
+defArray=[];
+
 $.ajaxSetup({ cache: false });
 
 
@@ -225,7 +227,7 @@ $('#book-show').on('click','.quest_link',function(){
 
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'correct_x':iterate.children[i].getAttribute('correct_x'),'correct_y':iterate.children[i].getAttribute('correct_y'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
 
               // var parent_div=document.createElement("div");
 
@@ -503,6 +505,20 @@ $(document).on('click','.mod-html',function(e){
   });
 
 
+$(document).on('click','.mod-canvas',function(e){
+    console.log(xml_id);
+    console.log($(this));
+    clicked=$(this);
+
+
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-canvas" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
 
 $(document).on('click','.mod-opt',function(e){
     console.log(xml_id);
@@ -520,6 +536,240 @@ $(document).on('click','.mod-opt',function(e){
   });
 
 
+$(document).on('click','.mod-image',function(e){
+    console.log(xml_id);
+    console.log($(this));
+    clicked=$(this);
+
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-image" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+$( "#dialog-canvas" ).dialog({
+      autoOpen: false,
+      height: 600,
+      width: 600,
+      modal: true,
+      buttons: {
+        "Insert Question": function() {
+
+          var canvas_x=$('#canvas_x').val();
+          var canvas_y=$('#canvas_y').val();
+          var canvas_xml=$('#canvas_xml').val();
+
+          var final_x=canvas_x/$('#image-ppt').width();
+          var final_y=canvas_y/$('#image-ppt').height();
+
+          for (var i = 0; i < topic_json[global_question].length; i++) {
+            if (canvas_xml==topic_json[global_question][i]['id']) {
+              topic_json[global_question][i].correct_x=final_x;
+              topic_json[global_question][i].correct_y=final_y;
+            }
+          }
+
+          $( this ).dialog( "close" );
+          refresh_dom();
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#main-body').html('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
+
+
+$( "#dialog-image" ).dialog({
+      autoOpen: false,
+      height: 500,
+      width: 350,
+      modal: true,
+      buttons: {
+        "Insert Image": function() {
+
+
+            var attr_text=$('#img-attr').val();
+
+            var desc_text=$('#img-desc').val();
+
+            var full_screen=$('#fullscheck').is(':checked');
+
+            var id=$('#imageid').val();
+            i=i+1;
+
+            var uniqueness=true;
+            var regex=false;
+
+            for (var i = 0; i < topic_json[global_question].length; i++) {
+                if(topic_json[global_question][i]['id'] == id){
+                  uniqueness=false;
+                }
+            };
+
+            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The ID is wrong. It can only include alpha numerals and (_)");
+            }else if(!uniqueness){
+              alert("The ID is not unique");
+            }else{
+
+
+                  var files=document.getElementById('imagefilemod').files;
+                  $("#overlay").show();
+                  var fslocation= global_chapter+"/"+global_question+"/media";
+                  console.log(fslocation);
+                  var file_name=files[0].name;
+                  insert=true;
+
+                  var current_topic=topic_json[global_question];
+
+
+                  var deferred = new $.Deferred();
+                    // var deferred1 = new $.Deferred();
+                    defArray.push(deferred);
+                    // defArray.push(deferred1);
+
+                  // var deferred1
+
+                  var img_dlg=$(this);
+
+
+
+
+                  for (var i = 0, f; f = files[i]; i++) {
+                    uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'],f,deferred);
+                  }
+
+
+
+
+                  if (editing_state == true) {
+
+                    // $('#header_text').val()
+
+                    $.when.apply($, defArray).then( function() {
+                      xml_id=parseInt($(".image.xml_id").attr('xml_id'));
+                      editing_state=false;
+                    //this code is called after all the ajax calls are done
+                      // sanitise_media();
+                       // topic_json[global_question].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text});
+                       for(var i=0, len=current_topic.length; i < len; i++){
+                          if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                            current_topic[i].data=file_name;
+                            current_topic[i].attribution=attr_text;
+                            current_topic[i].description=desc_text;
+                            current_topic[i].allowFullscreen=full_screen;
+                            topic_json[global_question]=current_topic;
+                            break;
+                          };
+                        }
+
+                       $("#overlay").hide();
+                       $('#canvas_xml').val(id);
+
+                       var canvas = document.getElementById('image-ppt');
+
+                      var context = canvas.getContext('2d');
+
+                      // load image from data url
+                      var imageObj = new Image();
+                      imageObj.onload = function() {
+
+                        canvas.width=parseInt(imageObj.width);
+                        canvas.height=parseInt(imageObj.height);
+
+                        context.drawImage(this, 0, 0);
+                      };
+
+                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+file_name;
+
+
+
+
+
+
+
+                       $('#dialog-canvas').dialog('open');
+                      // refresh_dom();
+
+                      // img_dlg.dialog( "close" );
+
+                    });
+
+                  }else{
+
+
+
+                    $.when.apply($, defArray).then( function() {
+                            for(var i=0, len=current_topic.length; i < len; i++){
+                                if (i>=current_clicked) {
+                                  var temp=current_topic[i];
+                                  temp.xml_id = parseInt(temp.xml_id)+1;
+                                  current_topic[i]=temp;
+                                }
+                              }
+                              topic_json[global_question]=current_topic;
+                      //this code is called after all the ajax calls are done
+                      // sanitise_media();
+                      topic_json[global_question].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id});
+                      $("#overlay").hide();
+                      $('#canvas_xml').val(id);
+
+                       var canvas = document.getElementById('image-ppt');
+
+                      var context = canvas.getContext('2d');
+
+                      // load image from data url
+                      var imageObj = new Image();
+                      imageObj.onload = function() {
+                        canvas.width=parseInt(imageObj.width);
+                        canvas.height=parseInt(imageObj.height);
+                        context.drawImage(this, 0, 0);
+                      };
+
+                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+file_name;
+
+
+                       $('#dialog-canvas').dialog('open');
+
+                      // refresh_dom();
+
+                      img_dlg.dialog( "close" );
+                    });
+
+
+                  }
+            }
+
+
+
+              // if (insert && ((file.name.toLowerCase().indexOf(".png") != -1) || (file.name.toLowerCase().indexOf(".jp") != -1) || (file.name.toLowerCase().indexOf(".gif") != -1)  )) {
+              //  insert_image(file.name);
+              // }else if(insert && ((file.name.toLowerCase().indexOf('.mp4')!=-1) || (file.name.toLowerCase().indexOf(".ogg") != -1) || (file.name.toLowerCase().indexOf(".webm") != -1) )){
+              //  insert_video(file.name);
+              // }
+
+
+
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#imageid').val('');
+        $('#imagefilemod').val('');
+        $('#img-attr').val('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
 
 $( "#dialog-html" ).dialog({
       autoOpen: false,
@@ -754,6 +1004,35 @@ $(document).on('click','#bookedit',function(){
 //ED OF NEW CODE
 
 
+// FOR THE CANVAS
+
+// $('#image-ppt').mousemove(function(e) {
+//     var pos = findPos(this);
+//     var x = e.pageX - pos.x;
+//     var y = e.pageY - pos.y;
+//     var coord = "x=" + x + ", y=" + y;
+//     var c = this.getContext('2d');
+//     var p = c.getImageData(x, y, 1, 1).data;
+//     // var hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+//     $('#status').html(coord + "<br>");
+// });
+
+$(document).on('click','#image-ppt',function(e){
+    var pos = findPos(this);
+    var x = e.pageX - pos.x;
+    var y = e.pageY - pos.y;
+    var coord = "x=" + x + ", y=" + y;
+
+    $('#canvas_x').val(x);
+    $('#canvas_y').val(y);
+
+    var c = this.getContext('2d');
+    var p = c.getImageData(x, y, 1, 1).data;
+   $('#status').html(coord + "<br>");
+});
+
+//END OF CANVAS
+
   });
 
 
@@ -915,8 +1194,11 @@ function refresh_dom(){
 
               var full_screen = current_topic[i].allowFullscreen;
 
+              var correct_x=current_topic[i].correct_x;
+              var correct_y=current_topic[i].correct_y;
 
-              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_question]['id']+"/"+current_topic[i]['data'];
+
+              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+current_topic[i]['data'];
               console.log(span);
               // span.src = global_chapter+"/"+global_question+"/"+"media/aram.png";
               span.width=320;
@@ -930,7 +1212,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen;
+              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Correct X"+correct_x+"<br> Correct Y : "+correct_y;
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -944,6 +1226,8 @@ function refresh_dom(){
               child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
+              child.setAttribute('correct_x',current_topic[i].correct_x);
+              child.setAttribute('correct_y',current_topic[i].correct_y);
               child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
 
               desc=dom.createElement('description');
@@ -1138,4 +1422,44 @@ side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn
 
 
             uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'],file);
+}
+
+function uploadFilesImage(url, file,deferred) {
+  var formData = new FormData();
+
+  // for (var i = 0, file; file = files[i]; ++i) {
+    formData.append(file.name, file,file.name);
+  // }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', url, true);
+  xhr.onload = function(e) {
+
+    if (this.status == 200) {
+      $("#overlay").hide();
+      deferred.resolve();
+
+      // Note: .response instead of .responseText
+      // var blob = new Blob([this.response], {type: 'image/png'});
+    }else{
+      $("#overlay").hide();
+      deferred.reject();
+    }
+  };
+
+  xhr.send(formData);  // multipart/form-data
+
+}
+
+
+function findPos(obj) {
+    var curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return { x: curleft, y: curtop };
+    }
+    return undefined;
 }
