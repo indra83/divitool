@@ -824,12 +824,14 @@ $( "#dialog-image" ).dialog({
       buttons: {
         "Insert Image": function() {
 
-
+            var title_text=$('#img-title').val();
             var attr_text=$('#img-attr').val();
 
             var desc_text=$('#img-desc').val();
 
             var full_screen=$('#fullscheck').is(':checked');
+
+            var showBorder=$('#showborder').is(':checked');
 
             var id=$('#imageid').val();
             i=i+1;
@@ -895,6 +897,8 @@ $( "#dialog-image" ).dialog({
                             current_topic[i].attribution=attr_text;
                             current_topic[i].description=desc_text;
                             current_topic[i].allowFullscreen=full_screen;
+                            current_topic[i].showBorder=showBorder;
+                            current_topic[i].title=title_text;
                             topic_json[global_topic]=current_topic;
                             break;
                           };
@@ -922,7 +926,7 @@ $( "#dialog-image" ).dialog({
                               topic_json[global_topic]=current_topic;
                       //this code is called after all the ajax calls are done
                       // sanitise_media();
-                      topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id});
+                      topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id,"showBorder":showBorder,'title':title_text});
                       $("#overlay").hide();
                       refresh_dom();
 
@@ -953,6 +957,8 @@ $( "#dialog-image" ).dialog({
         $('#imageid').val('');
         $('#imagefilemod').val('');
         $('#img-attr').val('');
+        $('#img-title').val('');
+        $('#img-desc').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1459,10 +1465,13 @@ function refresh_dom(){
 
               var span = document.createElement("img");
 
+              var title_text=current_topic[i].title;
 
               var attr_text = current_topic[i].attribution;
 
               var full_screen = current_topic[i].allowFullscreen;
+
+              var showBorder = current_topic[i].showBorder;
 
 
               span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
@@ -1479,7 +1488,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen;
+              custom_text.innerHTML="Title : "+ title_text + "<br> Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder;
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -1494,9 +1503,15 @@ function refresh_dom(){
 
               child.setAttribute('src',current_topic[i].data);
               child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
+              child.setAttribute('showBorder',current_topic[i].showBorder);
+
+              title=dom.createElement('title');
+              title.textContent=current_topic[i].title;
 
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;
+
+              child.appendChild(title);
 
               child.appendChild(desc);
 
