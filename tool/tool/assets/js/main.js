@@ -356,13 +356,13 @@ $(document).on('click','#bookedit',function(){
         console.log(iterate.children[i].InnerText);
 
         switch(iterate.children[i].nodeName){
-            case "header":
+            case "heading3":
 
               current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i,'id':iterate.children[i].getAttribute('id')})
 
 
               break;
-        case "subheader":
+        case "subtopic":
               current_topic.push({'type':'subheader','data':iterate.children[i].textContent,'xml_id':i,'id':iterate.children[i].getAttribute('id')})
 
               break;

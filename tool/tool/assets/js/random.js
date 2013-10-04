@@ -666,7 +666,7 @@ $( "#dialog-heading" ).dialog({
       width: 350,
       modal: true,
       buttons: {
-        "Insert Heading": function() {
+        "Insert Heading3": function() {
             var val=$('#header_text').val();
             var id=$('#headerid').val();
             i=i+1;
@@ -747,7 +747,7 @@ $( "#dialog-sub-heading" ).dialog({
       width: 350,
       modal: true,
       buttons: {
-        "Insert Sub-Heading": function() {
+        "Insert Sub-Topic": function() {
             var val=$('#sub_header_text').val();
             var id=$('#subheadingid').val();
             i=i+1;
@@ -1389,11 +1389,11 @@ function refresh_dom(){
         case "header":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING 3</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
 
-              child = dom.createElement('header');
+              child = dom.createElement('heading3');
               child.setAttribute('id',current_topic[i].id);
 
               child.textContent=current_topic[i].data;
@@ -1407,12 +1407,12 @@ function refresh_dom(){
         case "subheader":
               preview_pane.append("<h4>"+current_topic[i].data+"</h4>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB TOPIC</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">SUB HEADING</a>');
 
-              child = dom.createElement('subheader');
+              child = dom.createElement('subtopic');
               child.setAttribute('id',current_topic[i].id);
 
               child.textContent=current_topic[i].data;
