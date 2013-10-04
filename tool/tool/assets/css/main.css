@@ -11,6 +11,10 @@ li .topic_link{
 	cursor: pointer;
 }
 
+li .assess{
+	cursor:pointer;
+}
+
 #overlay{
 	position: fixed;
 	height: 100%;

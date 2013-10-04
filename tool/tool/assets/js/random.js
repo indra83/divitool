@@ -90,11 +90,29 @@ $('#mod-topic').click(function(){
     // options.push(master_json.chapters[i]['name']);
 
   }
-
-
-
   $('#dialog-topic').dialog('open');
 });
+
+
+
+
+
+
+$('#mod-test').click(function(){
+  // Populate the option tags
+  $('#chapter_select1').html('');
+  $("#chapter_select1").removeAttr("disabled");
+  // var options=[];
+  for (var i = 0; i < master_json.chapters.length; i++) {
+    var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
+    $('#chapter_select1').append(op);
+    // options.push(master_json.chapters[i]['name']);
+
+  }
+  $('#dialog-test').dialog('open');
+});
+
+
 
 
 
@@ -202,6 +220,131 @@ $('#dialog-topic').dialog({
                       // });
 
                       refresh_chapters();
+
+                      $( this ).dialog( "close" );
+                }
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#sub_header_text').val('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
+
+
+
+$('#dialog-test').dialog({
+      autoOpen: false,
+      height: 500,
+      width: 500,
+      modal: true,
+      buttons: {
+        "Insert Topic": function() {
+            // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
+            // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
+
+              var uniqueness=true;
+              var chp_id=$('#topicnumber').val();
+
+              for (var i = 0; i < master_json.chapters.length; i++) {
+
+                if (master_json.chapters[i]['id'] == chp_id) {
+                  uniqueness=false;
+                };
+
+                for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
+                  if (master_json.chapters[i].topics[j]['id'] == chp_id) {
+                    uniqueness=false;
+                  }
+                }
+              }
+
+              if ($('#testnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
+                alert("The ID is wrong. It can only include alpha numerals and (_)");
+              }else if(!uniqueness){
+                alert("The ID is not unique through the book.");
+              }else{
+
+                        if (editing_state == true) {
+                          editing_state=false;
+                          for (var i = 0; i < master_json.chapters[parseInt($('#chapter_select1').val())].assessments.length; i++) {
+                            if (master_json.chapters[parseInt($('#chapter_select1').val())].assessments[i]['id'] == $('#topicnumber').val()){
+                              master_json.chapters[parseInt($('#chapter_select1').val())].assessments[i]['name'] = $('#topicname').val();
+                              master_json.chapters[parseInt($('#chapter_select1').val())].assessments[i]['type'] = $('#testtype').val();
+                              master_json.chapters[parseInt($('#chapter_select1').val())].assessments[i]['difficulty'] = $('#testlevel').val();
+                              master_json.chapters[parseInt($('#chapter_select1').val())].assessments[i]['time'] = $('#testtime').val();
+                              break;
+                            }
+                          }
+
+                        }else{
+
+                            if (master_json.chapters[parseInt($('#chapter_select1').val())]['assessments'] == undefined) {
+                              master_json.chapters[parseInt($('#chapter_select1').val())]['assessments']=[];
+                            };
+                              master_json.chapters[parseInt($('#chapter_select1').val())]['assessments'].push({'id':$('#testnumber').val(),'name':$('#testname').val(),'type':$('#testtype').val(),'level':$('#testlevel').val(),'time':$('#testtime').val(),'difficulty':$('#testdifficulty').val(),});
+                          // }else{
+                            // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
+                            // if (result) {
+                              // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
+                                  // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
+                              // };
+                              // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
+                            // }
+                          // };
+
+
+
+
+                        //   var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
+                        //   child = dom.createElement('topic');
+                        //   child.setAttribute('id', $('#topicnumber').val());
+                        //   dom.documentElement.appendChild(child);
+
+                        //   window.URL = window.webkitURL || window.URL;
+                        //   window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                        //   file = new Blob([jsxml.toXml(dom)]);
+
+
+                        //   file.name="topic.xml"
+                        //   // file.append(master_json);
+                        //   // var a = document.getElementById("downloadFile");
+                        //   // a.hidden = '';
+                        //   // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
+                        //   // a.download = 'filename.txt';
+                        //   // a.textContent = 'Download file!';
+
+
+                        //   uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
+
+                        }
+
+
+
+
+                      window.URL = window.webkitURL || window.URL;
+                      window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+                      file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+                      file.name="master.json";
+
+                      uploadFiles('/savefile/',file);
+
+                      refresh_chapters();
+
+
+
+
+
+                      // $.post('/savefile/.json', {file1:master_json}).done(function(data) {
+                      //   console.log(data);
+                      // });
+
+                      // refresh_chapters();
 
                       $( this ).dialog( "close" );
                 }
@@ -412,6 +555,7 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
 
 
        var top=$('<ul>');
+
        top.addClass('sortchapters');
       if (master_json.chapters[i].topics != undefined) {
         for (var j = master_json.chapters[i].topics.length - 1; j >= 0; j--) {
@@ -427,8 +571,28 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
             a1.append('&nbsp;').append(del_btn);
             top.prepend(a1);
         }
-        a.append(top);
       }
+
+        var top1=$('<ul>');
+
+        for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
+          // master_json.chapters[i].assessments[k]
+          var test_el=$('<li style="background-color:wheat;">');
+          var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
+          link.attr('chapter-id',i);
+          link.attr('assessmentid',k);
+          var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-trash'));
+          var edit_btn_ch=$('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
+          link.prepend(edit_btn_ch);
+          link.append(del_btn_ch);
+          test_el.append(link);
+          top1.prepend(test_el);
+        }
+
+        a.append(top);
+        a.append(top1);
+
+
 
 
 

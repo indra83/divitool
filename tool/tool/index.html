@@ -39,6 +39,16 @@
                 <div class="col-md-6">
                   <button id="mod-topic" type="button" class="btn btn-primary">Add Topic</button>
                 </div>
+                <br>
+                <br>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <button id="mod-test" type="button" class="btn btn-primary">Add Test</button>
+                </div>
+                <div class="col-md-6">
+
+                </div>
               </div>
               <p>&nbsp;</p>
               <div class="row">
@@ -447,6 +457,71 @@
 
             </form>
           </div>
+
+          <!-- ADD ASSESSMENT -->
+
+
+          <div id="dialog-test" title="Add Test">
+            <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+                <label for="chapter_select1" class="col-lg-2 control-label">Chapter</label>
+                <div class="col-lg-10">
+                  <select class="form-control" name="chapter" id="chapter_select1">
+                </select>
+                </div>
+              </div>
+
+
+              <div class="form-group">
+              <label for="testnumber" class="col-lg-2 control-label">Assessment Id</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="testnumber" placeholder="Assessment Id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="testname" class="col-lg-2 control-label">Assessment Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="testname" placeholder="Assessment Name">
+              </div>
+            </div>
+
+            <div class="form-group">
+                <label for="testtype" class="col-lg-2 control-label">Chapter</label>
+                <div class="col-lg-10">
+                  <select class="form-control" name="type" id="testtype">
+                    <option value="mcq">MCQ</option>
+                </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="testdifficulty" class="col-lg-2 control-label">Chapter</label>
+                <div class="col-lg-10">
+                  <select class="form-control" name="diff" id="testdifficulty">
+                    <option value="mcq">Easy</option>
+                    <option value="mcq">Medium</option>
+                    <option value="mcq">Difficult</option>
+                </select>
+
+                </div>
+              </div>
+
+              <div class="form-group">
+              <label for="testtime" class="col-lg-2 control-label">Assessment Time (Minutes)</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="testtime" placeholder="Assessment Time (Minutes)">
+              </div>
+            </div>
+
+            </form>
+          </div>
+
+
+
+          <!-- END ASSESMENT -->
 
 
           <!-- Book Dialog -->

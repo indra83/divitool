@@ -181,7 +181,27 @@ $( ".sortchapters" ).sortable({
             a1.append('&nbsp;').append(del_btn);
             top.prepend(a1);
         }
+
+        var top1=$('<ul>');
+
+        for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
+          // master_json.chapters[i].assessments[k]
+          var test_el=$('<li style="background-color:wheat;">');
+          var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
+          link.attr('chapter-id',i);
+          link.attr('assessmentid',k);
+          var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-trash'));
+          var edit_btn_ch=$('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
+          link.prepend(edit_btn_ch);
+          link.append(del_btn_ch);
+          test_el.append(link);
+          top1.prepend(test_el);
+        }
+
+
+
         a.append(top);
+        a.append(top1);
       }
 
       $('#book-nav').prepend(a);
@@ -580,6 +600,19 @@ $(document).on('click','#bookedit',function(){
     e.preventDefault();
   });
 
+  $(document).on('click','.assess',function(e){
+    var popup = window.open('http://localhost:8080/tool/assessment.html?chapter='+$(this).attr('chapter-id')+"&assessment="+$(this).attr('assessmentid'));
+    popup.json=JSON.stringify(master_json);
+    popup.assessment=$(this).attr('assessmentid');
+    popup.chapter=$(this).attr('chapter-id');
+    popup.postMessage(JSON.stringify(master_json),'http://localhost:8080/tool/assessment.html');
+    e.preventDefault();
+  });
+
+window.addEventListener('message',function(event) {
+  // if(event.origin !== 'http://scriptandstyle.com') return;
+  console.log('received response:  ',event.data);
+},false);
 
   $(document).on('click','.editing-formula',function(e){
     editing_state=true;
