@@ -591,6 +591,7 @@ $( "#dialog-html" ).dialog({
 
 
 $(document).on('click','.editing-html',function(e){
+
     editing_state=true;
     console.log(xml_id);
     console.log($(this));
@@ -601,14 +602,14 @@ $(document).on('click','.editing-html',function(e){
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
-            tinyMCE.activeEditor.setContent(unescape(current_topic[i]['data']));
+            tinymce.EditorManager.get('html_ip').setContent(unescape(current_topic[i]['data']));
             break;
       };
     };
 
     $(".html.xml_id").attr('xml_id',xml_id);
-    if (topic_json[global_topic]==undefined) {
-      topic_json[global_topic]=[];
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
     };
     $( "#dialog-html" ).dialog( "open" );
     e.preventDefault();
@@ -625,14 +626,14 @@ $(document).on('click','.editing-option',function(e){
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
-            tinyMCE.activeEditor.setContent(unescape(current_topic[i]['data']));
+            tinymce.EditorManager.get('opt_ip').setContent(unescape(current_topic[i]['data']));
             break;
       };
     };
 
     $(".opt.xml_id").attr('xml_id',xml_id);
-    if (topic_json[global_topic]==undefined) {
-      topic_json[global_topic]=[];
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
     };
     $( "#dialog-opt" ).dialog( "open" );
     e.preventDefault();
