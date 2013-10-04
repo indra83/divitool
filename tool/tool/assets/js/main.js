@@ -184,6 +184,10 @@ $( ".sortchapters" ).sortable({
 
         var top1=$('<ul>');
 
+        if (master_json.chapters[i].assessments == undefined) {
+          master_json.chapters[i].assessments=[];
+        };
+
         for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
           // master_json.chapters[i].assessments[k]
           var test_el=$('<li style="background-color:wheat;padding:2px;">');
