@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Divi Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
+
+<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <script type="text/x-mathjax-config">
+
+</script>
+
+
+
+<div id="overlay">
+  <p>Please wait ...</p>
+</div>
+
+    <div class="container">
+          <h1>Divi!</h1>
+        <div class="row">
+          <div class="col-md-3">
+            <div class="row well well-lg">
+              <div class="row">
+                <div class="col-md-6">
+                  <button id="mod-quest" type="button" class="btn btn-primary">Add Question</button>
+                </div>
+                <div class="col-md-6">
+                  <button id="mod-topic" type="button" class="btn btn-primary">Add Topic</button>
+                </div>
+              </div>
+              <p>&nbsp;</p>
+              <div class="row">
+                <div id="book-desc" class="col-md-12 well well-lg">
+                  <button id="bookedit" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+                  <div id="bookid-cont">
+                  </div>
+                  <div id="courseid-cont">
+                  </div>
+                  <div id="coursename-cont">
+                  </div>
+                  <div id="bookversion-cont">
+                  </div>
+                  <div id="bookorder-cont">
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="row">
+                <div id="book-show" class="col-mod-12 well well-lg">
+                  <ul id="book-nav" class="nav nav-pills nav-stacked">
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-offset-1 col-md-8">
+            <div class="row well well-lg">
+              <div class="col-md-3 well well-lg side-scroll">
+                <div class="row">
+                  <div id="sidebar" class="col-md-12">
+                    <button xml_index="0" class="add-btn btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>
+
+                    <div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-md-9 well well-lg side-scroll">
+                <div id="preview" class=" col-md-12">
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+    </div>
+
+
+
+
+
+<!-- Dialog Elements  -->
+
+
+<div id="dialog-add" title="Add New Element">
+            <p class="validateTips">Add one of the following</p>
+            <div class="list-group">
+              <a href="#" id="mod-html" class="list-group-item plus mod-html" >Add HTML</a>
+              <a href="#" id="mod-opt" class="list-group-item plus mod-opt" >Add Option</a>
+
+              <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Header</a>
+              <a href="#" id="mod-subheading" class="list-group-item plus mod-subheading" >Add Sub HEading</a>
+              <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a>
+              <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Image</a>
+              <a href="#" id="mod-video" class="list-group-item plus mod-video" >Add Video</a>
+              <a href="#" id="mod-audio" class="list-group-item plus mod-audio" >Add Audio</a>
+
+            </div>
+
+</div>
+
+          <!-- HEADING -->
+
+          <div id="dialog-heading" title="Insert Heading">
+            <p class="validateTips">Insert Heading.</p>
+
+            <form class="form-horizontal" role="form">
+
+              <div class="form-group">
+                <label for="headerid">Heading3 ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="headerid" placeholder="Heading3 ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+              <label for="name">Heading </label>
+              <div class="col-lg-10">
+              <input type="text" name="name" id="header_text" class="text ui-widget-content ui-corner-all form-control" />
+              </div>
+              </div>
+              <input type="hidden" class="header xml_id">
+
+
+
+            </form>
+          </div>
+
+          <!-- SUB HEADING -->
+
+          <div id="dialog-sub-heading" title="Insert Sub HEading">
+
+            <form class="form-horizontal" role="form">
+
+              <div class="form-group">
+                <label for="subheadingid">Sub Heading ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="subheadingid" placeholder="Sub Heading ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+              <label for="name">Sub Heading</label>
+              <div class="col-lg-10">
+              <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all form-control" />
+              </div>
+              </div>
+
+              <input type="hidden" class="subheader xml_id">
+
+
+            </form>
+          </div>
+
+          <!-- END SUB HEADING -->
+
+          <!-- Image -->
+            <div id="dialog-image" title="Insert Image">
+
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
+
+              <div class="form-group">
+
+
+                <div class="col-lg-10">
+                  <input type="file"  class="form-control" name="file1" id="imagefilemod" accept ="image/png, image/gif,image/pjpeg, image/jpeg">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="imageid">Image ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="imageid" placeholder="Image ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="img-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="img-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="img-attr">Attribution/Source : </label>
+                <div class="col-lg-10">
+                <textarea id="img-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                  <div class="checkbox">
+                    <label>
+                      <input id="fullscheck" type="checkbox"> Allow Fulscreen
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+                <input type="hidden" class="image xml_id">
+
+
+
+              </form>
+            </div>
+          <!-- END OF IMAGE -->
+
+          <!-- SOUND -->
+            <div id="dialog-audio" title="Insert Sound">
+
+
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
+
+              <div class="form-group">
+
+
+                <div class="col-lg-10">
+                  <input type="file" id="audiofilemod" accept ="audio/mpeg, audio/mp4, audio/basic, audio/ogg, audio/webm">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="audioid">Audio ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="audioid" placeholder="Audio ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="audio-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="audio-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="audio-attr">Attribution/Source : </label>
+                <div class="col-lg-10">
+                <textarea id="audio-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+
+
+                <input type="hidden" class="audio xml_id">
+
+
+
+
+            </div>
+          <!-- END OF SOUND -->
+
+
+
+          <!-- EDITABLE DIV -->
+
+              <div id="dialog-html" title="Insert Image">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea class="html_input"></textarea>
+
+                    <input type="hidden" class="html xml_id">
+
+                    <label for="html-attr">Attribution/Source : </label>
+                    <textarea id="html-attr" class="text ui-widget-content ui-corner-all"></textarea>
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+
+              <div id="dialog-opt" title="Insert Image">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea class="html_input"></textarea>
+
+                    <input type="hidden" class="html xml_id">
+
+
+                          <label>
+                            <input id="correct" type="checkbox"> Is Correct Answer
+                          </label>
+
+
+
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+          <!-- END OF EDITABLE DIV -->
+
+
+
+
+          <!-- VIDEO -->
+            <div id="dialog-video" title="Insert Video">
+
+
+              <form id="image_form_submit" action="/"  enctype="multipart/form-data" method="POST" class="form-horizontal" role="form">
+
+              <div class="form-group">
+
+                <label for="videofilemod">Video File</label>
+                <div class="col-lg-10">
+                  <input type="file" id="videofilemod" accept="video/mpeg, video/mp4, video/ogg, video/webm, video/x-flv">
+                </div>
+              </div>
+
+
+
+              <div class="form-group">
+
+                <label for="thumbfilemod">Thumbnail File</label>
+                <div class="col-lg-10">
+                    <input type="file" id="thumbfilemod" accept ="image/png, image/gif,image/pjpeg, image/jpeg">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="videoid">Video ID</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="videoid" placeholder="Video ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="video-desc">Description</label>
+                <div class="col-lg-10">
+                <textarea id="video-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="video-attr">Attribution/Source : </label>
+                <div class="col-lg-10">
+                <textarea id="video-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+                <input type="hidden" class="video xml_id">
+
+
+
+              </form>
+
+
+            </div>
+          <!-- END OF VIDEO -->
+
+
+          <!-- FORMULA -->
+
+          <div id="dialog-formula" title="Insert Sub HEading">
+
+            <form>
+            <fieldset>
+              <label for="name">Formula</label>
+              <textarea type="text" name="name" id="formula_text" class="text ui-widget-content ui-corner-all" ></textarea>
+              <input type="hidden" class="formula xml_id">
+
+            </fieldset>
+            </form>
+          </div>
+
+          <!-- END FORMULA -->
+
+          <div id="dialog-quest" title="Add Question">
+
+
+             <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+              <label for="questionid" class="col-lg-2 control-label">Question Id</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="questionid" placeholder="Question Id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="question_name" class="col-lg-2 control-label">Question Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="question_name" placeholder="Question Name">
+              </div>
+            </div>
+
+            </form>
+
+          </div>
+
+
+
+          <div id="dialog-topic" title="Add Topic">
+            <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+              <label for="topicname" class="col-lg-2 control-label">Chapter</label>
+              <div class="col-lg-10">
+                <select class="form-control" name="chapter" id="chapter_select">
+              </select>
+              </div>
+            </div>
+
+
+              <div class="form-group">
+              <label for="topicnumber" class="col-lg-2 control-label">Topic Id</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="topicnumber" placeholder="Topic Id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="topicname" class="col-lg-2 control-label">Topic Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="topicname" placeholder="Topic Name">
+              </div>
+            </div>
+
+            </form>
+          </div>
+
+
+          <!-- Book Dialog -->
+
+          <div id="dialog-book" title="Book">
+            <form class="form-horizontal" role="form">
+
+
+              <div class="form-group">
+              <label for="bookname" class="col-lg-2 control-label">Book Name</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="bookname" placeholder="Book Name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bookid" class="col-lg-2 control-label">Book ID</label>
+
+              <div class="col-lg-10">
+                <input type="text" required pattern="^[_a-zA-Z0-9]+$" title="Only alphanumeric and underscore (_) allowed" class="form-control" id="bookid" placeholder="Book ID">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="courseid" class="col-lg-2 control-label">Course ID</label>
+
+              <div class="col-lg-10">
+                <input type="text" required pattern="^[_a-zA-Z0-9]+$" title="Only alphanumeric and underscore (_) allowed" class="form-control" id="courseid" placeholder="Course ID">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bookversion" class="col-lg-2 control-label">Book Version</label>
+
+              <div class="col-lg-10">
+                <input type="number" class="form-control" id="bookversion" placeholder="Book Version">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bookorder" class="col-lg-2 control-label">Book Order</label>
+
+              <div class="col-lg-10">
+                <input type="number" class="form-control" id="bookorder" placeholder="Book Order">
+              </div>
+            </div>
+
+            </form>
+          </div>
+
+
+
+
+          <!-- END OF BOOK DIALOG -->
+
+
+<!-- End of Dialog Elements -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="assets/js/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
+
+    <script src="assets/js/jsxml.js"></script>
+    <script src="assets/js/jquery.url.js"></script>
+    <script src="assets/js/assesment.js"></script>
+
+
+<script>
+$(document).on('focusin', function(e) {
+    if ($(event.target).closest(".mce-window").length) {
+    e.stopImmediatePropagation();
+  }
+});
+
+        tinymce.init({selector:'textarea.html_input',paste_as_text: true,
+          plugins:'diviformula imageupload',valid_elements : '*[*]',
+          toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload', height:300});
+        tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
+
+
+</script>
+
+
+  </body>
+</html>
