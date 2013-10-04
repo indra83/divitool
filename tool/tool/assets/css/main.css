@@ -36,3 +36,7 @@ li .assess{
 	display: none;
 	margin: 4px;
 }
+
+.dialog-image, .dialog-video{
+	padding:10px;
+}

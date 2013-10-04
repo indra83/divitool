@@ -384,7 +384,7 @@ $(document).on('click','#bookedit',function(){
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
 
 

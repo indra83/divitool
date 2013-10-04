@@ -975,7 +975,7 @@ $( "#dialog-audio" ).dialog({
       buttons: {
         "Insert Audio": function() {
 
-
+          $("#overlay").show();
 
           var id=$('#audioid').val();
             i=i+1;
@@ -1088,6 +1088,8 @@ $( "#dialog-video" ).dialog({
       buttons: {
         "Insert Video": function() {
 
+          $("#overlay").show();
+
           var id=$('#videoid').val();
             i=i+1;
 
@@ -1107,6 +1109,7 @@ $( "#dialog-video" ).dialog({
             }else{
 
                 var vide_dialog = $(this);
+                var title_text = $('#video-title').val();
                 var attr_text=$('#video-attr').val();
                 var desc_text=$('#video-desc').val();
                 var files=document.getElementById('videofilemod').files;
@@ -1147,6 +1150,7 @@ $( "#dialog-video" ).dialog({
                       current_topic[i].thumb=file_name1;
                       current_topic[i].attribution=attr_text;
                       current_topic[i].description=desc_text;
+                      current_topic[i].title=title_text;
                       topic_json[global_topic]=current_topic;
                       break;
                     };
@@ -1175,7 +1179,7 @@ $( "#dialog-video" ).dialog({
 
 
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1,"description":desc_text,'id':id});
+                  topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1,"description":desc_text,'id':id,'title':title_text});
                 }
 
 
@@ -1534,7 +1538,7 @@ function refresh_dom(){
 
               span.setAttribute('controls','');
 
-
+              var title_text = current_topic[i].title;
               var attr_text = current_topic[i].attribution;
 
 
@@ -1553,7 +1557,7 @@ function refresh_dom(){
 
               // if (current_topic[i]['thumb1'] == undefined) {
                 var custom_text=document.createElement("p");
-                custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description;
+                custom_text.innerHTML="Reference : "+attr_text+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description;
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1579,9 +1583,13 @@ function refresh_dom(){
               // img1=dom.createElement('image');
               child.setAttribute('thumb',current_topic[i]['thumb']);
 
+              title=dom.createElement('title');
+              title.textContent=current_topic[i].title;
+
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;
 
+              child.appendChild(title);
               child.appendChild(desc);
 
               ref=dom.createElement('references');
