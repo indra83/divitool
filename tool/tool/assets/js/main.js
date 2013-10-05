@@ -302,27 +302,27 @@ $( ".sortchapters" ).sortable({
 
 
 $('#sidebar').on('mouseover','.sortable',function(){
-    $(this).children('.inner-btn').show();
+    $(this).children('.inner-btn').css('visibility','visible');
 });
 
 $('#sidebar').on('mouseout','.sortable',function(){
-    $(this).children('.inner-btn').hide();
+    $(this).children('.inner-btn').css('visibility','hidden');
 });
 
 $('#book-show').on('mouseover','#book-nav li',function(){
-    $(this).find('.sidebar-btn').show();
+    $(this).find('.sidebar-btn').css('visibility','visible');
 });
 
 $('#book-show').on('mouseout','#book-nav li',function(){
-    $(this).find('.sidebar-btn').hide();
+    $(this).find('.sidebar-btn').css('visibility','hidden');
 });
 
 $('#book-show').on('mouseover','.sortchapters li',function(){
-    $(this).find('.sidebar-btn').show();
+    $(this).find('.sidebar-btn').css('visibility','visible');
 });
 
 $('#book-show').on('mouseout','.sortchapters li',function(){
-    $(this).find('.sidebar-btn').hide();
+    $(this).find('.sidebar-btn').css('visibility','hidden');
 });
 
 $(document).on('click','#bookedit',function(){
@@ -381,21 +381,21 @@ $(document).on('click','#bookedit',function(){
 
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'showBorder':iterate.children[i].getAttribute('showBorder'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'showBorder':iterate.children[i].getAttribute('showBorder'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
               // var parent_div=document.createElement("div");
 
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
 
 
               break;
 
         case "audio":
-              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
+              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
               //   var parent_div=document.createElement("div");
 
 

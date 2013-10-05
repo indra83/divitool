@@ -4,7 +4,8 @@
 }
 
 .inner-btn{
-	display: none;
+	/*display: none;*/
+	visibility:hidden;
 }
 
 li .topic_link{
@@ -33,7 +34,7 @@ li .assess{
 }
 
 .sidebar-btn{
-	display: none;
+	visibility:hidden;
 	margin: 4px;
 }
 
