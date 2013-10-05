@@ -249,7 +249,7 @@ $('#dialog-test').dialog({
             // if (master_json.chapters[parseInt($('#chapter_select').val())-1] != undefined) {
 
               var uniqueness=true;
-              var chp_id=$('#topicnumber').val();
+              var chp_id=$('#testnumber').val();
 
               for (var i = 0; i < master_json.chapters.length; i++) {
 
