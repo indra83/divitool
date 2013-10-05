@@ -575,6 +575,11 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
 
         var top1=$('<ul>');
 
+
+        if (master_json.chapters[i].assessments == undefined) {
+          master_json.chapters[i].assessments=[];
+        }else{
+
         for (var k = 0; k < master_json.chapters[i].assessments.length; k++) {
           // master_json.chapters[i].assessments[k]
           var test_el=$('<li style="background-color:wheat;padding:2px;">');
@@ -588,6 +593,7 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
           test_el.append(link);
           top1.prepend(test_el);
         }
+      }
 
         a.append(top);
         a.append(top1);
