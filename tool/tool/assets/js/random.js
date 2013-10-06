@@ -912,7 +912,7 @@ $( "#dialog-image" ).dialog({
                             current_topic[i].allowFullscreen=full_screen;
                             current_topic[i].showBorder=showBorder;
                             current_topic[i].title=title_text;
-                            current_topic[i].url=attr_name;
+                            current_topic[i].url=attr_url;
                             current_topic[i].name=attr_name;
 
 
@@ -1019,6 +1019,7 @@ $( "#dialog-audio" ).dialog({
                   // var deferred1 = new $.Deferred();
                   defArray.push(deferred);
 
+                  var title==$('#audio-title').val();
                   var attr_text=$('#audio-attr').val();
                   var desc_text=$('#audio-desc').val();
                   var attr_name=$('#audio-attr-name').val();
@@ -1051,7 +1052,8 @@ $( "#dialog-audio" ).dialog({
                       current_topic[i].data=file_name;
                       current_topic[i].attribution=attr_text;
                       current_topic[i].description=desc_text;
-                      current_topic[i].url=attr_name;
+                      current_topic[i].title=title;
+                      current_topic[i].url=attr_url;
                       current_topic[i].name=attr_name;
                       topic_json[global_topic]=current_topic;
 
@@ -1071,7 +1073,7 @@ $( "#dialog-audio" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,'id':id,'name':attr_name,'url':attr_url});
+                  topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,'id':id,'name':attr_name,'url':attr_url,'title':title});
 
                 }
 
@@ -1180,7 +1182,7 @@ $( "#dialog-video" ).dialog({
                       current_topic[i].attribution=attr_text;
                       current_topic[i].description=desc_text;
                       current_topic[i].title=title_text;
-                      current_topic[i].url=attr_name;
+                      current_topic[i].url=attr_url;
                       current_topic[i].name=attr_name;
                       topic_json[global_topic]=current_topic;
                       break;
@@ -1340,6 +1342,8 @@ $( "#dialog-html" ).dialog({
 
                 var current_topic=topic_json[global_topic];
                 var attr_text=$('#html-attr').val();
+                var attr_name=$('#html-attr-name').val();
+                var attr_url=$('#html-attr-url').val();
 
 
             if (editing_state == true) {
@@ -1349,6 +1353,9 @@ $( "#dialog-html" ).dialog({
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=val;
+                  current_topic[i].attribution=attr_text;
+                  current_topic[i].url=attr_url;
+                  current_topic[i].name=attr_name;
                   topic_json[global_topic]=current_topic;
                   break;
                 };
@@ -1365,7 +1372,7 @@ $( "#dialog-html" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text});
+                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text,'name':attr_name,'url':attr_url});
                 }
 
 
@@ -1386,11 +1393,14 @@ $( "#dialog-html" ).dialog({
         },
         Cancel: function() {
           tinyMCE.activeEditor.setContent('');
+          $('#html-attr').val('');
+          $('#html-attr-name').val('');
+          $('#html-attr-url').val('');
           $( this ).dialog( "close" );
         }
       },
       close: function() {
-        $('#main-body').html('');
+        tinyMCE.activeEditor.setContent('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1409,7 +1419,7 @@ function refresh_dom(){
   var side_bar=$('#sidebar');
   side_bar.html('');
 
-  preview_pane.append("<h1>"+master_json.chapters[global_chapter].topics[global_topic]['id']+"<small> is being editted </small></h1>");
+  preview_pane.append("<h1>"+master_json.chapters[global_chapter].topics[global_topic]['id']+"<small> is being editted </small></h1> <br><hr>");
 
 
   // var current_topic=topic_json[global_topic];
@@ -1434,7 +1444,7 @@ function refresh_dom(){
   for(var i=0, len=current_topic.length; i < len; i++){
     switch(current_topic[i].type){
         case "header":
-              preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
+              preview_pane.append("<h3>"+current_topic[i].data+"</h3> <br><hr>");
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING 3</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
@@ -1452,7 +1462,7 @@ function refresh_dom(){
 
               break;
         case "subheader":
-              preview_pane.append("<h4>"+current_topic[i].data+"</h4>");
+              preview_pane.append("<h4>"+current_topic[i].data+"</h4> <br><hr>");
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-subheader header-d">SUB TOPIC</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
@@ -1470,7 +1480,7 @@ function refresh_dom(){
 
         case "html":
               console.log("HTML");
-              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div>");
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br><hr>");
               preview_pane.append("Reference : "+current_topic[i].attribution);
               // preview_pane.attr('contenteditable','false');
 
@@ -1529,7 +1539,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder;
+              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder+"<br><hr>";
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -1608,7 +1618,7 @@ function refresh_dom(){
 
               // if (current_topic[i]['thumb1'] == undefined) {
                 var custom_text=document.createElement("p");
-                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description;
+                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description+"<br><hr>";
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1675,6 +1685,7 @@ function refresh_dom(){
 
 
                 var attr_text = current_topic[i].attribution;
+                var title_text=current_topic[i].title;
 
 
                 span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['data'];
@@ -1692,7 +1703,7 @@ function refresh_dom(){
 
                 // if (current_topic[i]['thumb1'] == undefined) {
                   var custom_text=document.createElement("p");
-                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"description :"+current_topic[i].description;
+                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"description :"+current_topic[i].description+"<br><hr>";
                   parent_div.appendChild(span);
                   parent_div.appendChild(custom_text);
                   // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1708,6 +1719,11 @@ function refresh_dom(){
               child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
+
+              title=dom.createElement('title');
+              title.textContent=current_topic[i].title;
+
+              child.appendChild(title);
 
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;

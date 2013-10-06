@@ -115,7 +115,7 @@
 <div id="dialog-add" title="Add New Element">
             <p class="validateTips">Add one of the following</p>
             <div class="list-group">
-              <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Header</a>
+              <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Heading 3</a>
               <a href="#" id="mod-subheading" class="list-group-item plus mod-subheading" >Add Subtopic</a>
               <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a>
               <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Image</a>
@@ -229,7 +229,7 @@
 
               <div class="form-group">
                 <div class="col-lg-10">
-                <label for="img-attr">Name/Title : </label>
+                <label for="img-attr-name">Name/Title : </label>
 
                 <textarea id="img-attr-name" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
@@ -238,7 +238,7 @@
 
               <div class="form-group">
                 <div class="col-lg-10">
-                <label for="img-attr">URL :  </label>
+                <label for="img-attr-url">URL :  </label>
 
                 <textarea id="img-attr-url" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
@@ -292,6 +292,14 @@
                 <label for="audioid">Audio ID</label>
 
                   <input type="text" class="form-control" id="audioid" placeholder="Audio ID">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                <label for="audio-title">Title</label>
+
+                <textarea id="audio-title" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 </div>
               </div>
 
@@ -361,8 +369,32 @@
 
                     <input type="hidden" class="html xml_id">
 
-                    <label for="html-attr">Attribution/Source : </label>
-                    <textarea id="html-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr">Author Name/ID/Organization Name : </label>
+
+                      <textarea id="html-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr-name">Name/Title : </label>
+
+                      <textarea id="html-attr-name" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr-url">URL :  </label>
+
+                      <textarea id="html-attr-url" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
 
 
                   <!-- END EDITABLE DIV -->
