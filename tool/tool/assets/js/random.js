@@ -1384,6 +1384,7 @@ $( "#dialog-html" ).dialog({
 
         },
         Cancel: function() {
+          tinyMCE.activeEditor.setContent('');
           $( this ).dialog( "close" );
         }
       },
