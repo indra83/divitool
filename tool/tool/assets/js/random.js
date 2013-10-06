@@ -146,9 +146,9 @@ $('#dialog-topic').dialog({
                 }
               }
 
-              if ($('#topicnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
+              if (editing_state == false && $('#topicnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
                 alert("The ID is wrong. It can only include alpha numerals and (_)");
-              }else if(!uniqueness){
+              }else if(editing_state == false && !uniqueness){
                 alert("The ID is not unique through the book.");
               }else{
 
@@ -268,9 +268,9 @@ $('#dialog-test').dialog({
                 }
               }
 
-              if ($('#testnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
+              if (editing_state == false && $('#testnumber').val().match('^[_a-zA-Z0-9]+$') == null) {
                 alert("The ID is wrong. It can only include alpha numerals and (_)");
-              }else if(!uniqueness){
+              }else if(editing_state == false && !uniqueness){
                 alert("The ID is not unique through the book.");
               }else{
 
@@ -391,9 +391,9 @@ $('#dialog-chapter').dialog({
                 };
               };
 
-              if ($('#chapterid').val().match('^[_a-zA-Z0-9]+$') == null) {
+              if ( editing_state == false && $('#chapterid').val().match('^[_a-zA-Z0-9]+$') == null) {
                 alert("The ID is wrong. It can only include alpha numerals and (_)");
-              }else if(!uniqueness){
+              }else if(editing_state == false && !uniqueness){
                 alert("The ID is not unique through the book.");
               }else{
 
@@ -408,6 +408,7 @@ $('#dialog-chapter').dialog({
 
                       };
                     }else{
+
                       master_json.chapters.push({'id':$('#chapterid').val(),'name':$('#chapter_name').val(),'topics':[]});
                     }
 
@@ -690,9 +691,9 @@ $( "#dialog-heading" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
                   var current_topic=topic_json[global_topic];
@@ -771,9 +772,9 @@ $( "#dialog-sub-heading" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
                 // i=i+1;
@@ -857,9 +858,9 @@ $( "#dialog-image" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
 
@@ -1007,9 +1008,9 @@ $( "#dialog-audio" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
 
@@ -1128,9 +1129,9 @@ $( "#dialog-video" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
 
