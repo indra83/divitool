@@ -1019,7 +1019,7 @@ $( "#dialog-audio" ).dialog({
                   // var deferred1 = new $.Deferred();
                   defArray.push(deferred);
 
-                  var title==$('#audio-title').val();
+                  var title=$('#audio-title').val();
                   var attr_text=$('#audio-attr').val();
                   var desc_text=$('#audio-desc').val();
                   var attr_name=$('#audio-attr-name').val();
