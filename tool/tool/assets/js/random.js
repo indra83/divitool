@@ -1481,7 +1481,7 @@ function refresh_dom(){
         case "html":
               console.log("HTML");
               preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br><hr>");
-              preview_pane.append("Reference : "+current_topic[i].attribution);
+              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url);
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1703,7 +1703,7 @@ function refresh_dom(){
 
                 // if (current_topic[i]['thumb1'] == undefined) {
                   var custom_text=document.createElement("p");
-                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"description :"+current_topic[i].description+"<br><hr>";
+                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br> Title : "+current_topic[i].title+"<br>"+"description :"+current_topic[i].description+"<br><hr>";
                   parent_div.appendChild(span);
                   parent_div.appendChild(custom_text);
                   // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
