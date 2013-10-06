@@ -681,6 +681,10 @@ window.addEventListener('message',function(event) {
         $('#img-attr').val(current_topic[i]['attribution']);
             $('#imageid').val(current_topic[i]['id']);
             $('#img-attr').val(current_topic[i]['attribution']);
+            $('#img-desc').val(current_topic[i]['description']);
+            $('#img-title').val(current_topic[i]['title']);
+            $('#img-attr-name').val(current_topic[i]['name']);
+            $('#img-attr-url').val(current_topic[i]['url']);
             break;
       };
     };
@@ -709,6 +713,9 @@ $(document).on('click','.editing-audio',function(e){
       if (xml_id == current_topic[i].xml_id) {
           $('#audioid').val(current_topic[i]['id']);
             $('#audio-attr').val(current_topic[i]['attribution']);
+            $('#audio-desc').val(current_topic[i]['description']);
+            $('#audio-attr-name').val(current_topic[i]['name']);
+            $('#audio-attr-url').val(current_topic[i]['url']);
             break;
       };
     };
@@ -736,6 +743,10 @@ $(document).on('click','.editing-video',function(e){
       if (xml_id == current_topic[i].xml_id) {
             $('#videoid').val(current_topic[i]['id']);
             $('#video-attr').val(current_topic[i]['attribution']);
+            $('#video-desc').val(current_topic[i]['description']);
+            $('#video-title').val(current_topic[i]['title']);
+            $('#video-attr-name').val(current_topic[i]['name']);
+            $('#video-attr-url').val(current_topic[i]['url']);
             break;
       };
     };

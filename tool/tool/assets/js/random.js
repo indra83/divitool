@@ -25,6 +25,8 @@ $(document).on('click','.edit-chp',function(e){
 
 $('#mod-chapter').click(function(){
   $("#chapterid").removeAttr("disabled");
+  $('#chapter_name').val('');
+      $('#chapterid').val('');
   $('#dialog-chapter').dialog('open');
 });
 
@@ -83,6 +85,8 @@ $('#mod-topic').click(function(){
   $('#chapter_select').html('');
   $("#chapter_select").removeAttr("disabled");
   $("#topicnumber").removeAttr("disabled");
+  $("#topicnumber").val('');
+  $('#topicname').val('');
   // var options=[];
   for (var i = 0; i < master_json.chapters.length; i++) {
     var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
@@ -971,6 +975,8 @@ $( "#dialog-image" ).dialog({
         $('#img-attr').val('');
         $('#img-title').val('');
         $('#img-desc').val('');
+        $('#img-attr-name').val('');
+        $('#img-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -981,7 +987,7 @@ $( "#dialog-image" ).dialog({
 
 $( "#dialog-audio" ).dialog({
       autoOpen: false,
-      height: 300,
+      height: 500,
       width: 350,
       modal: true,
       buttons: {
@@ -1086,6 +1092,9 @@ $( "#dialog-audio" ).dialog({
         $('#audioid').val('');
         $('#audiofilemod').val('');
         $('#audio-attr').val('');
+        $('#audio-desc').val('');
+        $('#audio-attr-name').val('');
+        $('#audio-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1234,7 +1243,12 @@ $( "#dialog-video" ).dialog({
       },
       close: function() {
         $('#videofilemod').val('');
+        $('#thumbfilemod').val('');
         $('#video-attr').val('');
+        $('#video-title').val('');
+        $('#video-attr-name').val('');
+        $('#video-attr-url').val('');
+        $('#video-desc').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
