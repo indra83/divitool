@@ -373,7 +373,7 @@ $(document).on('click','#bookedit',function(){
 
         case "html":
               // s=(new XMLSerializer()).serializeToString(iterate.children[i])
-              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'name':iterate.children[i].getElementsByTagName('name')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('url')[0].children[2].textContent})
+              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent})
               console.log("HTML");
 
 
@@ -381,21 +381,21 @@ $(document).on('click','#bookedit',function(){
 
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'showBorder':iterate.children[i].getAttribute('showBorder'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('name')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('url')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'showBorder':iterate.children[i].getAttribute('showBorder'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
               // var parent_div=document.createElement("div");
 
               break;
 
         case "video":
-              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('name')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('url')[0].children[2].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
+              current_topic.push({'type':'video','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'thumb':iterate.children[i].getAttribute('thumb'),'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
 
 
               break;
 
         case "audio":
-              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('name')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('url')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
+              current_topic.push({'type':'audio','data':iterate.children[i].getAttribute('src'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
               //   var parent_div=document.createElement("div");
 
 
@@ -654,6 +654,9 @@ window.addEventListener('message',function(event) {
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
             tinyMCE.activeEditor.setContent(unescape(current_topic[i]['data']));
+            $('#html-attr').val(current_topic[i]['attribution']);
+            $('#html-attr-name').val(current_topic[i]['name']);
+            $('#html-attr-url').val(current_topic[i]['url']);
             break;
       };
     };
@@ -712,6 +715,7 @@ $(document).on('click','.editing-audio',function(e){
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
           $('#audioid').val(current_topic[i]['id']);
+          $('#audio-title').val(current_topic[i]['title']);
             $('#audio-attr').val(current_topic[i]['attribution']);
             $('#audio-desc').val(current_topic[i]['description']);
             $('#audio-attr-name').val(current_topic[i]['name']);

@@ -1270,6 +1270,7 @@ $( "#dialog-video" ).dialog({
         }
       },
       close: function() {
+        $('#videoid').val('');
         $('#videofilemod').val('');
         $('#thumbfilemod').val('');
         $('#video-attr').val('');
@@ -1505,8 +1506,8 @@ function refresh_dom(){
 
         case "html":
               console.log("HTML");
-              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br><hr>");
-              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url);
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br>");
+              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br><hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1524,10 +1525,24 @@ function refresh_dom(){
               child.appendChild(data1);
 
               ref=dom.createElement('references');
-              ref.textContent=current_topic[i].attribution;
+
+              src = dom.createElement('source');
+              src.textContent=current_topic[i].attribution;
+
+              name1=dom.createElement('name');
+              name1.textContent=current_topic[i].name;
+
+              url=dom.createElement('url');
+              url.textContent=current_topic[i].url;
+
 
 
               child.appendChild(ref);
+
+              ref.appendChild(src);
+              ref.appendChild(name1);
+              ref.appendChild(url);
+
 
               dom.documentElement.appendChild(child);
 
@@ -1643,7 +1658,7 @@ function refresh_dom(){
 
               // if (current_topic[i]['thumb1'] == undefined) {
                 var custom_text=document.createElement("p");
-                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description+"<br><hr>";
+                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description+"<br>";
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1653,6 +1668,8 @@ function refresh_dom(){
                 span1.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].topics[global_topic]['id']+"/"+current_topic[i]['thumb'];
                 span1.width=100;
                 parent_div.appendChild(span1);
+                var line_var=document.createElement("hr");
+                parent_div.appendChild(line_var);
               // };
 
               preview_pane.append(parent_div);
