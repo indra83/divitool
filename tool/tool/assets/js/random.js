@@ -31,6 +31,61 @@ $('#mod-chapter').click(function(){
 });
 
 
+$(document).on('click','.edit-test',function(e){
+
+    var chapterid=$(this).attr('chapterid');
+    var assessmentid=$(this).attr('assessmentid');
+    var assessmentname="";
+    var assessmenttype="";
+    var assessmentdifficulty="";
+    var assessmenttime="";
+
+    var dropval=0;
+
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+
+              for (var j = 0; j < master_json.chapters[i].assessments.length; j++) {
+                if (master_json.chapters[i].assessments[j]['id'] == assessmentid) {
+                    assessmentname=master_json.chapters[i].assessments[j]['name'];
+                    assessmenttype=master_json.chapters[i].assessments[j]['type'];
+                    assessmentdifficulty=master_json.chapters[i].assessments[j]['difficulty'];
+                    assessmenttime=master_json.chapters[i].assessments[j]['time'];
+                    // assessmentname=master_json.chapters[i].assessments[j]['name'];
+                    dropval=i;
+                    break;
+                }
+              }
+
+              chaptername=master_json.chapters[i]['name'];
+              break;
+            }
+            // master_json.chapters[i]
+    }
+
+
+    $('#chapter_select1').attr('disabled','disabled');
+    $('#testnumber').val(assessmentid);
+    $('#testnumber').attr('disabled','disabled');
+    $('#testname').val(assessmentname);
+    $('#testtype').val(assessmenttype);
+    $('#testdifficulty').val(assessmentdifficulty);
+    $('#testtime').val(assessmenttime);
+    editing_state=true;
+
+  for (var i = 0; i < master_json.chapters.length; i++) {
+    var op=$('<option>').attr('value',i).html(master_json.chapters[i]['name']);
+    $('#chapter_select1').append(op);
+    // options.push(master_json.chapters[i]['name']);
+
+  }
+
+$('#chapter_select1').val(dropval);
+
+  $('#dialog-test').dialog('open');
+
+ e.preventDefault();
+});
 
 
 $(document).on('click','.edit-tpc',function(e){
@@ -292,39 +347,7 @@ $('#dialog-test').dialog({
                               master_json.chapters[parseInt($('#chapter_select1').val())]['assessments']=[];
                             };
                               master_json.chapters[parseInt($('#chapter_select1').val())]['assessments'].push({'id':$('#testnumber').val(),'name':$('#testname').val(),'type':$('#testtype').val(),'level':$('#testlevel').val(),'time':$('#testtime').val(),'difficulty':$('#testdifficulty').val(),});
-                          // }else{
-                            // var result=confirm("You will be replacing a chapter. Are you sure you want to continue? All Data will be lost !!");
-                            // if (result) {
-                              // if (master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'] == undefined) {
-                                  // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics']=[];
-                              // };
-                              // master_json.chapters[parseInt($('#chapter_select').val())-1]['topics'][parseInt($('#topicnumber').val())-1]={'name':$('#topicname').val(),'order':parseInt($('#topicnumber').val())};
-                            // }
-                          // };
 
-
-
-
-                        //   var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
-                        //   child = dom.createElement('topic');
-                        //   child.setAttribute('id', $('#topicnumber').val());
-                        //   dom.documentElement.appendChild(child);
-
-                        //   window.URL = window.webkitURL || window.URL;
-                        //   window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-                        //   file = new Blob([jsxml.toXml(dom)]);
-
-
-                        //   file.name="topic.xml"
-                        //   // file.append(master_json);
-                        //   // var a = document.getElementById("downloadFile");
-                        //   // a.hidden = '';
-                        //   // a.href = window.URL.createObjectURL(file.getBlob('text/plain'));
-                        //   // a.download = 'filename.txt';
-                        //   // a.textContent = 'Download file!';
-
-
-                        //   uploadFiles('/savefile/'+master_json.chapters[parseInt($('#chapter_select').val())]['id']+"/"+$('#topicnumber').val(),file);
 
                         }
 
@@ -591,11 +614,13 @@ for (var i = master_json.chapters.length - 1; i >= 0; i--) {
           var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
           link.attr('chapter-id',i);
           link.attr('assessmentid',k);
-          var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-trash'));
-          var edit_btn_ch=$('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
-          link.prepend(edit_btn_ch);
-          link.append(del_btn_ch);
+          var del_btn_ch=$('<button>').addClass('btn del-test sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[k]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+          var edit_btn_ch=$('<button>').addClass('btn edit-test sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[k]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
+          // link.prepend(edit_btn_ch);
+          // link.append(del_btn_ch);
+          test_el.append(edit_btn_ch)
           test_el.append(link);
+          test_el.append(del_btn_ch);
           top1.prepend(test_el);
         }
       }

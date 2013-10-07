@@ -194,11 +194,11 @@ $( ".sortchapters" ).sortable({
           var link=$('<a>').append(master_json.chapters[i].assessments[k]['name']).addClass('assess');
           link.attr('chapter-id',i);
           link.attr('assessmentid',k);
-          var del_btn_ch=$('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-trash'));
-          var edit_btn_ch=$('<button>').addClass('btn edit-assessment sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[j]).append($('<span>').addClass('glyphicon glyphicon-edit'));
-          link.prepend(edit_btn_ch);
-          link.append(del_btn_ch);
+          var del_btn_ch=$('<button>').addClass('btn del-test sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[k]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+          var edit_btn_ch=$('<button>').addClass('btn edit-test sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[i]['id']).attr('assessmentid',master_json.chapters[i].assessments[k]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
+          test_el.append(edit_btn_ch)
           test_el.append(link);
+          test_el.append(del_btn_ch);
           top1.prepend(test_el);
         }
 
@@ -786,7 +786,7 @@ $(document).on('click','.del-chp',function(e){
 
 
 $(document).on('click','.del-tpc',function(e){
-  var result=confirm("Are you Sure you want to delete this chapter?")
+  var result=confirm("Are you Sure you want to delete this Topic?")
   if (result == true) {
     var chapterid=$(this).attr('chapterid');
     var topicid=$(this).attr('topicid');
@@ -796,6 +796,37 @@ $(document).on('click','.del-tpc',function(e){
               for (var j = 0; j < master_json.chapters[i].topics.length; j++) {
                 if (master_json.chapters[i].topics[j]['id'] == topicid) {
                     master_json.chapters[i].topics.splice(j,1);
+                    break;
+                };
+              };
+              break;
+            };
+            // master_json.chapters[i]
+    };
+    window.URL = window.webkitURL || window.URL;
+    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+    file = new Blob([JSON.stringify(master_json, undefined, 2)]);
+    file.name="master.json";
+
+    uploadFiles('/savefile/',file);
+
+    refresh_chapters();
+  };
+ e.preventDefault();
+});
+
+
+$(document).on('click','.del-test',function(e){
+  var result=confirm("Are you Sure you want to delete this Assessment?")
+  if (result == true) {
+    var chapterid=$(this).attr('chapterid');
+    var assessmentid=$(this).attr('assessmentid');
+
+    for (var i = 0; i < master_json.chapters.length; i++) {
+            if (master_json.chapters[i]['id'] == chapterid) {
+              for (var j = 0; j < master_json.chapters[i].assessments.length; j++) {
+                if (master_json.chapters[i].assessments[j]['id'] == assessmentid) {
+                    master_json.chapters[i].assessments.splice(j,1);
                     break;
                 };
               };

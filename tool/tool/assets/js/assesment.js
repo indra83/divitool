@@ -21,6 +21,8 @@ defArray=[];
 
 $.ajaxSetup({ cache: false });
 
+var assessments_json={};
+
 
 
 
@@ -55,6 +57,7 @@ $('#dialog-quest').dialog({
         "Insert Question": function() {
             // master_json.chapters.push({'name':$('#chapter_name').val(),'order':parseInt($('#chapter_no').val())});
             // if (master_json.chapters[parseInt($('#chapter_no').val())-1] != undefined) {
+              topic_json[global_question]=topic_json[global_question] || [];
 
               var uniqueness=true;
               var chp_id=$('#questionid').val();
@@ -89,10 +92,10 @@ $('#dialog-quest').dialog({
 
                       };
                     }else{
-                      if (master_json.chapters[global_chapter].assessments[global_assessment].questions == undefined) {
-                        master_json.chapters[global_chapter].assessments[global_assessment].questions=[];
+                      if (assessments_json.questions == undefined) {
+                        assessments_json.questions=[];
                       };
-                      master_json.chapters[global_chapter].assessments[global_assessment].questions.push({'id':$('#questionid').val(),'name':$('#question_name').val()});
+                      assessments_json.questions.push({'id':$('#questionid').val(),'name':$('#question_name').val()});
 
                         var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
                           child = dom.createElement('question');
@@ -113,7 +116,7 @@ $('#dialog-quest').dialog({
                           // a.textContent = 'Download file!';
 
 
-                          uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+$('#questionid').val(),file);
+                          uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+$('#questionid').val(),file);
 
 
                     }
@@ -123,8 +126,8 @@ $('#dialog-quest').dialog({
 
                   window.URL = window.webkitURL || window.URL;
                   window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-                  file = new Blob([JSON.stringify(master_json, undefined, 2)]);
-                  file.name="master.json";
+                  file = new Blob([JSON.stringify(assessments_json, undefined, 2)]);
+                  file.name="assessments_json.json";
                   // file.append(master_json);
                   // var a = document.getElementById("downloadFile");
                   // a.hidden = '';
@@ -133,7 +136,11 @@ $('#dialog-quest').dialog({
                   // a.textContent = 'Download file!';
 
 
-                  uploadFiles('/savefile/',file);
+                  uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id'],file);
+
+                  global_question=topic_json.length;
+                  topic_json[global_question] = topic_json[global_question] || [];
+                  topic_json[global_question].push({"type":"html","data":escape("Please Edit the Question"),"xml_id":(current_clicked),"attribution":"Attribution of question"});
 
 
 
@@ -143,7 +150,8 @@ $('#dialog-quest').dialog({
                   //   console.log(data);
                   // });
 
-                  // refresh_chapters();
+                  refresh_chapters();
+                  refresh_dom();
 
                   $( this ).dialog( "close" );
 
@@ -190,7 +198,7 @@ $('#book-show').on('click','.quest_link',function(){
     current_topic=topic_json[global_question] || [];
     $.ajax({
       dataType:"xml",
-      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/question.xml",
+      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/question.xml",
     }).done(function(data) {
 
       var iterate=data.childNodes[0];
@@ -312,29 +320,31 @@ $.ajax({
 
       master_json=JSON.parse(data);
 
-var current_pop = master_json.chapters[global_chapter].assessments[global_assessment];
+      $.ajax({
+      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/assessments_json.json",
+    }).done(function(data) {
+
+      assessments_json=JSON.parse(data);
+
+      refresh_chapters();
 
 
 
+    }).fail(function(data){
+      alert('No assesment json. Loading new json');
+      assessments_json=master_json.chapters[global_chapter].assessments[global_assessment];
+    });
 
-for (var i = 0; i < current_pop.questions.length; i++) {
 
-
-            var a1 = $('<li>');
-            var link1=$('<a>').append(current_pop.questions[i]['name']);
-            var del_btn=$('<button>').addClass('btn del-tpc sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
-            var edit_btn=$('<button>').addClass('btn edit-tpc sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
-            link1.addClass('quest_link');
-            link1.attr('questionid',i);
-            link1.append(edit_btn).append('&nbsp;');
-            a1.append(link1);
-            link1.append('&nbsp;').append(del_btn);
-            $('#book-nav').prepend(a1);
-}
 
 }).fail(function(data){
       console.log(data);
     });
+
+
+
+
+
 // a.append(top);
 
 
@@ -494,8 +504,8 @@ $(document).on('click','.mod-html',function(e){
     console.log($(this));
     clicked=$(this);
     tinymce.activeEditor.chapterid=master_json.chapters[global_chapter]['id'];
-    tinymce.activeEditor.assessmentid=master_json.chapters[global_chapter].assessments[global_assessment]['id'];
-    tinymce.activeEditor.topic_id=master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'];
+    tinymce.activeEditor.assessmentid=assessments_json['id'];
+    tinymce.activeEditor.topic_id=assessments_json.questions[global_question]['id'];
 
     if (topic_json[global_question]==undefined) {
       topic_json[global_question]=[];
@@ -525,8 +535,8 @@ $(document).on('click','.mod-opt',function(e){
     console.log($(this));
     clicked=$(this);
     tinymce.activeEditor.chapterid=master_json.chapters[global_chapter]['id'];
-    tinymce.activeEditor.assessmentid=master_json.chapters[global_chapter].assessments[global_assessment]['id'];
-    tinymce.activeEditor.topic_id=master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'];
+    tinymce.activeEditor.assessmentid=assessments_json['id'];
+    tinymce.activeEditor.topic_id=assessments_json.questions[global_question]['id'];
 
     if (topic_json[global_question]==undefined) {
       topic_json[global_question]=[];
@@ -643,7 +653,7 @@ $( "#dialog-image" ).dialog({
 
 
                   for (var i = 0, f; f = files[i]; i++) {
-                    uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'],f,deferred);
+                    uploadFilesImage('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id'],f,deferred);
                   }
 
 
@@ -687,7 +697,7 @@ $( "#dialog-image" ).dialog({
                         context.drawImage(this, 0, 0);
                       };
 
-                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+file_name;
+                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+file_name;
 
 
 
@@ -733,7 +743,7 @@ $( "#dialog-image" ).dialog({
                         context.drawImage(this, 0, 0);
                       };
 
-                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+file_name;
+                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+file_name;
 
 
                        $('#dialog-canvas').dialog('open');
@@ -963,27 +973,27 @@ $( "#dialog-opt" ).dialog({
     });
 
 $('#sidebar').on('mouseover','.sortable',function(){
-    $(this).children('.inner-btn').show();
+    $(this).children('.inner-btn').css('visibility','visible');
 });
 
 $('#sidebar').on('mouseout','.sortable',function(){
-    $(this).children('.inner-btn').hide();
+    $(this).children('.inner-btn').css('visibility','none');
 });
 
 $('#book-show').on('mouseover','#book-nav li',function(){
-    $(this).find('.sidebar-btn').show();
+    $(this).find('.sidebar-btn').css('visibility','visible');
 });
 
 $('#book-show').on('mouseout','#book-nav li',function(){
-    $(this).find('.sidebar-btn').hide();
+    $(this).find('.sidebar-btn').css('visibility','none');
 });
 
 $('#book-show').on('mouseover','.sortchapters li',function(){
-    $(this).find('.sidebar-btn').show();
+    $(this).find('.sidebar-btn').css('visibility','visible');
 });
 
 $('#book-show').on('mouseout','.sortchapters li',function(){
-    $(this).find('.sidebar-btn').hide();
+    $(this).find('.sidebar-btn').css('visibility','none');
 });
 
 $(document).on('click','#bookedit',function(){
@@ -1065,7 +1075,7 @@ function refresh_dom(){
   var side_bar=$('#sidebar');
   side_bar.html('');
 
-  preview_pane.append("<h1>"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"<small> is being editted </small></h1>");
+  preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted </small></h1>");
 
 
   // var current_topic=topic_json[global_question];
@@ -1080,7 +1090,7 @@ function refresh_dom(){
     return parseInt(obj1.xml_id) - parseInt(obj2.xml_id);
   });
 
-      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question id="'+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+'"/>');
+      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question id="'+assessments_json.questions[global_question]['id']+'"/>');
 
       // child = dom.createElement('topic');
       // child.setAttribute('id', master_json.chapters[global_chapter].topics[global_question]['id']);
@@ -1198,7 +1208,7 @@ function refresh_dom(){
               var correct_y=current_topic[i].correct_y;
 
 
-              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id']+"/"+current_topic[i]['data'];
+              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+current_topic[i]['data'];
               console.log(span);
               // span.src = global_chapter+"/"+global_question+"/"+"media/aram.png";
               span.width=320;
@@ -1421,7 +1431,7 @@ side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn
             // a.textContent = 'Download file!';
 
 
-            uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment].questions[global_question]['id'],file);
+            uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id'],file);
 }
 
 function uploadFilesImage(url, file,deferred) {
@@ -1462,4 +1472,27 @@ function findPos(obj) {
         return { x: curleft, y: curtop };
     }
     return undefined;
+}
+
+function refresh_chapters () {
+
+          var current_pop = assessments_json;
+
+          for (var i = 0; i < current_pop.questions.length; i++) {
+
+
+                      var a1 = $('<li>');
+                      var link1=$('<a>').append(current_pop.questions[i]['name']);
+                      var del_btn=$('<button>').addClass('btn del-quest sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
+                      var edit_btn=$('<button>').addClass('btn edit-quest sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
+
+                      link1.addClass('quest_link');
+                      link1.attr('questionid',i);
+                      // link1.append(edit_btn).append('&nbsp;');
+                      a1.append(edit_btn);
+                      a1.append(link1);
+                      a1.append(del_btn);
+                      // link1.append('&nbsp;').append(del_btn);
+                      $('#book-nav').prepend(a1);
+          }
 }
