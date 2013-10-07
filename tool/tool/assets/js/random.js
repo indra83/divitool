@@ -1523,7 +1523,7 @@ function refresh_dom(){
         case "html":
               console.log("HTML");
               preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br>");
-              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br><hr>");
+              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br><hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1542,6 +1542,9 @@ function refresh_dom(){
 
               ref=dom.createElement('references');
 
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
+
               src = dom.createElement('source');
               src.textContent=current_topic[i].attribution;
 
@@ -1558,6 +1561,7 @@ function refresh_dom(){
               ref.appendChild(src);
               ref.appendChild(name1);
               ref.appendChild(url);
+              ref.appendChild(license);
 
 
               dom.documentElement.appendChild(child);
@@ -1595,7 +1599,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder+"<br><hr>";
+              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder+" <br> License : "+current_topic[i].license+"<br><hr>";
               parent_div.appendChild(span);
               parent_div.appendChild(custom_text);
 
@@ -1618,11 +1622,16 @@ function refresh_dom(){
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;
 
+
+
               child.appendChild(title);
 
               child.appendChild(desc);
 
               ref=dom.createElement('references');
+
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
 
               src = dom.createElement('source');
               src.textContent=current_topic[i].attribution;
@@ -1640,6 +1649,7 @@ function refresh_dom(){
               ref.appendChild(src);
               ref.appendChild(name1);
               ref.appendChild(url);
+              ref.appendChild(license);
 
               dom.documentElement.appendChild(child);
 
@@ -1674,7 +1684,7 @@ function refresh_dom(){
 
               // if (current_topic[i]['thumb1'] == undefined) {
                 var custom_text=document.createElement("p");
-                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description+"<br>";
+                custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br>"+"Title : "+current_topic[i].title+"<br> Description :"+current_topic[i].description+" <br> License : "+current_topic[i].license+"<br>";
                 parent_div.appendChild(span);
                 parent_div.appendChild(custom_text);
                 // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1712,6 +1722,10 @@ function refresh_dom(){
               child.appendChild(desc);
 
               ref=dom.createElement('references');
+
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
+
               src = dom.createElement('source');
               src.textContent=current_topic[i].attribution;
 
@@ -1724,6 +1738,7 @@ function refresh_dom(){
               ref.appendChild(src);
               ref.appendChild(name1);
               ref.appendChild(url);
+              ref.appendChild(license);
 
               child.appendChild(ref);
 
@@ -1761,7 +1776,7 @@ function refresh_dom(){
 
                 // if (current_topic[i]['thumb1'] == undefined) {
                   var custom_text=document.createElement("p");
-                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br> Title : "+current_topic[i].title+"<br>"+"description :"+current_topic[i].description+"<br><hr>";
+                  custom_text.innerHTML="Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+"<br> Title : "+current_topic[i].title+"<br>"+"description :"+current_topic[i].description+" <br> License : "+current_topic[i].license+"<br><hr>";
                   parent_div.appendChild(span);
                   parent_div.appendChild(custom_text);
                   // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
@@ -1789,6 +1804,10 @@ function refresh_dom(){
               child.appendChild(desc);
 
               ref=dom.createElement('references');
+
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
+
               src = dom.createElement('source');
               src.textContent=current_topic[i].attribution;
 
@@ -1801,6 +1820,7 @@ function refresh_dom(){
               ref.appendChild(src);
               ref.appendChild(name1);
               ref.appendChild(url);
+              ref.appendChild(license);
 
               child.appendChild(ref);
 
