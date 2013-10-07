@@ -871,6 +871,8 @@ $( "#dialog-image" ).dialog({
 
             var showBorder=$('#showborder').is(':checked');
 
+            var license=$('#img-attr-lcn').val();
+
             var id=$('#imageid').val();
             i=i+1;
 
@@ -939,6 +941,7 @@ $( "#dialog-image" ).dialog({
                             current_topic[i].title=title_text;
                             current_topic[i].url=attr_url;
                             current_topic[i].name=attr_name;
+                            current_topic[i].license=license;
 
 
                             topic_json[global_topic]=current_topic;
@@ -968,7 +971,7 @@ $( "#dialog-image" ).dialog({
                               topic_json[global_topic]=current_topic;
                       //this code is called after all the ajax calls are done
                       // sanitise_media();
-                      topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id,"showBorder":showBorder,'title':title_text,'name':attr_name,'url':attr_url});
+                      topic_json[global_topic].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id,"showBorder":showBorder,'title':title_text,'name':attr_name,'url':attr_url,'license':license});
                       $("#overlay").hide();
                       refresh_dom();
 
@@ -1049,6 +1052,7 @@ $( "#dialog-audio" ).dialog({
                   var desc_text=$('#audio-desc').val();
                   var attr_name=$('#audio-attr-name').val();
                   var attr_url=$('#audio-attr-url').val();
+                  var license=$('#audio-attr-lcn').val();
                 var files=document.getElementById('audiofilemod').files;
                 $("#overlay").show();
 
@@ -1080,6 +1084,7 @@ $( "#dialog-audio" ).dialog({
                       current_topic[i].title=title;
                       current_topic[i].url=attr_url;
                       current_topic[i].name=attr_name;
+                      current_topic[i].license=license;
                       topic_json[global_topic]=current_topic;
 
                       break;
@@ -1098,7 +1103,7 @@ $( "#dialog-audio" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,'id':id,'name':attr_name,'url':attr_url,'title':title});
+                  topic_json[global_topic].push({"type":"audio","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,'id':id,'name':attr_name,'url':attr_url,'title':title,'license':license});
 
                 }
 
@@ -1122,6 +1127,7 @@ $( "#dialog-audio" ).dialog({
         $('#audio-attr').val('');
         $('#audio-desc').val('');
         $('#audio-attr-name').val('');
+        $('#audio-attr-url').val('');
         $('#audio-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
@@ -1168,6 +1174,7 @@ $( "#dialog-video" ).dialog({
                 var desc_text=$('#video-desc').val();
                 var attr_name=$('#video-attr-name').val();
                 var attr_url=$('#video-attr-url').val();
+                var license=$('#video-attr-lcn').val();
                 var files=document.getElementById('videofilemod').files;
                 $("#overlay").show();
                 var fslocation= global_chapter+"/"+global_topic+"/media";
@@ -1209,6 +1216,7 @@ $( "#dialog-video" ).dialog({
                       current_topic[i].title=title_text;
                       current_topic[i].url=attr_url;
                       current_topic[i].name=attr_name;
+                      current_topic[i].license=license;
                       topic_json[global_topic]=current_topic;
                       break;
                     };
@@ -1237,7 +1245,7 @@ $( "#dialog-video" ).dialog({
 
 
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1,"description":desc_text,'id':id,'title':title_text,'name':attr_name,'url':attr_url});
+                  topic_json[global_topic].push({"type":"video","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"thumb":file_name1,"description":desc_text,'id':id,'title':title_text,'name':attr_name,'url':attr_url,'license':license});
                 }
 
 
@@ -1278,6 +1286,7 @@ $( "#dialog-video" ).dialog({
         $('#video-attr-name').val('');
         $('#video-attr-url').val('');
         $('#video-desc').val('');
+        $('#video-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1370,6 +1379,7 @@ $( "#dialog-html" ).dialog({
                 var attr_text=$('#html-attr').val();
                 var attr_name=$('#html-attr-name').val();
                 var attr_url=$('#html-attr-url').val();
+                var license=$('#html-attr-lcn').val();
 
 
             if (editing_state == true) {
@@ -1382,6 +1392,7 @@ $( "#dialog-html" ).dialog({
                   current_topic[i].attribution=attr_text;
                   current_topic[i].url=attr_url;
                   current_topic[i].name=attr_name;
+                  current_topic[i].license=license;
                   topic_json[global_topic]=current_topic;
                   break;
                 };
@@ -1398,7 +1409,7 @@ $( "#dialog-html" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text,'name':attr_name,'url':attr_url});
+                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text,'name':attr_name,'url':attr_url,'license':license});
                 }
 
 
@@ -1422,11 +1433,16 @@ $( "#dialog-html" ).dialog({
           $('#html-attr').val('');
           $('#html-attr-name').val('');
           $('#html-attr-url').val('');
+          $('#html-attr-url').val('');
           $( this ).dialog( "close" );
         }
       },
       close: function() {
         tinyMCE.activeEditor.setContent('');
+        $('#html-attr').val('');
+          $('#html-attr-name').val('');
+          $('#html-attr-url').val('');
+          $('#html-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
