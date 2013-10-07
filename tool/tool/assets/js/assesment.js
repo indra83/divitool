@@ -1489,11 +1489,11 @@ function refresh_chapters () {
 
                       link1.addClass('quest_link');
                       link1.attr('questionid',i);
-                      // link1.append(edit_btn).append('&nbsp;');
-                      a1.append(edit_btn);
+                      link1.prepend(edit_btn).append('&nbsp;');
+                      // a1.append(edit_btn);
                       a1.append(link1);
-                      a1.append(del_btn);
-                      // link1.append('&nbsp;').append(del_btn);
+                      // a1.append(del_btn);
+                      link1.append('&nbsp;').append(del_btn);
                       $('#book-nav').prepend(a1);
           }
 }
