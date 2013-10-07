@@ -887,6 +887,7 @@ $(document).on('click','.editing-option',function(e){
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
             tinymce.EditorManager.get('opt_ip').setContent(unescape(current_topic[i]['data']));
+            $('#html-attr').val(current_topic[i]['attribution']);
             break;
       };
     };
@@ -977,7 +978,7 @@ $('#sidebar').on('mouseover','.sortable',function(){
 });
 
 $('#sidebar').on('mouseout','.sortable',function(){
-    $(this).children('.inner-btn').css('visibility','none');
+    $(this).children('.inner-btn').css('visibility','hidden');
 });
 
 $('#book-show').on('mouseover','#book-nav li',function(){
@@ -985,7 +986,7 @@ $('#book-show').on('mouseover','#book-nav li',function(){
 });
 
 $('#book-show').on('mouseout','#book-nav li',function(){
-    $(this).find('.sidebar-btn').css('visibility','none');
+    $(this).find('.sidebar-btn').css('visibility','hidden');
 });
 
 $('#book-show').on('mouseover','.sortchapters li',function(){
@@ -993,7 +994,7 @@ $('#book-show').on('mouseover','.sortchapters li',function(){
 });
 
 $('#book-show').on('mouseout','.sortchapters li',function(){
-    $(this).find('.sidebar-btn').css('visibility','none');
+    $(this).find('.sidebar-btn').css('visibility','hidden');
 });
 
 $(document).on('click','#bookedit',function(){
@@ -1075,7 +1076,7 @@ function refresh_dom(){
   var side_bar=$('#sidebar');
   side_bar.html('');
 
-  preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted </small></h1>");
+  preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted </small></h1><hr>");
 
 
   // var current_topic=topic_json[global_question];
@@ -1137,7 +1138,7 @@ function refresh_dom(){
         case "html":
               console.log("HTML");
               preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div>");
-              preview_pane.append("Reference : "+current_topic[i].attribution);
+              preview_pane.append("Reference : "+current_topic[i].attribution+"<hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1167,7 +1168,7 @@ function refresh_dom(){
 
         case "option":
               console.log("HTML");
-              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div>");
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <hr>");
               preview_pane.append("Is Correct : "+current_topic[i].is_correct);
               // preview_pane.attr('contenteditable','false');
 
