@@ -95,7 +95,7 @@ $('#dialog-quest').dialog({
                       if (assessments_json.questions == undefined) {
                         assessments_json.questions=[];
                       };
-                      assessments_json.questions.push({'id':$('#questionid').val(),'name':$('#question_name').val()});
+                      assessments_json.questions.push({'id':$('#questionid').val(),'name':$('#question_name').val(),'type':$('#questiontype').val()});
 
                         var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><root/>'),
                           child = dom.createElement('question');
@@ -1149,7 +1149,9 @@ function refresh_dom(){
               // child.textContent = unescape(current_topic[i].data);
 
               data1=dom.createElement('data');
-              data1.textContent=unescape(current_topic[i].data);
+
+              cdata=dom.createCDATASection(unescape(current_topic[i].data));
+              data1.appendChild(cdata);
 
               child.appendChild(data1);
 
