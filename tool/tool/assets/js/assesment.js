@@ -73,6 +73,13 @@ $('#dialog-quest').dialog({
                     uniqueness=false;
                   };
                 };
+
+                for (var k = 0; k < assessments_json.questions.length; k++) {
+                  if(assessments_json.questions[k]['id'] == chp_id){
+                    uniqueness=false;
+                  }
+                };
+
               };
 
               if ($('#questionid').val().match('^[_a-zA-Z0-9]+$') == null) {
@@ -82,16 +89,7 @@ $('#dialog-quest').dialog({
               }else{
 
 
-                    if (editing_state==true) {
-                      editing_state=false;
-                      for (var i = 0; i < master_json.chapters.length; i++) {
-                        if (master_json.chapters[i]['id']==$('#chapterid').val()) {
-                          master_json.chapters[i]['name']=$('#chapter_name').val();
-                          break;
-                        }
 
-                      };
-                    }else{
                       if (assessments_json.questions == undefined) {
                         assessments_json.questions=[];
                       };
@@ -119,7 +117,7 @@ $('#dialog-quest').dialog({
                           uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+$('#questionid').val(),file);
 
 
-                    }
+                    // }
 
 
 
@@ -127,7 +125,7 @@ $('#dialog-quest').dialog({
                   window.URL = window.webkitURL || window.URL;
                   window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
                   file = new Blob([JSON.stringify(assessments_json, undefined, 2)]);
-                  file.name="assessments_json.json";
+                  file.name="assessments.json";
                   // file.append(master_json);
                   // var a = document.getElementById("downloadFile");
                   // a.hidden = '';
@@ -321,7 +319,7 @@ $.ajax({
       master_json=JSON.parse(data);
 
       $.ajax({
-      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/assessments_json.json",
+      url: "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+master_json.chapters[global_chapter].assessments[global_assessment]['id']+"/assessments.json",
     }).done(function(data) {
 
       assessments_json=JSON.parse(data);
@@ -1045,6 +1043,33 @@ $(document).on('click','#image-ppt',function(e){
 
 //END OF CANVAS
 
+$(document).on('click','.del-quest',function(e){
+  var result=confirm("Are you Sure you want to delete this Question?")
+  if (result == true) {
+    var questionid=$(this).attr('questionid');
+    // var assessmentid=$()
+
+    for (var i = 0; i < assessments_json.questions.length; i++) {
+            if (assessments_json.questions[i]['id'] == questionid) {
+              assessments_json.questions.splice(i,1);
+              break;
+            };
+            // master_json.chapters[i]
+    };
+
+    window.URL = window.webkitURL || window.URL;
+    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+    file = new Blob([JSON.stringify(assessments_json, undefined, 2)]);
+    file.name="assessments.json";
+
+    uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id'],file);
+
+    refresh_chapters();
+  };
+ e.preventDefault();
+});
+
+
   });
 
 
@@ -1483,6 +1508,8 @@ function findPos(obj) {
 
 function refresh_chapters () {
 
+          $('#book-nav').html('');
+
           var current_pop = assessments_json;
 
           for (var i = 0; i < current_pop.questions.length; i++) {
@@ -1495,11 +1522,11 @@ function refresh_chapters () {
 
                       link1.addClass('quest_link');
                       link1.attr('questionid',i);
-                      link1.prepend(edit_btn).append('&nbsp;');
+                      // link1.prepend(edit_btn).append('&nbsp;');
                       // a1.append(edit_btn);
                       a1.append(link1);
                       // a1.append(del_btn);
-                      link1.append('&nbsp;').append(del_btn);
-                      $('#book-nav').prepend(a1);
+                      a1.prepend(del_btn);
+                      $('#book-nav').append(a1);
           }
 }
