@@ -844,7 +844,8 @@ $( "#dialog-html" ).dialog({
         }
       },
       close: function() {
-        $('#main-body').html('');
+        tinyMCE.activeEditor.setContent('');
+        $('#html-attr').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -968,7 +969,7 @@ $( "#dialog-opt" ).dialog({
         }
       },
       close: function() {
-        $('#main-body').html('');
+        tinyMCE.activeEditor.setContent('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1183,9 +1184,12 @@ function refresh_dom(){
               // child.textContent = unescape(current_topic[i].data);
 
               data1=dom.createElement('data');
-              data1.textContent=unescape(current_topic[i].data);
+
+              cdata=dom.createCDATASection(unescape(current_topic[i].data));
+              data1.appendChild(cdata);
 
               child.appendChild(data1);
+
 
               // ref=dom.createElement('references');
               // ref.textContent=current_topic[i].attribution;
