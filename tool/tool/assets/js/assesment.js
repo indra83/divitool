@@ -863,6 +863,7 @@ $(document).on('click','.editing-html',function(e){
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
             tinymce.EditorManager.get('html_ip').setContent(unescape(current_topic[i]['data']));
+            $('#html-attr').val(current_topic[i].attribution);
             break;
       };
     };
@@ -1197,8 +1198,8 @@ function refresh_dom(){
 
         case "option":
               console.log("HTML");
-              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <hr>");
-              preview_pane.append("Is Correct : "+current_topic[i].is_correct);
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> ");
+              preview_pane.append("Is Correct : "+current_topic[i].is_correct +"<hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-option header-d">OPTION</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
