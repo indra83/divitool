@@ -330,7 +330,7 @@ $.ajax({
 
 
     }).fail(function(data){
-      alert('No assesment json. Loading new json');
+      // alert('No assesment json. Loading new json');
       assessments_json=master_json.chapters[global_chapter].assessments[global_assessment];
     });
 
