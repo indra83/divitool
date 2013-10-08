@@ -74,6 +74,10 @@ $('#dialog-quest').dialog({
                   };
                 };
 
+                if (assessments_json.questions == undefined) {
+                    assessments_json.questions=[];
+                };
+
                 for (var k = 0; k < assessments_json.questions.length; k++) {
                   if(assessments_json.questions[k]['id'] == chp_id){
                     uniqueness=false;
