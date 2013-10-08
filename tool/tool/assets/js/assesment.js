@@ -162,7 +162,8 @@ $('#dialog-quest').dialog({
         }
       },
       close: function() {
-        $('#sub_header_text').val('');
+        $('#questionid').val('');
+        $('#question_name').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
