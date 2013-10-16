@@ -219,24 +219,71 @@
               </div>
 
               <div class="form-group">
-                <label for="imageid">Image ID</label>
                 <div class="col-lg-10">
+                <label for="imageid">Image ID</label>
+
                   <input type="text" class="form-control" id="imageid" placeholder="Image ID">
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="img-desc">Description</label>
                 <div class="col-lg-10">
+                <label for="img-title">Title</label>
+
+                <textarea id="img-title" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                <label for="img-desc">Description</label>
+
                 <textarea id="img-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="img-attr">Attribution/Source : </label>
                 <div class="col-lg-10">
-                <textarea id="img-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <label for="img-attr">Author Name/ID/Organization Name : </label>
 
+                <textarea id="img-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                <label for="img-attr-name">Name/Title : </label>
+
+                <textarea id="img-attr-name" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-10">
+                <label for="img-attr-url">URL :  </label>
+
+                <textarea id="img-attr-url" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                </div>
+              </div>
+
+
+              <div class="form-group">
+
+                <div class="col-lg-10">
+                  <label for="img-attr-lcn" class="col-lg-2 control-label">License : </label>
+                  <select class="form-control" name="type" id="img-attr-lcn">
+                    <option value="CC Attribution (CC BY)">CC Attribution (CC BY)</option>
+                    <option value="CC Attribution - Sharealike (CC BY-SA)">CC Attribution - Sharealike (CC BY-SA)</option>
+                    <option value="CC Attribution - Noderivs (CC BY-ND)">CC Attribution - Noderivs (CC BY-ND)</option>
+                    <option value="CC Attribution - NonCommercial (CC BY-NC)">CC Attribution - NonCommercial (CC BY-NC)</option>
+                    <option value="CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)">CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)</option>
+                    <option value="CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)">CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)</option>
+                    <option value="Public Domain">Public Domain</option>
+                    <option value="GNU Free License">GNU Free License</option>
+                </select>
                 </div>
               </div>
 
@@ -250,12 +297,22 @@
                 </div>
               </div>
 
+              <div class="form-group">
+                <div class="col-lg-10">
+                  <div class="checkbox">
+                    <label>
+                      <input id="showborder" checked type="checkbox"> Show Border
+                    </label>
+                  </div>
+                </div>
+              </div>
+
                 <input type="hidden" class="image xml_id">
 
 
 
               </form>
-            </div> -->
+            </div>
           <!-- END OF IMAGE -->
 
           <!-- SOUND -->
@@ -325,13 +382,49 @@
 
                     <input type="hidden" class="html xml_id">
 
-                    <label for="html-attr">Attribution/Source : </label>
-                    <textarea id="html-attr" class="text ui-widget-content ui-corner-all"></textarea>
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr">Author Name/ID/Organization Name : </label>
 
+                      <textarea id="html-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
 
-                  <!-- END EDITABLE DIV -->
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr-name">Name/Title : </label>
 
-                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      <textarea id="html-attr-name" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-lg-10">
+                      <label for="html-attr-url">URL :  </label>
+
+                      <textarea id="html-attr-url" class="text ui-widget-content ui-corner-all form-control"></textarea>
+                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+
+                <div class="col-lg-10">
+                  <label for="html-attr-lcn" class="col-lg-2 control-label">License : </label>
+                  <select class="form-control" name="type" id="html-attr-lcn">
+                    <option value="CC Attribution (CC BY)">CC Attribution (CC BY)</option>
+                    <option value="CC Attribution - Sharealike (CC BY-SA)">CC Attribution - Sharealike (CC BY-SA)</option>
+                    <option value="CC Attribution - Noderivs (CC BY-ND)">CC Attribution - Noderivs (CC BY-ND)</option>
+                    <option value="CC Attribution - NonCommercial (CC BY-NC)">CC Attribution - NonCommercial (CC BY-NC)</option>
+                    <option value="CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)">CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)</option>
+                    <option value="CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)">CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)</option>
+                    <option value="Public Domain">Public Domain</option>
+                    <option value="GNU Free License">GNU Free License</option>
+                </select>
+                </div>
+              </div>
 
 
                 </fieldset>
@@ -339,7 +432,7 @@
               </div>
 
 
-              <div id="dialog-opt" title="Insert Image">
+              <div id="dialog-opt" title="Insert Option">
 
                 <form>
                 <fieldset>
@@ -375,6 +468,71 @@
               </div>
 
           <!-- END OF EDITABLE DIV -->
+
+
+          <div id="dialog-fill-blnk" title="Insert Option">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea id="blnk_ip" ></textarea>
+
+                    <input type="hidden" class="blnk xml_id">
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+
+
+          <div id="dialog-lbl" title="Insert Label">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea id="lbl_ip" class="html_input"></textarea>
+
+                    <input type="hidden" class="lbl xml_id">
+
+                    <input type="hidden" id="canvas_xv">
+                    <input type="hidden" id="canvas_yv">
+
+                    <p id="cnvas-lbl"></p>
+
+
+
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
 
 
 
@@ -477,6 +635,8 @@
                 <div class="col-lg-10">
                   <select class="form-control" name="diff" id="questiontype">
                     <option value="mcq">MCQ</option>
+                    <option value="label">Math The Label</option>
+                    <option value="fill_blank">Fill in the blank</option>
                 </select>
 
                 </div>

@@ -23,14 +23,10 @@ $.ajaxSetup({ cache: false });
 
 var assessments_json={};
 
+var global_qtype="";
 
 
 
-window.addEventListener('message',function(event) {
-	// if(event.origin !== 'http://davidwalsh.name') return;
-	console.log('message received:  ' + event.data,event);
-	event.source.postMessage('holla back youngin!',event.origin);
-},false);
 
 $(function(){
 
@@ -109,7 +105,7 @@ $('#dialog-quest').dialog({
                           file = new Blob([jsxml.toXml(dom)]);
 
 
-                          file.name="question.xml"
+                          file.name="question.xml";
                           // file.append(master_json);
                           // var a = document.getElementById("downloadFile");
                           // a.hidden = '';
@@ -140,11 +136,25 @@ $('#dialog-quest').dialog({
 
                   uploadFiles('/savefile/'+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id'],file);
 
-                  global_question=topic_json.length;
+                  global_question=assessments_json.questions.length-1;
                   topic_json[global_question] = topic_json[global_question] || [];
-                  topic_json[global_question].push({"type":"html","data":escape("Please Edit the Question"),"xml_id":(current_clicked),"attribution":"Attribution of question"});
+                  var qtype=$('#questiontype').val();
+
+                  if (qtype == "mcq") {
+
+                    topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
+                    global_qtype="mcq";
+                  }else if(qtype == "label"){
+                    topic_json[global_question].push({'type':'image','data':"dividefault.png",'allowFullscreen':true,'showBorder':true,'xml_id':current_clicked,'attribution':'attribution','name':'name','url':'url','license':'license','description':'description','id':'newimageid','title':'default title'});
+                    global_qtype="label";
+                  }else if (qtype == "fill_blank") {
+                    topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
+                    topic_json[global_question].push({'type':'fill_blank','data':'Please edit answer','xml_id':current_clicked});
 
 
+
+                    global_qtype="mcq";
+                  }
 
 
 
@@ -224,7 +234,7 @@ $('#book-show').on('click','.quest_link',function(){
 
         case "html":
               // s=(new XMLSerializer()).serializeToString(iterate.children[i])
-              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent})
+              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'license':iterate.children[i].getElementsByTagName('references')[0].children[3].textContent});
               console.log("HTML");
 
 
@@ -236,9 +246,21 @@ $('#book-show').on('click','.quest_link',function(){
 
               break;
 
+        case "answer":
+          current_topic.push({'type':'fill_blank','data':iterate.children[i].textContent,'xml_id':i})
+              console.log("HTML");
+
+              break;
+
+        case "label":
+          current_topic.push({'type':'label','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'x':iterate.children[i].getAttribute('x'),'y':iterate.children[i].getAttribute('y')})
+              console.log("LABEL");
+
+              break;
+
         case "image":
 
-              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'correct_x':iterate.children[i].getAttribute('correct_x'),'correct_y':iterate.children[i].getAttribute('correct_y'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id')});
+              current_topic.push({'type':'image','data':iterate.children[i].getAttribute('src'),'allowFullscreen':iterate.children[i].getAttribute('allowFullscreen'),'showBorder':iterate.children[i].getAttribute('showBorder'),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'license':iterate.children[i].getElementsByTagName('references')[0].children[3].textContent,'description':iterate.children[i].getElementsByTagName('description')[0].textContent,'id':iterate.children[i].getAttribute('id'),'title':iterate.children[i].getElementsByTagName('title')[0].textContent});
 
               // var parent_div=document.createElement("div");
 
@@ -607,12 +629,18 @@ $( "#dialog-image" ).dialog({
       buttons: {
         "Insert Image": function() {
 
-
+            var title_text=$('#img-title').val();
             var attr_text=$('#img-attr').val();
+            var attr_name=$('#img-attr-name').val();
+            var attr_url=$('#img-attr-url').val();
 
             var desc_text=$('#img-desc').val();
 
             var full_screen=$('#fullscheck').is(':checked');
+
+            var showBorder=$('#showborder').is(':checked');
+
+            var license=$('#img-attr-lcn').val();
 
             var id=$('#imageid').val();
             i=i+1;
@@ -626,9 +654,9 @@ $( "#dialog-image" ).dialog({
                 }
             };
 
-            if (id.match('^[_a-zA-Z0-9]+$') == null) {
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
               alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(!uniqueness){
+            }else if(editing_state == false && !uniqueness){
               alert("The ID is not unique");
             }else{
 
@@ -678,40 +706,22 @@ $( "#dialog-image" ).dialog({
                             current_topic[i].attribution=attr_text;
                             current_topic[i].description=desc_text;
                             current_topic[i].allowFullscreen=full_screen;
+                            current_topic[i].showBorder=showBorder;
+                            current_topic[i].title=title_text;
+                            current_topic[i].url=attr_url;
+                            current_topic[i].name=attr_name;
+                            current_topic[i].license=license;
+
+
                             topic_json[global_question]=current_topic;
                             break;
                           };
                         }
 
                        $("#overlay").hide();
-                       $('#canvas_xml').val(id);
+                      refresh_dom();
 
-                       var canvas = document.getElementById('image-ppt');
-
-                      var context = canvas.getContext('2d');
-
-                      // load image from data url
-                      var imageObj = new Image();
-                      imageObj.onload = function() {
-
-                        canvas.width=parseInt(imageObj.width);
-                        canvas.height=parseInt(imageObj.height);
-
-                        context.drawImage(this, 0, 0);
-                      };
-
-                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+file_name;
-
-
-
-
-
-
-
-                       $('#dialog-canvas').dialog('open');
-                      // refresh_dom();
-
-                      // img_dlg.dialog( "close" );
+                      img_dlg.dialog( "close" );
 
                     });
 
@@ -730,28 +740,9 @@ $( "#dialog-image" ).dialog({
                               topic_json[global_question]=current_topic;
                       //this code is called after all the ajax calls are done
                       // sanitise_media();
-                      topic_json[global_question].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id});
+                      topic_json[global_question].push({"type":"image","data":file_name,"xml_id":(current_clicked),"attribution":attr_text,"description":desc_text,"allowFullscreen":full_screen,"id":id,"showBorder":showBorder,'title':title_text,'name':attr_name,'url':attr_url,'license':license});
                       $("#overlay").hide();
-                      $('#canvas_xml').val(id);
-
-                       var canvas = document.getElementById('image-ppt');
-
-                      var context = canvas.getContext('2d');
-
-                      // load image from data url
-                      var imageObj = new Image();
-                      imageObj.onload = function() {
-                        canvas.width=parseInt(imageObj.width);
-                        canvas.height=parseInt(imageObj.height);
-                        context.drawImage(this, 0, 0);
-                      };
-
-                      imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+file_name;
-
-
-                       $('#dialog-canvas').dialog('open');
-
-                      // refresh_dom();
+                      refresh_dom();
 
                       img_dlg.dialog( "close" );
                     });
@@ -780,9 +771,14 @@ $( "#dialog-image" ).dialog({
         $('#imageid').val('');
         $('#imagefilemod').val('');
         $('#img-attr').val('');
+        $('#img-title').val('');
+        $('#img-desc').val('');
+        $('#img-attr-name').val('');
+        $('#img-attr-url').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
+// IMAGE END
 
 $( "#dialog-html" ).dialog({
       autoOpen: false,
@@ -853,6 +849,37 @@ $( "#dialog-html" ).dialog({
       }
     });
 
+$(document).on('click','.editing-image',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_question];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+        $('#img-attr').val(current_topic[i]['attribution']);
+            $('#imageid').val(current_topic[i]['id']);
+            $('#img-attr').val(current_topic[i]['attribution']);
+            $('#img-desc').val(current_topic[i]['description']);
+            $('#img-title').val(current_topic[i]['title']);
+            $('#img-attr-name').val(current_topic[i]['name']);
+            $('#img-attr-url').val(current_topic[i]['url']);
+            break;
+      };
+    };
+
+
+    $(".image.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-image" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
 
 $(document).on('click','.editing-html',function(e){
 
@@ -880,7 +907,32 @@ $(document).on('click','.editing-html',function(e){
     e.preventDefault();
   });
 
-$(document).on('click','.editing-option',function(e){
+$(document).on('click','.editing-blank',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_question];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            // $('#sub_header_text').val(current_topic[i]['data']);
+            $('#blnk_ip').val(current_topic[i]['data']);
+            break;
+      };
+    };
+
+    $(".blnk.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-fill-blnk" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+  $(document).on('click','.editing-option',function(e){
     editing_state=true;
     console.log(xml_id);
     console.log($(this));
@@ -904,6 +956,78 @@ $(document).on('click','.editing-option',function(e){
     $( "#dialog-opt" ).dialog( "open" );
     e.preventDefault();
   });
+
+
+  $('#dialog-fill-blnk').dialog({
+      autoOpen: false,
+      height: 600,
+      width: 600,
+      modal: true,
+      buttons: {
+        "Insert Option": function() {
+
+            var val=$('#blnk_ip').val();
+            // i=i+1;
+
+
+                var current_topic=topic_json[global_question];
+                // var attr_text=$('#html-attr').val();
+                // var is_correct=$('#correct').is(':checked');
+
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".blnk.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=val;
+                  // current_topic[i].isAnswer=is_correct;
+                  topic_json[global_question]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (i>=current_clicked) {
+                      var temp=current_topic[i];
+                      temp.xml_id = parseInt(temp.xml_id)+1;
+                      current_topic[i]=temp;
+                    }
+                  }
+                  topic_json[global_question]=current_topic;
+                  topic_json[global_question].push({"type":"option","data":escape(val),"xml_id":(current_clicked),"is_correct":is_correct});
+                }
+
+
+
+              // if (insert && ((file.name.toLowerCase().indexOf(".png") != -1) || (file.name.toLowerCase().indexOf(".jp") != -1) || (file.name.toLowerCase().indexOf(".gif") != -1)  )) {
+              //  insert_image(file.name);
+              // }else if(insert && ((file.name.toLowerCase().indexOf('.mp4')!=-1) || (file.name.toLowerCase().indexOf(".ogg") != -1) || (file.name.toLowerCase().indexOf(".webm") != -1) )){
+              //  insert_video(file.name);
+              // }
+
+
+              refresh_dom();
+
+            // tinyMCE.activeEditor.setContent('');
+            $('#blnk_ip').val('');
+            $( this ).dialog( "close" );
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        // tinyMCE.activeEditor.setContent('');
+        // $( '#dialog-add' ).dialog( "close" );
+      }
+    });
 
 
 
@@ -950,6 +1074,86 @@ $( "#dialog-opt" ).dialog({
                   }
                   topic_json[global_question]=current_topic;
                   topic_json[global_question].push({"type":"option","data":escape(val),"xml_id":(current_clicked),"is_correct":is_correct});
+                }
+
+
+
+              // if (insert && ((file.name.toLowerCase().indexOf(".png") != -1) || (file.name.toLowerCase().indexOf(".jp") != -1) || (file.name.toLowerCase().indexOf(".gif") != -1)  )) {
+              //  insert_image(file.name);
+              // }else if(insert && ((file.name.toLowerCase().indexOf('.mp4')!=-1) || (file.name.toLowerCase().indexOf(".ogg") != -1) || (file.name.toLowerCase().indexOf(".webm") != -1) )){
+              //  insert_video(file.name);
+              // }
+
+
+              refresh_dom();
+
+            tinyMCE.activeEditor.setContent('');
+            $('#html-attr').val('');
+            $( this ).dialog( "close" );
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        tinyMCE.activeEditor.setContent('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
+
+
+
+
+
+$( "#dialog-lbl" ).dialog({
+      autoOpen: false,
+      height: 600,
+      width: 600,
+      modal: true,
+      buttons: {
+        "Insert Option": function() {
+
+            var val=tinyMCE.activeEditor.getContent();
+            // i=i+1;
+
+
+                var current_topic=topic_json[global_question];
+                var x = $('#canvas_xv').val();
+                var y=$('#canvas_yv').val();
+                // var attr_text=$('#html-attr').val();
+                // var is_correct=$('#correct').is(':checked');
+
+
+
+            if (editing_state == true) {
+              xml_id=parseInt($(".opt.xml_id").attr('xml_id'));
+              editing_state=false;
+
+              for(var i=0, len=current_topic.length; i < len; i++){
+                if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                  current_topic[i].data=val;
+                  current_topic[i].x=x;
+                  current_topic[i].y=y;
+                  // current_topic[i].isAnswer=is_correct;
+                  topic_json[global_question]=current_topic;
+                  break;
+                };
+              }
+
+              // $('#header_text').val()
+
+            }else{
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (i>=current_clicked) {
+                      var temp=current_topic[i];
+                      temp.xml_id = parseInt(temp.xml_id)+1;
+                      current_topic[i]=temp;
+                    }
+                  }
+                  topic_json[global_question]=current_topic;
+                  topic_json[global_question].push({"type":"label","data":escape(val),"xml_id":(current_clicked),'x':x,'y':y});
                 }
 
 
@@ -1169,8 +1373,8 @@ function refresh_dom(){
 
         case "html":
               console.log("HTML");
-              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div>");
-              preview_pane.append("Reference : "+current_topic[i].attribution+"<hr>");
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br>");
+              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br><hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1188,16 +1392,44 @@ function refresh_dom(){
               child.appendChild(data1);
 
               ref=dom.createElement('references');
-              ref.textContent=current_topic[i].attribution;
+
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
+
+              src = dom.createElement('source');
+              src.textContent=current_topic[i].attribution;
+
+              name1=dom.createElement('name');
+              name1.textContent=current_topic[i].name;
+
+              url=dom.createElement('url');
+              url.textContent=current_topic[i].url;
+
 
 
               child.appendChild(ref);
+
+              ref.appendChild(src);
+              ref.appendChild(name1);
+              ref.appendChild(url);
+              ref.appendChild(license);
+
 
               dom.documentElement.appendChild(child);
 
               // side_bar.append('<a href="#" xml_index="'+current_topic[i].xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable plus">HTML</a>');
 
+              break;
+
+        case "fill_blank":
+              preview_pane.append("<div> Answer : "+current_topic[i].data+"</div> ");
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-blank header-d">ANSWER</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              side_bar.append(holder);
+
+              child = dom.createElement('answer');
+              child.textContent=current_topic[i].data
+              dom.documentElement.appendChild(child);
               break;
 
         case "option":
@@ -1232,22 +1464,100 @@ function refresh_dom(){
 
               break;
 
+        case "label":
+              console.log("HTML");
+              preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> "+"<br> x : "+current_topic[i].x+" y : "+current_topic[i].y);
+
+              // preview_pane.attr('contenteditable','false');
+
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-label header-d">LABEL</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              side_bar.append(holder);
+
+              child = dom.createElement('label');
+
+              child.setAttribute('x',current_topic[i].x);
+              child.setAttribute('y',current_topic[i].y);
+
+
+              // child.textContent = unescape(current_topic[i].data);
+
+              data1=dom.createElement('data');
+
+              cdata=dom.createCDATASection(unescape(current_topic[i].data));
+              data1.appendChild(cdata);
+
+              child.appendChild(data1);
+
+
+              // ref=dom.createElement('references');
+              // ref.textContent=current_topic[i].attribution;
+
+
+              // child.appendChild(ref);
+
+              dom.documentElement.appendChild(child);
+
+              break;
+
         case "image":
-              var parent_div=document.createElement("div");
+
+
+            // NEW DATA
+
+
+            var parent_div=document.createElement("div");
+
+              var canvas=document.createElement("canvas");
+
+              var context = canvas.getContext('2d');
+
 
               var span = document.createElement("img");
 
+              var title_text=current_topic[i].title;
 
               var attr_text = current_topic[i].attribution;
 
               var full_screen = current_topic[i].allowFullscreen;
 
-              var correct_x=current_topic[i].correct_x;
-              var correct_y=current_topic[i].correct_y;
+              var showBorder = current_topic[i].showBorder;
 
 
-              span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+current_topic[i]['data'];
-              console.log(span);
+              // load image from data url
+              var imageObj = new Image();
+              imageObj.onload = function() {
+                canvas.width=parseInt(imageObj.width);
+                canvas.height=parseInt(imageObj.height);
+                context.drawImage(this, 0, 0);
+              };
+
+
+
+              if (current_topic[i]['data'] == "dividefault.png") {
+                imageObj.src ="assets/images/divi.png";
+              }else{
+                imageObj.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+current_topic[i]['data'];
+                // console.log(span);
+              }
+
+
+              canvas.addEventListener('click', function(e){
+                var pos = findPos(this);
+                var x = e.pageX - pos.x;
+                var y = e.pageY - pos.y;
+                var coord = "x=" + x + ", y=" + y;
+
+                $('#canvas_xv').val(x/this.width);
+                $('#canvas_yv').val(y/this.height);
+
+                var c = this.getContext('2d');
+                var p = c.getImageData(x, y, 1, 1).data;
+                $('#cnvas-lbl').html('You clicked on => '+coord);
+                $( "#dialog-lbl" ).dialog('open');
+                return false;
+              });
+
+
               // span.src = global_chapter+"/"+global_question+"/"+"media/aram.png";
               span.width=320;
               // console.log("FFFIIIIINNNAAAALLLLLLLLLLLL");
@@ -1260,8 +1570,8 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Correct X"+correct_x+"<br> Correct Y : "+correct_y;
-              parent_div.appendChild(span);
+              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder+" <br> License : "+current_topic[i].license+"<br><hr>";
+              parent_div.appendChild(canvas);
               parent_div.appendChild(custom_text);
 
               preview_pane.append(parent_div);
@@ -1274,21 +1584,121 @@ function refresh_dom(){
               child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
-              child.setAttribute('correct_x',current_topic[i].correct_x);
-              child.setAttribute('correct_y',current_topic[i].correct_y);
               child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
+              child.setAttribute('showBorder',current_topic[i].showBorder);
+
+              title=dom.createElement('title');
+              title.textContent=current_topic[i].title;
 
               desc=dom.createElement('description');
               desc.textContent=current_topic[i].description;
 
+
+
+              child.appendChild(title);
+
               child.appendChild(desc);
 
               ref=dom.createElement('references');
-              ref.textContent=attr_text;
+
+              license=dom.createElement('license');
+              license.textContent=current_topic[i].license;
+
+              src = dom.createElement('source');
+              src.textContent=current_topic[i].attribution;
+
+              name1=dom.createElement('name');
+              name1.textContent=current_topic[i].name;
+
+              url=dom.createElement('url');
+              url.textContent=current_topic[i].url;
+
+
 
               child.appendChild(ref);
 
+              ref.appendChild(src);
+              ref.appendChild(name1);
+              ref.appendChild(url);
+              ref.appendChild(license);
+
               dom.documentElement.appendChild(child);
+
+
+
+
+
+
+
+
+
+
+            //END OF NEW DATA
+
+
+
+
+              // var parent_div=document.createElement("div");
+
+              // var span = document.createElement("img");
+
+
+              // var attr_text = current_topic[i].attribution;
+
+              // var full_screen = current_topic[i].allowFullscreen;
+
+              // var correct_x=current_topic[i].correct_x;
+              // var correct_y=current_topic[i].correct_y;
+
+
+              // if (current_topic[i]['data'] == "dividefault.png") {
+              //   span.src ="assets/images/divi.png";
+              // }else{
+              //   span.src = "/getfiles/"+master_json.chapters[global_chapter]['id']+"/"+assessments_json['id']+"/"+assessments_json.questions[global_question]['id']+"/"+current_topic[i]['data'];
+              //   console.log(span);
+              // }
+
+              // // span.src = global_chapter+"/"+global_question+"/"+"media/aram.png";
+              // span.width=320;
+              // // console.log("FFFIIIIINNNAAAALLLLLLLLLLLL");
+              // // console.log(e.target.result);
+              // // console.log("FFFIIIIINNNAAAALLLLLLLLLLLL END");
+              // // $('#'+xml_id).attr('src',e.target.result);
+
+
+              // // span.style.fontWeight = "bold";
+              // // span.innerHTML=" NMBS";
+
+              // var custom_text=document.createElement("p");
+              // custom_text.innerHTML="Reference : "+attr_text+"<br>"+"description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Correct X"+correct_x+"<br> Correct Y : "+correct_y;
+              // parent_div.appendChild(span);
+              // parent_div.appendChild(custom_text);
+
+              // preview_pane.append(parent_div);
+
+              // var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              // side_bar.append(holder);
+
+
+              // child = dom.createElement('image');
+              // child.setAttribute('id',current_topic[i].id);
+
+              // child.setAttribute('src',current_topic[i].data);
+              // child.setAttribute('correct_x',current_topic[i].correct_x);
+              // child.setAttribute('correct_y',current_topic[i].correct_y);
+              // child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
+
+              // desc=dom.createElement('description');
+              // desc.textContent=current_topic[i].description;
+
+              // child.appendChild(desc);
+
+              // ref=dom.createElement('references');
+              // ref.textContent=attr_text;
+
+              // child.appendChild(ref);
+
+              // dom.documentElement.appendChild(child);
 
               // side_bar.append('<a href="#" xml_index="'+xml_id+'" class="testing1"> <i class="icon-plus-sign"></i> </a>');
               // side_bar.append('<a href="#" id="header" xml_index="'+xml_id+'" class="editable plus">Image</a>');
