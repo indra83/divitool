@@ -1541,7 +1541,7 @@ function refresh_dom(){
     return parseInt(obj1.xml_id) - parseInt(obj2.xml_id);
   });
 
-      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question id="'+assessments_json.questions[global_question]['id']+'"/>');
+      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question id="'+assessments_json.questions[global_question]['id']+'" type="'+global_qtype+'"/>');
 
       var subq=dom.createElement('subquestions');
 
