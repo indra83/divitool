@@ -128,6 +128,8 @@
             <div class="list-group">
               <!-- <a href="#" id="mod-html" class="list-group-item plus mod-html" >Add HTML</a> -->
               <a href="#" id="mod-opt" class="list-group-item plus mod-opt" >Add Option</a>
+              <a href="#" id="mod-match" class="list-group-item plus mod-match" >Add Match</a>
+              <a href="#" id="mod-vocab" class="list-group-item plus mod-vocab" >Add Sub Question</a>
 
 
 
@@ -470,6 +472,46 @@
           <!-- END OF EDITABLE DIV -->
 
 
+          <!-- SUBQ -->
+
+          <div id="dialog-vocab" title="Insert Sub Question">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+
+                    <textarea id="vocab_ip" class="html_input"></textarea>
+
+                    <input type="hidden" class="vocab xml_id">
+
+
+                          <label>
+                            <input id="vcorrect" type="checkbox"> Is Correct Answer
+                          </label>
+
+
+
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+          <!-- END OF SUBQ -->
+
+
           <div id="dialog-fill-blnk" title="Insert Option">
 
                 <form>
@@ -484,6 +526,41 @@
                     </div> -->
 
                     <textarea id="blnk_ip" ></textarea>
+
+                    <input type="hidden" class="blnk xml_id">
+
+
+                  <!-- END EDITABLE DIV -->
+
+                  <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
+
+
+                </fieldset>
+                </form>
+              </div>
+
+
+               <div id="dialog-match" title="Insert Match">
+
+                <form>
+                <fieldset>
+
+                  <!-- EDITABLE DIV -->
+
+
+
+                    <!-- <div id="main-body" contenteditable="true" >
+
+                    </div> -->
+                    <p> LEFT MATCH</p>
+                    <textarea id="left_ip" class="html_input" ></textarea>
+
+                    <br>
+                    <br>
+
+                    <p> RIGHT MATCH</p>
+
+                    <textarea id="right_ip" class="html_input" ></textarea>
 
                     <input type="hidden" class="blnk xml_id">
 
@@ -637,11 +714,12 @@
                     <option value="mcq">MCQ</option>
                     <option value="label">Math The Label</option>
                     <option value="fill_blank">Fill in the blank</option>
+                    <option value="match">Match The Following</option>
+                    <option value="vocab">Vocabulary Test</option>
                 </select>
 
                 </div>
               </div>
-
             </form>
 
           </div>
