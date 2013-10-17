@@ -205,6 +205,7 @@ $('#book-show').on('click','.quest_link',function(){
 	global_question=parseInt($(this).attr('questionid'),10);
     // global_assessment=parseInt($(this).attr('assessmentid'),10);
     // global_chapter=parseInt($(this).attr('chapter-id'),10);
+    global_qtype=$(this).attr('qtype');
     topic_json[global_question]=[];
 
     var xml_string="";
@@ -253,8 +254,24 @@ $('#book-show').on('click','.quest_link',function(){
 
               break;
 
+        case "subquestions":
+               var par=iterate.children[i];
+              for (var j = 0; j < par.children.length; j++) {
+                current_topic.push({'type':'vocab','data':escape(par.children[j].getElementsByTagName('data')[0].textContent),'xml_id':i,'is_correct':par.children[j].getAttribute('isTrue')});
+              };
+              break;
+
         case "match":
               current_topic.push({'type':'match','left':escape(iterate.children[i].getElementsByTagName('left')[0].textContent),'right':escape(iterate.children[i].getElementsByTagName('right')[0].textContent),'xml_id':i})
+              break;
+
+        case "matches":
+              var par=iterate.children[i];
+              for (var j = 0; j < par.children.length; j++) {
+                current_topic.push({'type':'match','left':escape(par.children[j].getElementsByTagName('left')[0].textContent),'right':escape(par.children[j].getElementsByTagName('right')[0].textContent),'xml_id':i})
+              };
+              console.log(iterate.children[i]);
+
               break;
 
         case "answer":
@@ -267,6 +284,14 @@ $('#book-show').on('click','.quest_link',function(){
           current_topic.push({'type':'label','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'x':iterate.children[i].getAttribute('x'),'y':iterate.children[i].getAttribute('y')})
               console.log("LABEL");
 
+              break;
+
+        case "labels":
+                 var par=iterate.children[i];
+                for (var j = 0; j < par.children.length; j++) {
+                  current_topic.push({'type':'label','data':escape(par.children[j].getElementsByTagName('data')[0].textContent),'xml_id':i,'x':par.children[j].getAttribute('x'),'y':par.children[j].getAttribute('y')});
+                    console.log("LABEL");
+                };
               break;
 
         case "image":
@@ -1518,6 +1543,12 @@ function refresh_dom(){
 
       var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question id="'+assessments_json.questions[global_question]['id']+'"/>');
 
+      var subq=dom.createElement('subquestions');
+
+      var match=dom.createElement('matches');
+
+      var label=dom.createElement('labels');
+
       // child = dom.createElement('topic');
       // child.setAttribute('id', master_json.chapters[global_chapter].topics[global_question]['id']);
       // dom.documentElement.appendChild(child);
@@ -1681,7 +1712,9 @@ function refresh_dom(){
 
               // child.appendChild(ref);
 
-              dom.documentElement.appendChild(child);
+              // dom.documentElement.appendChild(child);
+
+              subq.appendChild(child);
 
               break;
 
@@ -1723,7 +1756,9 @@ function refresh_dom(){
 
               // child.appendChild(ref);
 
-              dom.documentElement.appendChild(child);
+              match.appendChild(child);
+
+              // dom.documentElement.appendChild(child);
 
             break;
 
@@ -1751,6 +1786,8 @@ function refresh_dom(){
 
               child.appendChild(data1);
 
+              label.appendChild(child);
+
 
               // ref=dom.createElement('references');
               // ref.textContent=current_topic[i].attribution;
@@ -1758,7 +1795,7 @@ function refresh_dom(){
 
               // child.appendChild(ref);
 
-              dom.documentElement.appendChild(child);
+              // dom.documentElement.appendChild(child);
 
               break;
 
@@ -2124,6 +2161,16 @@ function refresh_dom(){
 
     }
   }
+
+  if (global_qtype=='label') {
+    dom.documentElement.appendChild(label);
+  }else if(global_qtype == 'match'){
+    dom.documentElement.appendChild(match);
+  }else if(global_qtype=='vocab'){
+    dom.documentElement.appendChild(subq);
+  }
+
+
 side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
 
   // $('#side_bar').sortable();
@@ -2201,6 +2248,7 @@ function refresh_chapters () {
 
                       link1.addClass('quest_link');
                       link1.attr('questionid',i);
+                      link1.attr('qtype',current_pop.questions[i]['type'])
                       // link1.prepend(edit_btn).append('&nbsp;');
                       // a1.append(edit_btn);
                       a1.append(link1);
