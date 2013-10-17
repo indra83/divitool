@@ -154,7 +154,7 @@ $('#dialog-quest').dialog({
                     global_qtype="match";
                   }else if(qtype == "vocab"){
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
-                    global_qtype="match";
+                    global_qtype="vocab";
                   }
 
 
@@ -247,7 +247,7 @@ $('#book-show').on('click','.quest_link',function(){
 
               break;
 
-        case "option":
+        case "subquestion":
           current_topic.push({'type':'vocab','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'is_correct':iterate.children[i].getAttribute('isTrue')})
               console.log("HTML");
 
