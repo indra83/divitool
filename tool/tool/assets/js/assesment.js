@@ -1747,7 +1747,7 @@ function refresh_dom(){
         case "header":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">TITLE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">TITLE</a>&nbsp;');
               side_bar.append(holder);
 
 
@@ -1785,7 +1785,7 @@ function refresh_dom(){
               preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br><hr>");
               // preview_pane.attr('contenteditable','false');
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;');
               side_bar.append(holder);
 
               child = dom.createElement('html');
@@ -1832,7 +1832,7 @@ function refresh_dom(){
 
         case "fill_blank":
               preview_pane.append("<div> Answer : "+current_topic[i].data+"</div> ");
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-blank header-d">ANSWER</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-blank header-d">ANSWER</a>&nbsp;');
               side_bar.append(holder);
 
               child = dom.createElement('answer');
@@ -2064,7 +2064,7 @@ function refresh_dom(){
 
               preview_pane.append(parent_div);
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-image header-d">IMAGE</a>&nbsp;');
               side_bar.append(holder);
 
 
