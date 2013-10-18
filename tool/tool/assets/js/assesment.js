@@ -1174,6 +1174,39 @@ $(document).on('click','.editing-blank',function(e){
   });
 
 
+
+
+  $(document).on('click','.editing-vocab',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_question];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            // $('#sub_header_text').val(current_topic[i]['data']);
+            tinymce.EditorManager.get('vocab_ip').setContent(unescape(current_topic[i]['data']));
+            if (current_topic[i]['is_correct'] == 'false' || current_topic[i]['is_correct'] == false) {
+              $('#vcorrect').prop('checked', false);
+            }else{
+              $('#vcorrect').prop('checked', true);
+            }
+
+            break;
+      };
+    };
+
+    $(".vocab.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-vocab" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
   $('#dialog-fill-blnk').dialog({
       autoOpen: false,
       height: 600,
@@ -1343,7 +1376,7 @@ $( "#dialog-vocab" ).dialog({
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=val;
-                  current_topic[i].isAnswer=is_correct;
+                  current_topic[i].is_correct=is_correct;
                   topic_json[global_question]=current_topic;
                   break;
                 };
