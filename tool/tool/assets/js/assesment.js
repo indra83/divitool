@@ -151,6 +151,7 @@ $('#dialog-quest').dialog({
                     topic_json[global_question].push({'type':'fill_blank','data':'Please edit answer','xml_id':current_clicked});
                     global_qtype="fill_blank";
                   }else if(qtype == "match"){
+                    topic_json[global_question].push({'type':'header','data':'Please edit Title','xml_id':current_clicked,'id':'dummyid'});
                     global_qtype="match";
                   }else if(qtype == "vocab"){
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
@@ -200,6 +201,115 @@ $( "#dialog-add" ).dialog({
     });
 
 
+$(document).on('click','.testing1',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_question];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+            $('#headerid').val(current_topic[i]['id']);
+            $('#header_text').val(current_topic[i]['data']);
+            break;
+      };
+    };
+
+
+    $(".header.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-heading" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+
+
+
+$( "#dialog-heading" ).dialog({
+      autoOpen: false,
+      height: 300,
+      width: 350,
+      modal: true,
+      buttons: {
+        "Insert Heading3": function() {
+            var val=$('#header_text').val();
+            var id=$('#headerid').val();
+            i=i+1;
+
+            var uniqueness=true;
+            var regex=false;
+
+            for (var i = 0; i < topic_json[global_question].length; i++) {
+                if(topic_json[global_question][i]['id'] == id){
+                  uniqueness=false;
+                }
+            };
+
+            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
+              alert("The ID is wrong. It can only include alpha numerals and (_)");
+            }else if(editing_state == false && !uniqueness){
+              alert("The ID is not unique");
+            }else{
+                  var current_topic=topic_json[global_question];
+
+                if (editing_state == true) {
+                  xml_id=parseInt($(".header.xml_id").attr('xml_id'));
+                  editing_state=false;
+
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (xml_id == parseInt(current_topic[i].xml_id,10)) {
+                      current_topic[i].id=id;
+                      current_topic[i].data=val;
+                      topic_json[global_question]=current_topic;
+                      break;
+                    };
+                  }
+
+                  // $('#header_text').val()
+
+                }else{
+
+                  console.log("EDIT FALSE");
+                  for(var i=0, len=current_topic.length; i < len; i++){
+                    if (i>=current_clicked) {
+                        var temp=current_topic[i];
+                        temp.xml_id = parseInt(temp.xml_id)+1;
+                        current_topic[i]=temp;
+                    };
+
+                  }
+                  topic_json[global_question]=current_topic;
+                  topic_json[global_question].push({"type":"header","data":val,"xml_id":(current_clicked),"id":id});
+                }
+
+
+                  refresh_dom();
+
+                $( this ).dialog( "close" );
+            }
+
+
+
+
+
+
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        $('#header_text').val('');
+        $('#headerid').val('');
+        $( '#dialog-add' ).dialog( "close" );
+      }
+    });
+
 
 $('#book-show').on('click','.quest_link',function(){
 	global_question=parseInt($(this).attr('questionid'),10);
@@ -223,6 +333,13 @@ $('#book-show').on('click','.quest_link',function(){
         console.log(iterate.children[i].InnerText);
 
         switch(iterate.children[i].nodeName){
+            case "title":
+
+              current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i,'id':iterate.children[i].getAttribute('id')});
+
+
+              break;
+
             case "header":
 
               current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i,'id':iterate.children[i].getAttribute('id')})
@@ -949,6 +1066,35 @@ $(document).on('click','.editing-image',function(e){
 
 
 
+
+$(document).on('click','.editing-match',function(e){
+    editing_state=true;
+    console.log(xml_id);
+    console.log($(this));
+    parent=$(this);
+    xml_id=parseInt($(this).attr("xml_index"));
+
+    current_topic=topic_json[global_question];
+    for (var i = 0; i < current_topic.length; i++) {
+      if (xml_id == current_topic[i].xml_id) {
+
+            tinymce.EditorManager.get('left_ip').setContent(unescape(current_topic[i]['left']));
+            tinymce.EditorManager.get('right_ip').setContent(unescape(current_topic[i]['right']));
+            break;
+      };
+    };
+
+
+    $(".match.xml_id").attr('xml_id',xml_id);
+    if (topic_json[global_question]==undefined) {
+      topic_json[global_question]=[];
+    };
+    $( "#dialog-match" ).dialog( "open" );
+    e.preventDefault();
+  });
+
+
+
 $(document).on('click','.editing-html',function(e){
 
     editing_state=true;
@@ -962,7 +1108,9 @@ $(document).on('click','.editing-html',function(e){
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
             tinymce.EditorManager.get('html_ip').setContent(unescape(current_topic[i]['data']));
-            $('#html-attr').val(current_topic[i].attribution);
+            $('#html-attr').val(current_topic[i]['attribution']);
+            $('#html-attr-name').val(current_topic[i]['name']);
+            $('#html-attr-url').val(current_topic[i]['url']);
             break;
       };
     };
@@ -1263,13 +1411,13 @@ $( "#dialog-match" ).dialog({
 
 
             if (editing_state == true) {
-              xml_id=parseInt($(".opt.xml_id").attr('xml_id'));
+              xml_id=parseInt($(".match.xml_id").attr('xml_id'));
               editing_state=false;
 
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].left=left;
-                  current_topic[i].left=right;
+                  current_topic[i].right=right;
                   topic_json[global_question]=current_topic;
                   break;
                 };
@@ -1559,11 +1707,11 @@ function refresh_dom(){
         case "header":
               preview_pane.append("<h3>"+current_topic[i].data+"</h3>");
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">HEADING</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable testing1 header-d">TITLE</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
 
-              child = dom.createElement('header');
+              child = dom.createElement('title');
               child.setAttribute('id',current_topic[i].id);
 
               child.textContent=current_topic[i].data;
