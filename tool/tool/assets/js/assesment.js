@@ -148,7 +148,7 @@ $('#dialog-quest').dialog({
                     global_qtype="label";
                   }else if (qtype == "fill_blank") {
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
-                    topic_json[global_question].push({'type':'fill_blank','data':'Please edit answer','xml_id':current_clicked});
+                    topic_json[global_question].push({'type':'fill_blank','data':'Please edit answer','xml_id':current_clicked+1});
                     global_qtype="fill_blank";
                   }else if(qtype == "match"){
                     topic_json[global_question].push({'type':'header','data':'Please edit Title','xml_id':current_clicked,'id':'dummyid'});
@@ -980,6 +980,10 @@ $( "#dialog-html" ).dialog({
                 var current_topic=topic_json[global_question];
                 var attr_text=$('#html-attr').val();
 
+                var attr_name=$('#html-attr-name').val();
+                var attr_url=$('#html-attr-url').val();
+                var license=$('#html-attr-lcn').val();
+
 
             if (editing_state == true) {
               xml_id=parseInt($(".html.xml_id").attr('xml_id'));
@@ -988,6 +992,11 @@ $( "#dialog-html" ).dialog({
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=val;
+                  current_topic[i].attribution=attr_text;
+                  current_topic[i].url=attr_url;
+                  current_topic[i].name=attr_name;
+                  current_topic[i].license=license;
+
                   topic_json[global_question]=current_topic;
                   break;
                 };
@@ -1213,7 +1222,7 @@ $(document).on('click','.editing-blank',function(e){
       width: 600,
       modal: true,
       buttons: {
-        "Insert Option": function() {
+        "Insert Answer": function() {
 
             var val=$('#blnk_ip').val();
             // i=i+1;
