@@ -1159,7 +1159,11 @@ $(document).on('click','.editing-blank',function(e){
       if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
             tinymce.EditorManager.get('opt_ip').setContent(unescape(current_topic[i]['data']));
-            $('#html-attr').val(current_topic[i]['attribution']);
+            if (current_topic[i]['is_correct'] == 'false' || current_topic[i]['is_correct'] == false) {
+              $('#correct').prop('checked', false);
+            }else{
+              $('#correct').prop('checked', true);
+            }
             break;
       };
     };
@@ -1336,7 +1340,7 @@ $( "#dialog-opt" ).dialog({
               refresh_dom();
 
             tinyMCE.activeEditor.setContent('');
-            $('#html-attr').val('');
+            $('#correct').prop('checked', false);
             $( this ).dialog( "close" );
 
         },
@@ -1346,7 +1350,9 @@ $( "#dialog-opt" ).dialog({
       },
       close: function() {
         tinyMCE.activeEditor.setContent('');
+        $('#correct').prop('checked', false);
         $( '#dialog-add' ).dialog( "close" );
+
       }
     });
 
@@ -1407,6 +1413,7 @@ $( "#dialog-vocab" ).dialog({
               refresh_dom();
 
             tinyMCE.activeEditor.setContent('');
+            $('#vcorrect').prop('checked', false);
 
             $( this ).dialog( "close" );
 
@@ -1417,6 +1424,7 @@ $( "#dialog-vocab" ).dialog({
       },
       close: function() {
         tinyMCE.activeEditor.setContent('');
+        $('#vcorrect').prop('checked', false);
         $( '#dialog-add' ).dialog( "close" );
       }
     });
