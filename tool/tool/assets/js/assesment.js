@@ -144,7 +144,8 @@ $('#dialog-quest').dialog({
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
                     global_qtype="mcq";
                   }else if(qtype == "label"){
-                    topic_json[global_question].push({'type':'image','data':"dividefault.png",'allowFullscreen':true,'showBorder':true,'xml_id':current_clicked,'attribution':'attribution','name':'name','url':'url','license':'license','description':'description','id':'newimageid','title':'default title'});
+                    topic_json[global_question].push({'type':'header','data':'Please edit Title','xml_id':current_clicked,'id':'dummyid'});
+                    topic_json[global_question].push({'type':'image','data':"dividefault.png",'allowFullscreen':true,'showBorder':true,'xml_id':current_clicked+1,'attribution':'attribution','name':'name','url':'url','license':'license','description':'description','id':'newimageid','title':'default title'});
                     global_qtype="label";
                   }else if (qtype == "fill_blank") {
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
@@ -211,7 +212,7 @@ $(document).on('click','.testing1',function(e){
     current_topic=topic_json[global_question];
     for (var i = 0; i < current_topic.length; i++) {
       if (xml_id == current_topic[i].xml_id) {
-            $('#headerid').val(current_topic[i]['id']);
+            // $('#headerid').val(current_topic[i]['id']);
             $('#header_text').val(current_topic[i]['data']);
             break;
       };
@@ -238,23 +239,12 @@ $( "#dialog-heading" ).dialog({
       buttons: {
         "Insert Heading3": function() {
             var val=$('#header_text').val();
-            var id=$('#headerid').val();
+
             i=i+1;
 
-            var uniqueness=true;
-            var regex=false;
 
-            for (var i = 0; i < topic_json[global_question].length; i++) {
-                if(topic_json[global_question][i]['id'] == id){
-                  uniqueness=false;
-                }
-            };
 
-            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
-              alert("The ID is wrong. It can only include alpha numerals and (_)");
-            }else if(editing_state == false && !uniqueness){
-              alert("The ID is not unique");
-            }else{
+            // if (true) {
                   var current_topic=topic_json[global_question];
 
                 if (editing_state == true) {
@@ -263,7 +253,7 @@ $( "#dialog-heading" ).dialog({
 
                   for(var i=0, len=current_topic.length; i < len; i++){
                     if (xml_id == parseInt(current_topic[i].xml_id,10)) {
-                      current_topic[i].id=id;
+
                       current_topic[i].data=val;
                       topic_json[global_question]=current_topic;
                       break;
@@ -284,14 +274,14 @@ $( "#dialog-heading" ).dialog({
 
                   }
                   topic_json[global_question]=current_topic;
-                  topic_json[global_question].push({"type":"header","data":val,"xml_id":(current_clicked),"id":id});
+                  topic_json[global_question].push({"type":"header","data":val,"xml_id":(current_clicked)});
                 }
 
 
                   refresh_dom();
 
                 $( this ).dialog( "close" );
-            }
+
 
 
 
@@ -335,7 +325,7 @@ $('#book-show').on('click','.quest_link',function(){
         switch(iterate.children[i].nodeName){
             case "title":
 
-              current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i,'id':iterate.children[i].getAttribute('id')});
+              current_topic.push({'type':'header','data':iterate.children[i].textContent,'xml_id':i});
 
 
               break;
@@ -1754,7 +1744,7 @@ function refresh_dom(){
 
 
               child = dom.createElement('title');
-              child.setAttribute('id',current_topic[i].id);
+
 
               child.textContent=current_topic[i].data;
 
