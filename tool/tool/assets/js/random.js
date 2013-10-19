@@ -1476,7 +1476,7 @@ function refresh_dom(){
     return parseInt(obj1.xml_id) - parseInt(obj2.xml_id);
   });
 
-      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic id="'+master_json.chapters[global_chapter].topics[global_topic]['id']+'"/>');
+      var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="'+master_json.chapters[global_chapter].topics[global_topic]['id']+'"/>');
 
       // child = dom.createElement('topic');
       // child.setAttribute('id', master_json.chapters[global_chapter].topics[global_topic]['id']);
