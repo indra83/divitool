@@ -140,6 +140,8 @@ $('#dialog-quest').dialog({
                   topic_json[global_question] = topic_json[global_question] || [];
                   var qtype=$('#questiontype').val();
 
+                  current_clicked = 0;
+
                   if (qtype == "mcq") {
                     topic_json[global_question].push({'type':'html','data':'Please edit question','xml_id':current_clicked,'attribution':'Reference','name':'Name','url':'url','license':'license'});
                     global_qtype="mcq";
@@ -1976,6 +1978,8 @@ function refresh_dom(){
 
               label.appendChild(child);
 
+              current_clicked  = current_topic.length;
+
 
               // ref=dom.createElement('references');
               // ref.textContent=current_topic[i].attribution;
@@ -2041,6 +2045,7 @@ function refresh_dom(){
                 var c = this.getContext('2d');
                 var p = c.getImageData(x, y, 1, 1).data;
                 $('#cnvas-lbl').html('You clicked on => '+coord);
+                current_clicked=current_topic.length;
                 $( "#dialog-lbl" ).dialog('open');
                 return false;
               });
@@ -2358,8 +2363,10 @@ function refresh_dom(){
     dom.documentElement.appendChild(subq);
   }
 
+if (global_qtype != 'label') {
+  side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
+};
 
-side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
 
   // $('#side_bar').sortable();
   // $( "#side_bar" ).disableSelection();
