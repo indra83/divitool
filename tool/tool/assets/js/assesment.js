@@ -190,7 +190,7 @@ $('#dialog-quest').dialog({
 
 $( "#dialog-add" ).dialog({
       autoOpen: false,
-      height: 500,
+      height: 200,
       width: 350,
       modal: true,
       buttons: {
@@ -1720,6 +1720,23 @@ function refresh_dom(){
   side_bar.html('');
 
   preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted </small></h1><hr>");
+
+  if (global_qtype == 'mcq') {
+    $('#mod-opt').show();
+    $('#mod-match').hide();
+    $('#mod-vocab').hide();
+
+  }else if(global_qtype == 'match'){
+    $('#mod-opt').hide();
+    $('#mod-match').show();
+    $('#mod-vocab').hide();
+
+  }else if(global_qtype == 'vocab'){
+    $('#mod-opt').hide();
+    $('#mod-match').hide();
+    $('#mod-vocab').show();
+
+  }
 
 
   // var current_topic=topic_json[global_question];
