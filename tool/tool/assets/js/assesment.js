@@ -2054,9 +2054,9 @@ function refresh_dom(){
 
 
               canvas.addEventListener('click', function(e){
-                var pos = findPos(this);
-                var x = e.pageX - pos.x;
-                var y = e.pageY - pos.y;
+                // var pos = findPos(this);
+                var x = e.offsetX;
+                var y = e.offsetY;
                 var coord = "x=" + x + ", y=" + y;
 
                 $('#canvas_xv').val(x/this.width);
