@@ -1031,6 +1031,9 @@ $( "#dialog-html" ).dialog({
       close: function() {
         tinyMCE.activeEditor.setContent('');
         $('#html-attr').val('');
+        $('#html-attr-name').val('');
+        $('#html-attr-url').val('');
+        $('#html-attr-lcn').val('');
         $( '#dialog-add' ).dialog( "close" );
       }
     });
@@ -1214,8 +1217,8 @@ $(document).on('click','.editing-blank',function(e){
 
   $('#dialog-fill-blnk').dialog({
       autoOpen: false,
-      height: 600,
-      width: 600,
+      height: 400,
+      width: 400,
       modal: true,
       buttons: {
         "Insert Answer": function() {
@@ -1958,7 +1961,7 @@ function refresh_dom(){
 
               // preview_pane.attr('contenteditable','false');
 
-              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-label header-d">LABEL</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+              var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-label header-d">LABEL</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
               child = dom.createElement('label');
