@@ -152,60 +152,7 @@
   <input type="hidden" id="canvas_y">
 </div>
 
-          <!-- HEADING -->
-<!--
-          <div id="dialog-heading" title="Insert Heading">
-            <p class="validateTips">Insert Heading.</p>
 
-            <form class="form-horizontal" role="form">
-
-              <div class="form-group">
-                <label for="headerid">Heading3 ID</label>
-                <div class="col-lg-10">
-                  <input type="text" class="form-control" id="headerid" placeholder="Heading3 ID">
-                </div>
-              </div>
-
-              <div class="form-group">
-              <label for="name">Heading </label>
-              <div class="col-lg-10">
-              <input type="text" name="name" id="header_text" class="text ui-widget-content ui-corner-all form-control" />
-              </div>
-              </div>
-              <input type="hidden" class="header xml_id">
-
-
-
-            </form>
-          </div> -->
-
-          <!-- SUB HEADING -->
-
-          <!-- <div id="dialog-sub-heading" title="Insert Sub HEading">
-
-            <form class="form-horizontal" role="form">
-
-              <div class="form-group">
-                <label for="subheadingid">Sub Heading ID</label>
-                <div class="col-lg-10">
-                  <input type="text" class="form-control" id="subheadingid" placeholder="Sub Heading ID">
-                </div>
-              </div>
-
-              <div class="form-group">
-              <label for="name">Sub Heading</label>
-              <div class="col-lg-10">
-              <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all form-control" />
-              </div>
-              </div>
-
-              <input type="hidden" class="subheader xml_id">
-
-
-            </form>
-          </div> -->
-
-          <!-- END SUB HEADING -->
 
           <!-- Image -->
              <div id="dialog-image" title="Insert Image">
@@ -228,21 +175,21 @@
                 </div>
               </div>
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <div class="col-lg-10">
                 <label for="img-title">Title</label>
 
                 <textarea id="img-title" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 </div>
-              </div>
+              </div> -->
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <div class="col-lg-10">
                 <label for="img-desc">Description</label>
 
                 <textarea id="img-desc" class="text ui-widget-content ui-corner-all form-control"></textarea>
                 </div>
-              </div>
+              </div> -->
 
               <div class="form-group">
                 <div class="col-lg-10">
@@ -289,7 +236,7 @@
                 </div>
               </div>
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <div class="col-lg-10">
                   <div class="checkbox">
                     <label>
@@ -297,9 +244,9 @@
                     </label>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <div class="col-lg-10">
                   <div class="checkbox">
                     <label>
@@ -307,7 +254,7 @@
                     </label>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
                 <input type="hidden" class="image xml_id">
 
@@ -367,7 +314,7 @@
 
           <!-- EDITABLE DIV -->
 
-              <div id="dialog-html" title="Insert Image">
+              <div id="dialog-html" title="HTML">
 
                 <form>
                 <fieldset>
@@ -571,10 +518,11 @@
 
 
                 </fieldset>
+
                 </form>
               </div>
 
-              <div id="dialog-heading" title="Insert Heading">
+              <div id="dialog-heading" title="Title">
             <p class="validateTips">Insert Heading.</p>
 
             <form class="form-horizontal" role="form">
@@ -732,7 +680,7 @@
                 <div class="col-lg-10">
                   <select class="form-control" name="diff" id="questiontype">
                     <option value="mcq">MCQ</option>
-                    <option value="label">Match The Label</option>
+                    <option value="label">Label the figure</option>
                     <option value="fill_blank">Fill in the blank</option>
                     <option value="match">Match The Following</option>
                     <option value="vocab">Vocabulary Test</option>
@@ -853,7 +801,9 @@ $(document).on('focusin', function(e) {
 });
 
         tinymce.init({selector:'textarea.html_input',paste_as_text: true,
-          plugins:'diviformula imageupload',valid_elements : '*[*]',
+          paste_text_sticky: true,
+          paste_text_sticky_default: true,
+          plugins:'diviformula imageupload paste',valid_elements : '*[*]',
           toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload', height:300});
         tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
 

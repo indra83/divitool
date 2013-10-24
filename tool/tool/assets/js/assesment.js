@@ -383,6 +383,15 @@ $('#book-show').on('click','.quest_link',function(){
 
               break;
 
+        case "options":
+              var par=iterate.children[i];
+              for (var j = 0; j < par.children.length; j++) {
+                current_topic.push({'type':'option','data':escape(par.children[j].getElementsByTagName('data')[0].textContent),'xml_id':i+j,'is_correct':par.children[j].getAttribute('isAnswer')});
+              };
+              console.log(iterate.children[i]);
+
+              break;
+
         case "answer":
           current_topic.push({'type':'fill_blank','data':iterate.children[i].textContent,'xml_id':i})
               console.log("HTML");
@@ -1019,7 +1028,7 @@ $( "#dialog-html" ).dialog({
 
               refresh_dom();
 
-            tinyMCE.activeEditor.setContent('');
+            tinymce.EditorManager.get('html_ip').setContent('');
             $('#html-attr').val('');
             $( this ).dialog( "close" );
 
@@ -1029,7 +1038,7 @@ $( "#dialog-html" ).dialog({
         }
       },
       close: function() {
-        tinyMCE.activeEditor.setContent('');
+        tinymce.EditorManager.get('html_ip').setContent('');
         $('#html-attr').val('');
         $('#html-attr-name').val('');
         $('#html-attr-url').val('');
@@ -1313,7 +1322,7 @@ $( "#dialog-opt" ).dialog({
               for(var i=0, len=current_topic.length; i < len; i++){
                 if (xml_id == parseInt(current_topic[i].xml_id,10)) {
                   current_topic[i].data=val;
-                  current_topic[i].isAnswer=is_correct;
+                  current_topic[i].is_correct=is_correct;
                   topic_json[global_question]=current_topic;
                   break;
                 };
@@ -1344,7 +1353,7 @@ $( "#dialog-opt" ).dialog({
 
               refresh_dom();
 
-            tinyMCE.activeEditor.setContent('');
+            tinymce.EditorManager.get('opt_ip').setContent('');
             $('#correct').prop('checked', false);
             $( this ).dialog( "close" );
 
@@ -1354,7 +1363,7 @@ $( "#dialog-opt" ).dialog({
         }
       },
       close: function() {
-        tinyMCE.activeEditor.setContent('');
+        tinymce.EditorManager.get('opt_ip').setContent('');
         $('#correct').prop('checked', false);
         $( '#dialog-add' ).dialog( "close" );
 
@@ -1367,7 +1376,7 @@ $( "#dialog-vocab" ).dialog({
       width: 600,
       modal: true,
       buttons: {
-        "Insert Option": function() {
+        "Insert Sub Question": function() {
 
             var val=tinyMCE.activeEditor.getContent();
             // i=i+1;
@@ -1719,7 +1728,13 @@ function refresh_dom(){
   var side_bar=$('#sidebar');
   side_bar.html('');
 
-  preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted </small></h1><hr>");
+  var help_text='';
+
+  if (global_qtype == 'label') {
+    help_text='Please click on image where you want to add a label.';
+  };
+
+  preview_pane.append("<h1>"+assessments_json.questions[global_question]['id']+"<small> is being editted <br> "+help_text+" </small></h1><hr>");
 
   if (global_qtype == 'mcq') {
     $('#mod-opt').show();
@@ -1758,6 +1773,8 @@ function refresh_dom(){
       var match=dom.createElement('matches');
 
       var label=dom.createElement('labels');
+
+      var options_mult=dom.createElement('options');
 
       // child = dom.createElement('topic');
       // child.setAttribute('id', master_json.chapters[global_chapter].topics[global_question]['id']);
@@ -1890,7 +1907,9 @@ function refresh_dom(){
 
               // child.appendChild(ref);
 
-              dom.documentElement.appendChild(child);
+              options_mult.appendChild(child);
+
+              // dom.documentElement.appendChild(child);
 
               break;
 
@@ -2026,13 +2045,13 @@ function refresh_dom(){
 
               var span = document.createElement("img");
 
-              var title_text=current_topic[i].title;
+              // var title_text=current_topic[i].title;
 
               var attr_text = current_topic[i].attribution;
 
-              var full_screen = current_topic[i].allowFullscreen;
+              // var full_screen = current_topic[i].allowFullscreen;
 
-              var showBorder = current_topic[i].showBorder;
+              // var showBorder = current_topic[i].showBorder;
 
 
               // load image from data url
@@ -2083,7 +2102,7 @@ function refresh_dom(){
               // span.innerHTML=" NMBS";
 
               var custom_text=document.createElement("p");
-              custom_text.innerHTML="Title : "+ title_text + "<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> description :"+current_topic[i].description+"<br>Allow fullscreen: "+full_screen+"<br> Show border: "+showBorder+" <br> License : "+current_topic[i].license+"<br><hr>";
+              custom_text.innerHTML="<br> Author Name/ID/Organization Name : "+attr_text+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br><hr>";
               parent_div.appendChild(canvas);
               parent_div.appendChild(custom_text);
 
@@ -2097,20 +2116,20 @@ function refresh_dom(){
               child.setAttribute('id',current_topic[i].id);
 
               child.setAttribute('src',current_topic[i].data);
-              child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
-              child.setAttribute('showBorder',current_topic[i].showBorder);
+              // child.setAttribute('allowFullscreen',current_topic[i].allowFullscreen);
+              // child.setAttribute('showBorder',current_topic[i].showBorder);
 
-              title=dom.createElement('title');
-              title.textContent=current_topic[i].title;
+              // title=dom.createElement('title');
+              // title.textContent=current_topic[i].title;
 
-              desc=dom.createElement('description');
-              desc.textContent=current_topic[i].description;
+              // desc=dom.createElement('description');
+              // desc.textContent=current_topic[i].description;
 
 
 
-              child.appendChild(title);
+              // child.appendChild(title);
 
-              child.appendChild(desc);
+              // child.appendChild(desc);
 
               ref=dom.createElement('references');
 
@@ -2381,9 +2400,11 @@ function refresh_dom(){
     dom.documentElement.appendChild(match);
   }else if(global_qtype=='vocab'){
     dom.documentElement.appendChild(subq);
+  }else if(global_qtype=='mcq'){
+    dom.documentElement.appendChild(options_mult);
   }
 
-if (global_qtype != 'label') {
+if (global_qtype != 'label' && global_qtype != 'fill_blank') {
   side_bar.append('<button xml_index="'+current_topic.length+'" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
 };
 
@@ -2457,7 +2478,7 @@ function refresh_chapters () {
 
 
                       var a1 = $('<li>');
-                      var link1=$('<a>').append(current_pop.questions[i]['name']);
+                      var link1=$('<a>').append(current_pop.questions[i]['id'] +' - '+current_pop.questions[i]['name']);
                       var del_btn=$('<button>').addClass('btn del-quest sidebar-btn btn-danger btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
                       var edit_btn=$('<button>').addClass('btn edit-quest sidebar-btn btn-warning btn-xs').attr('chapterid',master_json.chapters[global_chapter]['id']).attr('questionid',current_pop.questions[i]['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
 
