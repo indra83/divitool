@@ -1380,6 +1380,8 @@ $( "#dialog-html" ).dialog({
                 var attr_name=$('#html-attr-name').val();
                 var attr_url=$('#html-attr-url').val();
                 var license=$('#html-attr-lcn').val();
+                var box_type=$('#boxtype').val();
+                var box_title=$('#html-box-title').val();
 
 
             if (editing_state == true) {
@@ -1393,6 +1395,9 @@ $( "#dialog-html" ).dialog({
                   current_topic[i].url=attr_url;
                   current_topic[i].name=attr_name;
                   current_topic[i].license=license;
+                  current_topic[i].box_type=box_type;
+                  current_topic[i].box_title=box_title;
+
                   topic_json[global_topic]=current_topic;
                   break;
                 };
@@ -1409,7 +1414,7 @@ $( "#dialog-html" ).dialog({
                     }
                   }
                   topic_json[global_topic]=current_topic;
-                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text,'name':attr_name,'url':attr_url,'license':license});
+                  topic_json[global_topic].push({"type":"html","data":escape(val),"xml_id":(current_clicked),"attribution":attr_text,'name':attr_name,'url':attr_url,'license':license,'box_type':box_type,'box_title':box_title});
                 }
 
 
@@ -1523,13 +1528,16 @@ function refresh_dom(){
         case "html":
               console.log("HTML");
               preview_pane.append("<div>"+unescape(current_topic[i].data)+"</div> <br>");
-              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br><hr>");
+              preview_pane.append("Author Name/ID/Organization Name : "+current_topic[i].attribution+" <br> Name/Title : "+current_topic[i].name+" <br> URL : "+current_topic[i].url+" <br> License : "+current_topic[i].license+"<br> Box Title : "+current_topic[i].box_title+"Box Type :"+current_topic[i].box_type+" <br> <hr>");
               // preview_pane.attr('contenteditable','false');
 
               var holder=$('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index='+current_topic[i].xml_id+' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="'+current_topic[i].xml_id+'" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index='+current_topic[i].xml_id+' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
               side_bar.append(holder);
 
               child = dom.createElement('html');
+
+              child.setAttribute('boxType',current_topic[i].box_type);
+              child.setAttribute('boxTitle',current_topic[i].box_title);
 
               // child.textContent = unescape(current_topic[i].data);
 

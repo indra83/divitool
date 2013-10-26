@@ -373,7 +373,12 @@ $(document).on('click','#bookedit',function(){
 
         case "html":
               // s=(new XMLSerializer()).serializeToString(iterate.children[i])
-              current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'license':iterate.children[i].getElementsByTagName('references')[0].children[3].textContent})
+              try{
+                current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'license':iterate.children[i].getElementsByTagName('references')[0].children[3].textContent,'box_type':(iterate.children[i].getAttribute('boxType') ? iterate.children[i].getAttribute('boxType') : '' ),'box_title':iterate.children[i].getAttribute('boxTitle')})
+              }catch(err){
+                current_topic.push({'type':'html','data':escape(iterate.children[i].getElementsByTagName('data')[0].textContent),'xml_id':i,'attribution':iterate.children[i].getElementsByTagName('references')[0].children[0].textContent,'name':iterate.children[i].getElementsByTagName('references')[0].children[1].textContent,'url':iterate.children[i].getElementsByTagName('references')[0].children[2].textContent,'license':iterate.children[i].getElementsByTagName('references')[0].children[3].textContent})
+              }
+
               console.log("HTML");
 
 
