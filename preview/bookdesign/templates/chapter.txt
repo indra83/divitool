@@ -1,0 +1,5 @@
+<div class="container_page_title">
+  <img src="/preview_static/images/chapter_icon.png" width="50" height="50"  class="left" ></img>
+  <div class="container_title_text">{{title}}</div>
+  <div class="container_author">{{author}}</div>
+</div>

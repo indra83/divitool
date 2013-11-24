@@ -1,0 +1,4 @@
+<div class="container_learnobj">
+	<div class="container_learnobj_title">{{{title}}}</div>
+	<div class="container_learnobj_text">{{{content}}}</div>
+</div>

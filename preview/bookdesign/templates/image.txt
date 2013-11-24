@@ -1,0 +1,6 @@
+<div id="{{id}}" class="container_page_image"> 
+  <div class="container_image_box"> 
+    <div class="container_image"><img src="{{image_path}}"></img></div>
+    <p><b>{{caption}}</b><br/><i>{{desc}}</i></p>
+  </div>
+</div>

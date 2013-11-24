@@ -1,0 +1,4 @@
+<div id="{{id}}" style="text-align:center;"> 
+	<img src="{{image_path}}" style="padding-left: 20px;padding-right: 20px;padding-top: 20px; padding-bottom: 40px;display: block; margin-left: auto; margin-right: auto;"></img>
+	<div style="display:inline-block; text-align:left;"><b>{{caption}}</b><br/><i>{{desc}}</i></div>
+</div>

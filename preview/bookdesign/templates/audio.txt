@@ -1,0 +1,11 @@
+<div id="{{id}}" onclick="javascript:openResource('{{id}}');" class="container_media">
+	<div class="media_wrapper">
+		<img src="/preview_static/images/play_audio.png" width="60" height="60"/>           
+	</div>
+	<div class="text_wrapper">
+		<p><b>{{title}}</b>
+			<br/>{{desc}}
+		</p>
+	</div>
+</div>
+

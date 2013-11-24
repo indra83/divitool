@@ -1,0 +1,4 @@
+<div id="{{id}}" class="container_page_text_title">
+  <img src="/preview_static/images/topic_icon.png" width="60" height="60" class="left"></img>
+  {{title}}
+</div>

@@ -39,7 +39,14 @@ public class ToolServer extends JFrame implements ActionListener {
 	SwingWorker					worker			= new SwingWorker<Void, Void>() {
 													@Override
 													public Void doInBackground() {
-														startServer();
+														try {
+															System.out.println("server starting");
+															startServer();
+															System.out.println("server started");
+														} catch (Exception e) {
+															System.out.println("error: " + e);
+															e.printStackTrace();
+														}
 														return null;
 													}
 
@@ -89,11 +96,24 @@ public class ToolServer extends JFrame implements ActionListener {
 		ServletContextHandler formulaContextHandler = new ServletContextHandler(server, "/saveformula", true, false);
 		formulaContextHandler.addServlet(FormulaServlet.class, "/*");
 
+		// preview related
+		ServletContextHandler previewContextHandler = new ServletContextHandler(server, "/preview", true, false);
+		previewContextHandler.addServlet(PreviewServlet.class, "/*");
+
+		String previewDir = ToolServer.class.getClassLoader().getResource("bookdesign").toExternalForm();
+		System.out.println("preview:" + previewDir);
+		ResourceHandler previewResHandler = new ResourceHandler();
+		previewResHandler.setResourceBase(previewDir);
+		ContextHandler previewStaticHandler = new ContextHandler("/preview_static");
+		previewStaticHandler.setHandler(previewResHandler);
+
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(staticHandler);
 		contexts.addHandler(booksHandler);
 		contexts.addHandler(servletContextHandler);
 		contexts.addHandler(formulaContextHandler);
+		contexts.addHandler(previewContextHandler);
+		contexts.addHandler(previewStaticHandler);
 		contexts.addHandler(new DefaultHandler());
 		server.setHandler(contexts);
 
@@ -143,14 +163,12 @@ public class ToolServer extends JFrame implements ActionListener {
 					return;
 				}
 				selectBooksDir.setEnabled(false);
-				Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-				if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-					worker.execute();
-					try {
-						desktop.browse(new URI("http://localhost:8080/tool/index.html"));
-					} catch (Exception ee) {
-						ee.printStackTrace();
-					}
+				worker.execute();
+				try {
+					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+					desktop.browse(new URI("http://localhost:8080/tool/index.html"));
+				} catch (Exception ee) {
+					ee.printStackTrace();
 				}
 			}
 		});

@@ -1,0 +1,6 @@
+<div id="{{id}}" class="container_page_video">
+  <div onclick="javascript:openResource('{{id}}');" class="container_video_box">
+    <div class="container_video"><img src="{{thumbnail_path}}"></img><span></span></div>
+    <p>{{caption}}</p>
+  </div>
+</div>

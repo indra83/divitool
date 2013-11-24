@@ -1,0 +1,39 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+ <html>
+  <head>
+   <!-- book design stuff -->
+   <link rel="stylesheet" href="/preview_static/css/style.css"/>
+   
+   <script type="text/javascript">
+   		function openResource(resId) {
+			console.log("resId:"+resId);
+			MainWindow.openResource(resId);
+		}
+   </script>
+   
+   <script type="text/javascript">
+   		var isHeaderShown = true;
+   		
+   		function blah() {
+   			// console.log("scrollTop");
+   			document.onscroll = function() { 
+   				// console.log('Works in Chrome!'+document.body.scrollTop.toString());
+   					if(document.body.scrollTop>150 && isHeaderShown) {
+   						isHeaderShown=false;
+   						MainWindow.showHeader(isHeaderShown);
+   					}else if(document.body.scrollTop<130 && !isHeaderShown) {
+   						isHeaderShown=true;
+   						MainWindow.showHeader(isHeaderShown);
+   					} 
+   			};
+		}
+ 	</script>
+  </head>
+  <body>
+  <div class="container">
+  <br/><br/><br/>
+   {{{content}}}
+   
+  </div>
+  </body>
+ </html>

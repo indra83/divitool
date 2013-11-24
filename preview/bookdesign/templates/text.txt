@@ -1,0 +1,3 @@
+<div class="container_page_text">
+  {{{content}}}
+</div>
