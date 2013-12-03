@@ -7,7 +7,7 @@
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
-
+    <link href="assets/css/equation-embed.css" rel="stylesheet" media="screen">
 <script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -398,38 +398,25 @@ hr{
 
           <!-- EDITABLE DIV -->
 
-              <div id="dialog-html" title="Insert Image">
+              <div id="dialog-html" title="Insert HTML">
 
                 <form>
                 <fieldset>
 
-                  <!-- EDITABLE DIV -->
-
-
-
-                    <!-- <div id="main-body" contenteditable="true" >
-
-                    </div> -->
-
                     <textarea class="html_input"></textarea>
-
                     <input type="hidden" class="html xml_id">
 
                     <div class="form-group">
                       <div class="col-lg-10">
                       <label for="html-attr">Author Name/ID/Organization Name : </label>
-
                       <textarea id="html-attr" class="text ui-widget-content ui-corner-all form-control"></textarea>
-                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
                       </div>
                     </div>
 
                     <div class="form-group">
                       <div class="col-lg-10">
                       <label for="html-attr-name">Name/Title : </label>
-
                       <textarea id="html-attr-name" class="text ui-widget-content ui-corner-all form-control"></textarea>
-                      <!-- <input type="text" name="name" id="sub_header_text" class="text ui-widget-content ui-corner-all" /> -->
                       </div>
                     </div>
 
@@ -810,10 +797,11 @@ hr{
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
-
+  
     <script src="assets/js/jsxml.js"></script>
     <script src="assets/js/random.js"></script>
     <script src="assets/js/main.js"></script>
+   <script src="assets/js/eq_editor.js"></script>
 
 
 <script>
@@ -823,11 +811,13 @@ $(document).on('focusin', function(e) {
   }
 });
 
-        tinymce.init({selector:'textarea.html_input',paste_as_text: true,
+        tinymce.init({selector:'textarea.html_input',
+          paste_as_text: true,
           paste_text_sticky: true,
           paste_text_sticky_default: true,
-          plugins:'diviformula imageupload paste',valid_elements : '*[*]',
-          toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload', height:300});
+          plugins:'imageupload paste formulaupload',
+          valid_elements : '*[*]',
+          toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload', height:300});
         tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
 
 

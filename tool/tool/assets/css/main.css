@@ -1,4 +1,4 @@
-.side-scroll{
+.sid\e-scroll{
 	height: 800px;
 	overflow: auto;
 }
@@ -10,6 +10,12 @@
 
 li .topic_link{
 	cursor: pointer;
+}
+
+.preview{
+	background-image:'../images/preview.png';	
+	width:16px;
+	height:16px;	
 }
 
 li .assess{

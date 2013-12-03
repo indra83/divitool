@@ -1,8 +1,8 @@
 (function() {
-    tinymce.create('tinymce.plugins.ImageUploadPlugin', {
+    tinymce.create('tinymce.plugins.FormulaUploadPlugin', {
         init : function(ed, url) {
-            url = tinyMCE.activeEditor.getParam('imageupload_rel') || url;
-            var imageUploadUrl = tinyMCE.activeEditor.getParam('imageupload_url');
+            url = tinyMCE.activeEditor.getParam('formulaupload_rel') || url;
+            var formulaUploadUrl = tinyMCE.activeEditor.getParam('formulaupload_url');
             var head = document.getElementsByTagName('body')[0];
             var css = document.createElement('link');                       
             css.type = 'text/css';
@@ -13,45 +13,36 @@
             // Register commands
             ed.addCommand('mceImageUpload', function() {
                 $('#image_upload_type').val('tinymce'); 
-                $('body').append('<div class="imageUploadBg"></div>');
+                $('body').append('<div class="formulaUploadBg"></div>');
                 
                 var showImageUploadError = function(msg) {
-                    $('.imageUploadError').html(msg).show();
+                    $('.formulaUploadError').html(msg).show();
                     removeForeground();
                 };
                 
                 var removeForeground = function() {
-                    $('.imageUploadFg').remove();
-                    $('.imageUploadFgLoading').remove();
+                    $('.formulaUploadFg').remove();
+                    $('.formulaUploadFgLoading').remove();
                 };
                 
                 var removeBackground = function() {
-                    $('.imageUploadBg').remove();
-                    $('.imageUploadContainer').remove();
+                    $('.formulaUploadBg').remove();
+                    $('.formulaUploadContainer').remove();
                 };
-                
+
                 var container = '\
-                    <div class="imageUploadContainer mce-container mce-panel mce-window">\
-                        <div class="imageUploadContainerInner">\
-                            <div class="mce-window-head">\
-                                <div class="mce-title">Upload Image</div>\
-                                <button type="button" class="mce-close">×</button>\
-                            </div>\
-                            <form action="' + imageUploadUrl + '" method="POST"  enctype="multipart/form-data" id="uploadImageForm">\
-                            <div class="mce-container imageUploadFormContainer" hidefocus="1" tabindex="-1">\
-                                <div class="mce-container-body">\
-                                    <label for="image-upload-area">Select a file</label>\
-                                    <input type="file" name="file" id="image-upload-area" class="mce-textbox mce-placeholder" hidefocus="true" style="width: 258px;">\
-                                </div>\
-                                <p class="imageUploadError"></p>\
-                            </div>\
-                            </form>\
-                            <div class="imageUploadConfirmCase mce-panel">\
+					<div class="formulaUploadContainer mce-container" hidefocus="1" tabindex="-1"><div class="mce-container-body"> \
+                        <textarea type="formula" name="formula" id="image-upload-area" class="mce-textbox mce-placeholder" hidefocus="true"></textarea></div>\
+                             <div class="previewContainer">\
+                                <div class="header" >Formula Preview</div>\
+                                <div class="formulapreview"></div>\
+                            </div></div>\
+                            <div class="formulaUploadConfirmCase mce-panel">\
                                 <div class="mce-btn mce-primary">\
-                                    <button role="presentation" class="imageUploadSubmit">Upload</button>\
+                                    <button role="presentation" class="formulaUploadSubmit">Upload</button>\
                                 </div>\
                                 <div class="mce-btn">\
-                                    <button role="presentation" class="imageUploadClose">Close</button>\
+                                    <button role="presentation" class="formulaUploadClose">Close</button>\
                                 </div>\
                             </div>\
                         </div>\
@@ -60,8 +51,7 @@
                 
                 $('body').append(container);
                 
-                
-                $('.imageUploadBg, .imageUploadContainer .imageUploadClose, .mce-close').on('click', function(){
+                $('.formulaUploadBg, .formulaUploadContainer .formulaUploadClose, .mce-close').on('click', function(){
                     removeForeground();
                     removeBackground();
                 });
@@ -101,13 +91,13 @@
                     }
                 });
                 
-                $('.imageUploadSubmit').on('click', function(){
+                $('.formulaUploadSubmit').on('click', function(){
                     
-                    $('.imageUploadError').html('').hide();
+                    $('.formulaUploadError').html('').hide();
                     
                     if ($('#image-upload-area').val() != '') {
-                        $('body').append('<div class="imageUploadFg"></div>');
-                        $('body').append('<div class="imageUploadFgLoading"></div>');
+                        $('body').append('<div class="formulaUploadFg"></div>');
+                        $('body').append('<div class="formulaUploadFgLoading"></div>');
                         $('#uploadImageForm').submit();
                     } else {
                         showImageUploadError('Please select an image to upload.');
@@ -116,9 +106,8 @@
                 });
             });
 
-            
             // Register buttons
-            ed.addButton('imageupload', {
+            ed.addButton('formulaupload', {
                 title : 'Image Upload',
                 cmd : 'mceImageUpload',
                 image : url + '/img/icon.png'
@@ -129,12 +118,12 @@
             return {
                 longname : 'Image Upload',
                 author : 'BoxUK',
-                authorurl : 'https://github.com/boxuk/tinymce-imageupload',
-                infourl : 'https://github.com/boxuk/tinymce-imageupload/blob/master/README.md',
+                authorurl : 'https://github.com/boxuk/tinymce-formulaupload',
+                infourl : 'https://github.com/boxuk/tinymce-formulaupload/blob/master/README.md',
                 version : '1.0.0'
             };
         }
     });
-
-    tinymce.PluginManager.add('imageupload', tinymce.plugins.ImageUploadPlugin);
+    
+    tinymce.PluginManager.add('formulaupload', tinymce.plugins.FormulaUploadPlugin);
 })();

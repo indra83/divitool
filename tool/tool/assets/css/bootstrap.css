@@ -2504,6 +2504,11 @@ input[type="button"].btn-block {
   content: "\e020";
 }
 
+
+.glyphicon-trash:before {
+  content: "\e020";
+}
+
 .glyphicon-home:before {
   content: "\e021";
 }
