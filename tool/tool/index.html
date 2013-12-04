@@ -811,15 +811,18 @@ $(document).on('focusin', function(e) {
   }
 });
 
-        tinymce.init({selector:'textarea.html_input',
-          paste_as_text: true,
-          paste_text_sticky: true,
-          paste_text_sticky_default: true,
-          plugins:'imageupload paste formulaupload',
-          valid_elements : '*[*]',
-          toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload', height:300});
-        tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
-
+	tinymce.init({
+		  selector:'textarea.html_input',
+		  paste_as_text: true,
+		  paste_text_sticky: true,
+		  paste_text_sticky_default: true,
+		  plugins:'imageupload paste formulaupload',
+		  valid_elements : '*[*]',
+		  toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload', 
+		  height:300,
+		  init_instance_callback:"formulaOnclick"
+	});
+	 tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
 
 </script>
 

@@ -1,3 +1,17 @@
+function formulaOnclick(inst,e,d) {
+	inst.on("click",function(curr,e) {
+		var target = curr.srcElement ? curr.srcElement : curr.target;
+		if(target.localName == "img"){
+			var targetJ = $(target);
+			var text = targetJ.attr("text");
+			if(text){
+				this.execCommand('mceFormulaUpload',null,target.outerHTML);
+			}
+		}
+	});
+}
+
+
 (function(){
 	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
@@ -131,7 +145,7 @@ $.ajax({
                 imgCount = currTopic[imageCount] ? currTopic[imageCount]  :defaultId;
                 edit_btn.attr(imageCount, imgCount);
                 
-                var previewBytton = $('<button>').addClass('btn sidebar-btn btn-warning btn-xs').attr('chapterid', ['id']).attr('topicid', currTopic['id']).append($('<span>').addClass('glyphicon glyphicon-zoom-in'));
+                var previewBytton = $('<button>').addClass('btn sidebar-btn preview-tpc btn-warning btn-xs').attr('chapterid', currChap['id']).attr('topicid', currTopic['id']).append($('<span>').addClass('glyphicon glyphicon-zoom-in'));
                 link1.addClass('topic_link');
                 link1.attr('chapter-id', i);
                 link1.attr('topic-id', j);
@@ -175,7 +189,7 @@ $.ajax({
     $('#courseid-cont').html(' Course ID : ' + master_json['courseId']);
     $('#bookorder-cont').html(' Book Order : ' + master_json['orderNo']);
     $('#bookversion-cont').html(' Book Version : ' + master_json['version']);
-
+    $('.preview-tpc').on('click',previewTopic);
     $(".sortchapters").sortable({
         start: function (e, ui) {
             // alert("started");
@@ -231,6 +245,15 @@ $.ajax({
 });
 
 
+previewTopic = function(e){
+	var chapterid = $(this).attr('chapterid');
+    var topicid = $(this).attr('topicid');
+	if(!$.isEmptyObject(chapterid) && !$.isEmptyObject(topicid)){
+		window.open("/preview/?/"+chapterid+"/"+topicid+"/topic.xml",'open_window');
+	}else{
+		alert("something went wrong. Please check");
+	}
+};
 
 $('#sidebar').on('mouseover', '.sortable', function () {
     $(this).children('.inner-btn').css('visibility', 'visible');
