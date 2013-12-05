@@ -1,60 +1,23 @@
 package co.in.divi.tool;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.io.File;
-import java.net.URI;
 import java.util.prefs.Preferences;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import co.in.divi.tool.ui.HomePanel;
+import co.in.divi.tool.ui.ValidationPanel;
 
-public class ToolServer extends JFrame implements ActionListener {
+public class ToolServer extends JFrame {
 
 	private static final String	PREF_BOOKS_DIR	= "PREF_BOOKS_DIR";
-
-	JButton						selectBooksDir;
-	JLabel						bookDir;
-	JFileChooser				chooser;
-	String						choosertitle;
-
-	SwingWorker					worker			= new SwingWorker<Void, Void>() {
-													@Override
-													public Void doInBackground() {
-														try {
-															System.out.println("server starting");
-															startServer();
-															System.out.println("server started");
-														} catch (Exception e) {
-															System.out.println("error: " + e);
-															e.printStackTrace();
-														}
-														return null;
-													}
-
-													@Override
-													public void done() {
-
-													}
-												};
+	public static final String	CARD_HOME		= "HOME";
+	public static final String	CARD_VALIDATION	= "VALIDATION";
 
 	public static void main(String[] args) {
 
@@ -68,64 +31,7 @@ public class ToolServer extends JFrame implements ActionListener {
 		System.out.println("started UI...");
 	}
 
-	private static void startServer() {
-		Server server = new Server();
-		Connector connector = new SelectChannelConnector();
-		connector.setHost("localhost");
-		connector.setPort(8080);
-		server.addConnector(connector);
-
-		String webDir = ToolServer.class.getClassLoader().getResource("tool").toExternalForm();
-		ResourceHandler resHandler = new ResourceHandler();
-		resHandler.setResourceBase(webDir);
-
-		ContextHandler staticHandler = new ContextHandler("/tool");
-		staticHandler.setHandler(resHandler);
-
-		ResourceHandler booksResHandler = new ResourceHandler();
-		booksResHandler.setResourceBase(getBooksDir().getAbsolutePath());
-		ContextHandler booksHandler = new ContextHandler("/getfiles");
-		booksHandler.setHandler(booksResHandler);
-
-		// ContextHandler apiHandler = new ContextHandler("/api");
-		// apiHandler.setHandler(resHandler);
-
-		ServletContextHandler servletContextHandler = new ServletContextHandler(server, "/savefile", true, false);
-		servletContextHandler.addServlet(FileUploadServlet.class, "/*");
-
-		ServletContextHandler formulaContextHandler = new ServletContextHandler(server, "/saveformula", true, false);
-		formulaContextHandler.addServlet(FormulaServlet.class, "/*");
-
-		// preview related
-		ServletContextHandler previewContextHandler = new ServletContextHandler(server, "/preview", true, false);
-		previewContextHandler.addServlet(PreviewServlet.class, "/*");
-
-		String previewDir = ToolServer.class.getClassLoader().getResource("bookdesign").toExternalForm();
-		System.out.println("preview:" + previewDir);
-		ResourceHandler previewResHandler = new ResourceHandler();
-		previewResHandler.setResourceBase(previewDir);
-		ContextHandler previewStaticHandler = new ContextHandler("/preview_static");
-		previewStaticHandler.setHandler(previewResHandler);
-
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		contexts.addHandler(staticHandler);
-		contexts.addHandler(booksHandler);
-		contexts.addHandler(servletContextHandler);
-		contexts.addHandler(formulaContextHandler);
-		contexts.addHandler(previewContextHandler);
-		contexts.addHandler(previewStaticHandler);
-		contexts.addHandler(new DefaultHandler());
-		server.setHandler(contexts);
-
-		try {
-			server.start();
-			server.join();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void setBooksDir(File booksDir) {
+	public static void setBooksDir(File booksDir) {
 		Preferences prefs = Preferences.userNodeForPackage(ToolServer.class);
 		prefs.put(PREF_BOOKS_DIR, booksDir.getPath());
 	}
@@ -142,66 +48,28 @@ public class ToolServer extends JFrame implements ActionListener {
 		return null;
 	}
 
+	private HomePanel		homePanel;
+	private ValidationPanel	validationPanel;
+
 	public ToolServer() {
+		super();
 		// books directory
-		JPanel booksPanel = new JPanel(new GridLayout(1, 2));
-		bookDir = new JLabel();
-		if (getBooksDir() != null)
-			bookDir.setText(getBooksDir().toString());
-		booksPanel.add(bookDir);
-		selectBooksDir = new JButton("Select book directory");
-		selectBooksDir.setSize(100, 50);
-		selectBooksDir.addActionListener(this);
-		booksPanel.add(selectBooksDir);
-		// setup launch button
-		JButton launchBrowser = new JButton("Open Editor");
-		launchBrowser.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (getBooksDir() == null) {
-					JOptionPane.showMessageDialog(null, "Please select the book directory");
-					return;
-				}
-				selectBooksDir.setEnabled(false);
-				worker.execute();
-				try {
-					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-					desktop.browse(new URI("http://localhost:8080/tool/index.html"));
-				} catch (Exception ee) {
-					ee.printStackTrace();
-				}
-			}
-		});
-
-		add(booksPanel, BorderLayout.NORTH);
-		add(launchBrowser, BorderLayout.SOUTH);
-
-		setTitle("Simple example");
-		setSize(600, 300);
-		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
+		setTitle("Divi Content Creator");
+		setLocationRelativeTo(null);
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		int result;
-
-		chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new java.io.File("."));
-		chooser.setDialogTitle(choosertitle);
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		//
-		// disable the "All files" option.
-		//
-		chooser.setAcceptAllFileFilterUsed(false);
-		//
-		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
-			System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
-			setBooksDir(chooser.getSelectedFile());
-			bookDir.setText(getBooksDir().toString());
-		} else {
-			System.out.println("No Selection ");
-		}
+		JPanel contentPane = new JPanel();
+		contentPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new CardLayout());
+		homePanel = new HomePanel(this);
+		validationPanel = new ValidationPanel(this);
+		contentPane.add(homePanel, CARD_HOME);
+		contentPane.add(validationPanel, CARD_VALIDATION);
+		// contentPane.setSize(650, 650);
+		setPreferredSize(new Dimension(650, 650));
+		setContentPane(contentPane);
+		pack();
+		setLocationByPlatform(true);
+		setVisible(true);
 	}
 }
