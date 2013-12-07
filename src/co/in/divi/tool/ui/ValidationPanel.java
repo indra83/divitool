@@ -16,6 +16,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 import co.in.divi.tool.ToolServer;
+import co.in.divi.tool.validation.ValidationWorker;
 
 public class ValidationPanel extends JPanel {
 
@@ -34,6 +35,7 @@ public class ValidationPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				validateButton.setEnabled(false);
+				new ValidationWorker(logArea).execute();
 			}
 		});
 		gridPanel.add(validateButton);
