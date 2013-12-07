@@ -12,6 +12,11 @@ function formulaOnclick(inst,e,d) {
 }
 
 
+divi.filesAttach = function(){
+	return '/getfiles/';
+};
+
+
 (function(){
 	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
@@ -112,7 +117,7 @@ $(".sortchapters").sortable({
 
 
 $.ajax({
-    url: "/getfiles/master.json",
+    url: divi.filesAttach()+"master.json",
 }).done(function (data) {
 
     console.log("IN");
@@ -300,7 +305,7 @@ $('#book-show').on('click', '.topic_link', function () {
     current_topic = topic_json[global_topic] || [];
     $.ajax({
         dataType: "xml",
-        url: "/getfiles/" + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'] + "/topic.xml",
+        url: divi.filesAttach()+ master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'] + "/topic.xml",
     }).done(function (data) {
 
         var iterate = data.childNodes[0];
@@ -356,7 +361,6 @@ $('#book-show').on('click', '.topic_link', function () {
                 break;
 
             case "image":
-
                 current_topic.push({
                     'type': 'image',
                     'data': iterate.children[i].getAttribute('src'),
@@ -409,9 +413,6 @@ $('#book-show').on('click', '.topic_link', function () {
 
 
                 break;
-
-
-
             case "formula":
                 current_topic.push({
                     'type': 'formula',
@@ -655,7 +656,7 @@ $(document).on('click', '.editing-html', function (e) {
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             // $('#sub_header_text').val(current_topic[i]['data']);
-            tinyMCE.activeEditor.setContent(unescape(current_topic[i]['data']));
+            tinyMCE.activeEditor.setContent(divi.UpdateImgContent(unescape(current_topic[i]['data'])));
             $('#html-attr').val(current_topic[i]['attribution']);
             $('#html-attr-name').val(current_topic[i]['name']);
             $('#html-attr-url').val(current_topic[i]['url']);

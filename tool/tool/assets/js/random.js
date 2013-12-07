@@ -1,4 +1,6 @@
 
+
+
 $(document).on('click', '.edit-chp', function (e) {
 
     var chapterid = $(this).attr('chapterid');
@@ -824,6 +826,38 @@ $("#dialog-sub-heading").dialog({
 
 divi = {};
 
+divi.UpdateImgContent = function(data,toRemove){
+	var dataJ = $(data);
+	var elements = dataJ.find("img");
+	var eachElem,regex,originalsrc;
+	var prefix = divi.imageLocation("/getfiles/");
+	for(var x in elements){
+		if(elements.hasOwnProperty(x)){
+			eachElem = elements[x];
+			if(eachElem && eachElem.localName == 'img'){
+				var src = $(eachElem).attr('src');
+				originalsrc = src;
+				/*if(src.indexOf(prefix) != -1){
+					regex = new RegExp(prefix, 'g');
+					src = src.replace(regex, '');
+				}*/
+				if(src.indexOf('../getfiles') != -1){
+					src = src.replace('../getfiles','/getfiles');
+				}
+				if(toRemove){
+					src = src.replace(prefix,'');
+				}else{
+					if(src.indexOf(prefix) == -1){
+						src = prefix+src;
+					}
+				}
+				data = data.replace(originalsrc,src);
+			}
+		}
+	}
+	return data;
+};
+
 divi.imageUploadSuccess = function(e,dlg,data){
    var id = data.xmlId;
    if(id){
@@ -872,7 +906,7 @@ divi.imageUploadFailure = function(e,dlg,data){
 };
 
 divi.postFormulaUpload = function(reqData,data){
-	var currLocation = divi.imageLocation("/getfiles/")+"/equations/";
+	var currLocation = "/./equations/";
 	var currData,location;
 	var val = data.data;
 	for(var i=0;i < reqData.length;i++){
@@ -1020,14 +1054,14 @@ divi.saveInlineImages = function(data){
 
 divi.saveInlineSucess = function(data,files){
 	var val = data.data;
-	var currLocation = divi.imageLocation("/getfiles/");
+	var currLocation = "/./htmlimages/";
 	var dataQuery = $(val);
 	var matchedElem;
 	for(var i=0;i < files.length;i++){
 		currData = files[i];
 		matchedElem = dataQuery.find('img[name="'+currData.name+'"]');
 		if(matchedElem){
-			$(matchedElem).attr('src',currLocation+"/"+currData.name);
+			$(matchedElem).attr('src',currLocation+currData.name);
 		}
 	}
 	data.data = $("<div/>").append($(dataQuery).clone()).html();
@@ -1571,7 +1605,7 @@ function refresh_dom() {
 
         case "html":
             console.log("HTML");
-            preview_pane.append("<div>" + unescape(current_topic[i].data) + "</div> <br>");
+            preview_pane.append("<div>" + divi.UpdateImgContent(unescape(current_topic[i].data)) + "</div> <br>");
             preview_pane.append("Author Name/ID/Organization Name : " + current_topic[i].attribution + " <br> Name/Title : " + current_topic[i].name + " <br> URL : " + current_topic[i].url + " <br> License : " + current_topic[i].license + "<br> Box Title : " + current_topic[i].box_title + "Box Type :" + current_topic[i].box_type + " <br> <hr>");
             // preview_pane.attr('contenteditable','false');
             var holder = $('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index=' + current_topic[i].xml_id + ' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="' + current_topic[i].xml_id + '" class="editable editing-html header-d">HTML</a>&nbsp;<button xml_index=' + current_topic[i].xml_id + ' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
@@ -1586,8 +1620,8 @@ function refresh_dom() {
             data1 = dom.createElement('data');
 
             cdata = dom.createCDATASection(unescape(current_topic[i].data));
+			cdata.data = divi.UpdateImgContent(cdata.data,true);
             data1.appendChild(cdata);
-
             child.appendChild(data1);
 
             ref = dom.createElement('references');
