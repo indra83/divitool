@@ -860,7 +860,7 @@ divi.UpdateImgContent = function(data,toRemove){
 
 divi.imageUploadSuccess = function(e,dlg,data){
    var id = data.xmlId;
-   if(id){
+   if(id >= 0){
 	   editing_state = false;
 	   for (var i = 0, len = current_topic.length; i < len; i++) {
 	       if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
