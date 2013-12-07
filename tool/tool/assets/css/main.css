@@ -12,6 +12,8 @@ li .topic_link{
 	cursor: pointer;
 }
 
+
+
 .preview{
 	background-image:'../images/preview.png';	
 	width:16px;
@@ -27,12 +29,26 @@ li .assess{
 	height: 100%;
 	width:100%;
 	background-color: #666;
-	z-index: 100000;
+	z-index: 999;
 	display:none;
 	filter: alpha(opacity=75); /* internet explorer */
 	-khtml-opacity: 0.75;      /* khtml, old safari */
 	-moz-opacity: 0.75;       /* mozilla, netscape */
 	opacity: 0.75;           /* fx, safari, opera */
+}
+
+.load{ /* style for your dialog */
+     position:fixed;
+    width: 100px;
+    height: 100px;
+    padding:15px;
+    display:none;
+    left:40%;
+    top:40%;
+    z-index : 1000;
+    background-color:#FFFFFF;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 .sortchapters li{

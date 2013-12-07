@@ -870,7 +870,7 @@ divi.imageUploadSuccess = function(e,dlg,data){
 	           break;
 	       };
 	   }
-	   $("#overlay").hide();
+	   divi.hideLoader();
 	   refresh_dom();
 	   dlg.dialog("close");
    }
@@ -900,7 +900,7 @@ divi.imageUploadFailure = function(e,dlg,data){
         'url': data.url,
         'license': data.license
     });
-    $("#overlay").hide();
+    divi.hideLoader();
     refresh_dom();
     dlg.dialog("close");
 };
@@ -917,6 +917,20 @@ divi.postFormulaUpload = function(reqData,data){
 	data.data = val;
 	divi.saveInsertHtml.call(this,data);
 };
+
+divi.showLoader = function(){
+	setTimeout(function() {
+		 $('.overlay').show();	
+		 $('.load').show();	
+	},10);
+}
+
+divi.hideLoader = function(){
+	setTimeout(function() {
+		$('.load').hide();	
+		$('.overlay').hide();
+	},20);
+}
 
 
 divi.imageLocation = function(action,appendChapter){
@@ -954,53 +968,58 @@ divi.unique = function(tagName,value){
 
 
 divi.upload = function(e,data,mainData){
-	var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,baseLoc,passData;
-	var files = [];
-	var xml_id = parseInt($(".image.xml_id").attr('xml_id'));
-		title_text = $('#img-title').val();
-	    attr_text = $('#img-attr').val();
-	    attr_name = $('#img-attr-name').val();
-	    attr_url = $('#img-attr-url').val();
-	    desc_text = $('#img-desc').val();
-	    full_screen = $('#fullscheck').is(':checked');
-	    showBorder = $('#showborder').is(':checked');
-	    license = $('#img-attr-lcn').val();
-	    id = $('#imageid').val();
-	    files = document.getElementById('imagefilemod').files;
-	    var file_name = files[0].name;
-	    passData = {id:id,data:files[0].name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license};
-	    baseLoc = "/savefile/";
+	try{
+		divi.showLoader();
+		var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,baseLoc,passData;
+		var files = [];
+		var xml_id = parseInt($(".image.xml_id").attr('xml_id'));
+			title_text = $('#img-title').val();
+		    attr_text = $('#img-attr').val();
+		    attr_name = $('#img-attr-name').val();
+		    attr_url = $('#img-attr-url').val();
+		    desc_text = $('#img-desc').val();
+		    full_screen = $('#fullscheck').is(':checked');
+		    showBorder = $('#showborder').is(':checked');
+		    license = $('#img-attr-lcn').val();
+		    id = $('#imageid').val();
+		    files = document.getElementById('imagefilemod').files;
+		    var file_name = files[0].name;
+		    passData = {id:id,data:files[0].name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license};
+		    baseLoc = "/savefile/";
 
-	var uniqueness = divi.unique('id',id);
-	var regex = false;
+		var uniqueness = divi.unique('id',id);
+		var regex = false;
 
-	if (editing_state == false && !divi.idMatch(id)) {
-        alert("The ID is wrong. It can only include alpha numerals and (_)");
-    } else if (editing_state == false && !uniqueness) {
-        alert("The ID is not unique");
-    } else {
-        
-        $("#overlay").show();
-        
-        insert = true;
-        var current_topic = topic_json[global_topic];
+		if (editing_state == false && !divi.idMatch(id)) {
+	        alert("The ID is wrong. It can only include alpha numerals and (_)");
+	    } else if (editing_state == false && !uniqueness) {
+	        alert("The ID is not unique");
+	    } else {
+	        insert = true;
+	        var current_topic = topic_json[global_topic];
 
-        var img_dlg = $(this);
-        
-        var url = divi.imageLocation(baseLoc);
-	   var deferred = new $.Deferred();
-	   defArray.push(deferred);
-	   uploadFilesImage(url, files, deferred);
-	   if (editing_state == true) {
-			$.when.apply($, defArray).then(function (e) {
-				divi.imageUploadSuccess(e,img_dlg,passData);
+	        var img_dlg = $(this);
+	        
+	        var url = divi.imageLocation(baseLoc);
+		   var deferred = new $.Deferred();
+		   defArray.push(deferred);
+		   uploadFilesImage(url, files, deferred);
+		   if (editing_state == true) {
+				$.when.apply($, defArray).then(function (e) {
+					divi.imageUploadSuccess(e,img_dlg,passData);
+					});
+			} else {
+				$.when.apply($, defArray).then(function () {
+					divi.imageUploadFailure(e,img_dlg,passData);
 				});
-		} else {
-			$.when.apply($, defArray).then(function () {
-				divi.imageUploadFailure(e,img_dlg,passData);
-			});
-		}
-    }
+			}
+	    }
+   		
+   	}catch(err){
+   		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+   	}finally{
+   		divi.hideLoader();
+   	}
 };
 
 divi.saveInlineFormulae = function(data){
@@ -1022,7 +1041,7 @@ divi.saveInlineFormulae = function(data){
 }
 
 divi.saveInlineImages = function(data){
-    $("#overlay").show();
+	divi.showLoader();
 	var files = tinyMCE.activeEditor.files;
 	var proceedToHtml = true;
 	if(files){
@@ -1073,7 +1092,7 @@ divi.saveInlineSucess = function(data,files){
 $("#dialog-image").dialog({
     autoOpen: false,
     height: 500,
-    width: 350,
+    width: 500,
     modal: true,
     buttons: {
         "Insert Image": divi.upload,
@@ -1097,115 +1116,113 @@ $("#dialog-image").dialog({
 $("#dialog-audio").dialog({
     autoOpen: false,
     height: 500,
-    width: 350,
+    width: 500,
     modal: true,
     buttons: {
         "Insert Audio": function () {
+        	try{
+        		divi.showLoader();
+                var id = $('#audioid').val();
+                i = i + 1;
 
-            $("#overlay").show();
+                var uniqueness = true;
+                var regex = false;
 
-            var id = $('#audioid').val();
-            i = i + 1;
+                for (var i = 0; i < topic_json[global_topic].length; i++) {
+                    if (topic_json[global_topic][i]['id'] == id) {
+                        uniqueness = false;
+                    }
+                };
 
-            var uniqueness = true;
-            var regex = false;
+                if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
+                    alert("The ID is wrong. It can only include alpha numerals and (_)");
+                } else if (editing_state == false && !uniqueness) {
+                    alert("The ID is not unique");
+                } else {
 
-            for (var i = 0; i < topic_json[global_topic].length; i++) {
-                if (topic_json[global_topic][i]['id'] == id) {
-                    uniqueness = false;
-                }
-            };
+                    var audio_dialog = $(this);
+                    var deferred = new $.Deferred();
+                    // var deferred1 = new $.Deferred();
+                    defArray.push(deferred);
 
-            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
-                alert("The ID is wrong. It can only include alpha numerals and (_)");
-            } else if (editing_state == false && !uniqueness) {
-                alert("The ID is not unique");
-            } else {
+                    var title = $('#audio-title').val();
+                    var attr_text = $('#audio-attr').val();
+                    var desc_text = $('#audio-desc').val();
+                    var attr_name = $('#audio-attr-name').val();
+                    var attr_url = $('#audio-attr-url').val();
+                    var license = $('#audio-attr-lcn').val();
+                    var files = document.getElementById('audiofilemod').files;
+                    divi.showLoader();
 
-                var audio_dialog = $(this);
-                var deferred = new $.Deferred();
-                // var deferred1 = new $.Deferred();
-                defArray.push(deferred);
-
-                var title = $('#audio-title').val();
-                var attr_text = $('#audio-attr').val();
-                var desc_text = $('#audio-desc').val();
-                var attr_name = $('#audio-attr-name').val();
-                var attr_url = $('#audio-attr-url').val();
-                var license = $('#audio-attr-lcn').val();
-                var files = document.getElementById('audiofilemod').files;
-                $("#overlay").show();
-
-                for (var i = 0, f; f = files[i]; i++) {
-                    uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred);
-                }
-
-                $.when.apply($, defArray).then(function () {
-
-
-
-                    var fslocation = global_chapter + "/" + global_topic + "/media";
-                    console.log(fslocation);
-                    var file_name = files[0].name;
-                    insert = true;
-
-                    var current_topic = topic_json[global_topic];
-
-
-                    if (editing_state == true) {
-                        xml_id = parseInt($(".audio.xml_id").attr('xml_id'));
-                        editing_state = false;
-
-                        for (var i = 0, len = current_topic.length; i < len; i++) {
-                            if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
-                                current_topic[i].data = file_name;
-                                current_topic[i].attribution = attr_text;
-                                current_topic[i].description = desc_text;
-                                current_topic[i].title = title;
-                                current_topic[i].url = attr_url;
-                                current_topic[i].name = attr_name;
-                                current_topic[i].license = license;
-                                topic_json[global_topic] = current_topic;
-
-                                break;
-                            };
-                        }
-
-                        // $('#header_text').val()
-                    } else {
-
-                        for (var i = 0, len = current_topic.length; i < len; i++) {
-                            if (i >= current_clicked) {
-                                var temp = current_topic[i];
-                                temp.xml_id = parseInt(temp.xml_id) + 1;
-                                current_topic[i] = temp;
-                            }
-                        }
-                        topic_json[global_topic] = current_topic;
-                        topic_json[global_topic].push({
-                            "type": "audio",
-                            "data": file_name,
-                            "xml_id": (current_clicked),
-                            "attribution": attr_text,
-                            "description": desc_text,
-                            'id': id,
-                            'name': attr_name,
-                            'url': attr_url,
-                            'title': title,
-                            'license': license
-                        });
-
+                    for (var i = 0, f; f = files[i]; i++) {
+                        uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred);
                     }
 
+                    $.when.apply($, defArray).then(function () {
+
+                        var fslocation = global_chapter + "/" + global_topic + "/media";
+                        console.log(fslocation);
+                        var file_name = files[0].name;
+                        insert = true;
+
+                        var current_topic = topic_json[global_topic];
 
 
-                    refresh_dom();
-                    audio_dialog.dialog("close");
-                });
-            }
+                        if (editing_state == true) {
+                            xml_id = parseInt($(".audio.xml_id").attr('xml_id'));
+                            editing_state = false;
 
+                            for (var i = 0, len = current_topic.length; i < len; i++) {
+                                if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
+                                    current_topic[i].data = file_name;
+                                    current_topic[i].attribution = attr_text;
+                                    current_topic[i].description = desc_text;
+                                    current_topic[i].title = title;
+                                    current_topic[i].url = attr_url;
+                                    current_topic[i].name = attr_name;
+                                    current_topic[i].license = license;
+                                    topic_json[global_topic] = current_topic;
 
+                                    break;
+                                };
+                            }
 
+                            // $('#header_text').val()
+                        } else {
+
+                            for (var i = 0, len = current_topic.length; i < len; i++) {
+                                if (i >= current_clicked) {
+                                    var temp = current_topic[i];
+                                    temp.xml_id = parseInt(temp.xml_id) + 1;
+                                    current_topic[i] = temp;
+                                }
+                            }
+                            topic_json[global_topic] = current_topic;
+                            topic_json[global_topic].push({
+                                "type": "audio",
+                                "data": file_name,
+                                "xml_id": (current_clicked),
+                                "attribution": attr_text,
+                                "description": desc_text,
+                                'id': id,
+                                'name': attr_name,
+                                'url': attr_url,
+                                'title': title,
+                                'license': license
+                            });
+
+                        }
+
+                        refresh_dom();
+                        audio_dialog.dialog("close");
+                    });
+                }
+	       		
+	       	}catch(err){
+	       		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+	       	}finally{
+	       		divi.hideLoader();
+	       	}
         },
         Cancel: function () {
             $(this).dialog("close");
@@ -1230,140 +1247,127 @@ var defArray = [];
 $("#dialog-video").dialog({
     autoOpen: false,
     height: 500,
-    width: 350,
+    width: 500,
     modal: true,
     buttons: {
         "Insert Video": function () {
+        	try{
+        		divi.showLoader();
+                var id = $('#videoid').val();
+                i = i + 1;
 
-            $("#overlay").show();
+                var uniqueness = true;
+                var regex = false;
 
-            var id = $('#videoid').val();
-            i = i + 1;
+                for (var i = 0; i < topic_json[global_topic].length; i++) {
+                    if (topic_json[global_topic][i]['id'] == id) {
+                        uniqueness = false;
+                    }
+                };
 
-            var uniqueness = true;
-            var regex = false;
+                if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
+                    alert("The ID is wrong. It can only include alpha numerals and (_)");
+                } else if (editing_state == false && !uniqueness) {
+                    alert("The ID is not unique");
+                } else {
 
-            for (var i = 0; i < topic_json[global_topic].length; i++) {
-                if (topic_json[global_topic][i]['id'] == id) {
-                    uniqueness = false;
-                }
-            };
+                    var vide_dialog = $(this);
+                    var title_text = $('#video-title').val();
+                    var attr_text = $('#video-attr').val();
+                    var desc_text = $('#video-desc').val();
+                    var attr_name = $('#video-attr-name').val();
+                    var attr_url = $('#video-attr-url').val();
+                    var license = $('#video-attr-lcn').val();
+                    var files = document.getElementById('videofilemod').files;
+                    divi.showLoader();
+                    var fslocation = global_chapter + "/" + global_topic + "/media";
+                    console.log(fslocation);
+                    var file_name = files[0].name;
+                    insert = true;
 
-            if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
-                alert("The ID is wrong. It can only include alpha numerals and (_)");
-            } else if (editing_state == false && !uniqueness) {
-                alert("The ID is not unique");
-            } else {
+                    var current_topic = topic_json[global_topic];
 
-                var vide_dialog = $(this);
-                var title_text = $('#video-title').val();
-                var attr_text = $('#video-attr').val();
-                var desc_text = $('#video-desc').val();
-                var attr_name = $('#video-attr-name').val();
-                var attr_url = $('#video-attr-url').val();
-                var license = $('#video-attr-lcn').val();
-                var files = document.getElementById('videofilemod').files;
-                $("#overlay").show();
-                var fslocation = global_chapter + "/" + global_topic + "/media";
-                console.log(fslocation);
-                var file_name = files[0].name;
-                insert = true;
+                    var files1 = document.getElementById('thumbfilemod').files;
 
-                var current_topic = topic_json[global_topic];
+                    var file_name1 = files1[0].name;
 
-                var files1 = document.getElementById('thumbfilemod').files;
-                $("#overlay").show();
-
-                var file_name1 = files1[0].name;
-
-                var deferred = new $.Deferred();
-                var deferred1 = new $.Deferred();
-                defArray.push(deferred);
-                defArray.push(deferred1);
-                for (var i = 0, f; f = files[i]; i++) {
-                    uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred);
-                }
-
-                for (var i = 0, f; f = files1[i]; i++) {
-                    uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred1);
-                }
-
-                $.when.apply($, defArray).then(function () {
-                    $('#overlay').hide();
-                    if (editing_state == true) {
-                        xml_id = parseInt($(".video.xml_id").attr('xml_id'));
-                        editing_state = false;
-
-                        for (var i = 0, len = current_topic.length; i < len; i++) {
-                            if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
-                                current_topic[i].data = file_name;
-                                current_topic[i].thumb = file_name1;
-                                current_topic[i].attribution = attr_text;
-                                current_topic[i].description = desc_text;
-                                current_topic[i].title = title_text;
-                                current_topic[i].url = attr_url;
-                                current_topic[i].name = attr_name;
-                                current_topic[i].license = license;
-                                topic_json[global_topic] = current_topic;
-                                break;
-                            };
-                        }
-
-                        // $('#header_text').val()
-                    } else {
-
-
-                        for (var i = 0, len = current_topic.length; i < len; i++) {
-                            if (i >= current_clicked) {
-                                var temp = current_topic[i];
-                                temp.xml_id = parseInt(temp.xml_id) + 1;
-                                current_topic[i] = temp;
-                            }
-                        }
-
-
-
-
-                        var fslocation = global_chapter + "/" + global_topic + "/media";
-                        console.log(fslocation);
-
-                        insert = true;
-
-
-                        topic_json[global_topic] = current_topic;
-                        topic_json[global_topic].push({
-                            "type": "video",
-                            "data": file_name,
-                            "xml_id": (current_clicked),
-                            "attribution": attr_text,
-                            "thumb": file_name1,
-                            "description": desc_text,
-                            'id': id,
-                            'title': title_text,
-                            'name': attr_name,
-                            'url': attr_url,
-                            'license': license
-                        });
+                    var deferred = new $.Deferred();
+                    var deferred1 = new $.Deferred();
+                    defArray.push(deferred);
+                    defArray.push(deferred1);
+                    for (var i = 0, f; f = files[i]; i++) {
+                        uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred);
                     }
 
+                    for (var i = 0, f; f = files1[i]; i++) {
+                        uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred1);
+                    }
+
+                    $.when.apply($, defArray).then(function () {
+                    	divi.hideLoader();
+                        if (editing_state == true) {
+                            xml_id = parseInt($(".video.xml_id").attr('xml_id'));
+                            editing_state = false;
+
+                            for (var i = 0, len = current_topic.length; i < len; i++) {
+                                if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
+                                    current_topic[i].data = file_name;
+                                    current_topic[i].thumb = file_name1;
+                                    current_topic[i].attribution = attr_text;
+                                    current_topic[i].description = desc_text;
+                                    current_topic[i].title = title_text;
+                                    current_topic[i].url = attr_url;
+                                    current_topic[i].name = attr_name;
+                                    current_topic[i].license = license;
+                                    topic_json[global_topic] = current_topic;
+                                    break;
+                                };
+                            }
+
+                            // $('#header_text').val()
+                        } else {
+
+                            for (var i = 0, len = current_topic.length; i < len; i++) {
+                                if (i >= current_clicked) {
+                                    var temp = current_topic[i];
+                                    temp.xml_id = parseInt(temp.xml_id) + 1;
+                                    current_topic[i] = temp;
+                                }
+                            }
+                            var fslocation = global_chapter + "/" + global_topic + "/media";
+                            console.log(fslocation);
+
+                            insert = true;
 
 
-                    // $.when.apply($, defArray).then( function() {
-                    //this code is called after all the ajax calls are done
-                    vide_dialog.dialog("close");
-                    refresh_dom();
-                    // });
-                });
-            }
-
-
-
-            // if (insert && ((file.name.toLowerCase().indexOf(".png") != -1) || (file.name.toLowerCase().indexOf(".jp") != -1) || (file.name.toLowerCase().indexOf(".gif") != -1)  )) {
-            //  insert_image(file.name);
-            // }else if(insert && ((file.name.toLowerCase().indexOf('.mp4')!=-1) || (file.name.toLowerCase().indexOf(".ogg") != -1) || (file.name.toLowerCase().indexOf(".webm") != -1) )){
-            //  insert_video(file.name);
-            // }
-            // refresh_dom();
+                            topic_json[global_topic] = current_topic;
+                            topic_json[global_topic].push({
+                                "type": "video",
+                                "data": file_name,
+                                "xml_id": (current_clicked),
+                                "attribution": attr_text,
+                                "thumb": file_name1,
+                                "description": desc_text,
+                                'id': id,
+                                'title': title_text,
+                                'name': attr_name,
+                                'url': attr_url,
+                                'license': license
+                            });
+                        }
+                        // $.when.apply($, defArray).then( function() {
+                        //this code is called after all the ajax calls are done
+                        vide_dialog.dialog("close");
+                        refresh_dom();
+                        // });
+                    });
+                }
+	       		
+	       	}catch(err){
+	       		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+	       	}finally{
+	       		divi.hideLoader();
+	       	}
         },
         Cancel: function () {
             $(this).dialog("close");
@@ -1387,52 +1391,51 @@ $("#dialog-video").dialog({
 // FORMULA START
 $("#dialog-formula").dialog({
     autoOpen: false,
-    height: 300,
-    width: 350,
+    height: 500,
+    width: 600,
     modal: true,
     buttons: {
         "Insert Formula": function () {
-            var val = $('#formula_text').val();
-            i = i + 1;
-            var current_topic = topic_json[global_topic];
+        	try{
+        		divi.showLoader();
+        		 var val = $('#formula_text').val();
+                 i = i + 1;
+                 var current_topic = topic_json[global_topic];
+                 if (editing_state == true) {
+                     xml_id = parseInt($(".formula.xml_id").attr('xml_id'));
+                     editing_state = false;
 
+                     for (var i = 0, len = current_topic.length; i < len; i++) {
+                         if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
+                             current_topic[i].data = val;
+                             topic_json[global_topic] = current_topic;
+                             break;
+                         };
+                     }
 
-
-            if (editing_state == true) {
-                xml_id = parseInt($(".formula.xml_id").attr('xml_id'));
-                editing_state = false;
-
-                for (var i = 0, len = current_topic.length; i < len; i++) {
-                    if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
-                        current_topic[i].data = val;
-                        topic_json[global_topic] = current_topic;
-                        break;
-                    };
-                }
-
-                // $('#header_text').val()
-            } else {
-
-
-                for (var i = 0, len = current_topic.length; i < len; i++) {
-                    if (i >= current_clicked) {
-                        var temp = current_topic[i];
-                        temp.xml_id = parseInt(temp.xml_id) + 1;
-                        current_topic[i] = temp;
-                    }
-                }
-                topic_json[global_topic] = current_topic;
-                topic_json[global_topic].push({
-                    "type": "formula",
-                    "data": val,
-                    "xml_id": (current_clicked)
-                });
-            }
-
-            refresh_dom();
-
-            $(this).dialog("close");
-
+                     // $('#header_text').val()
+                 } else {
+                     for (var i = 0, len = current_topic.length; i < len; i++) {
+                         if (i >= current_clicked) {
+                             var temp = current_topic[i];
+                             temp.xml_id = parseInt(temp.xml_id) + 1;
+                             current_topic[i] = temp;
+                         }
+                     }
+                     topic_json[global_topic] = current_topic;
+                     topic_json[global_topic].push({
+                         "type": "formula",
+                         "data": val,
+                         "xml_id": (current_clicked)
+                     });
+                 }
+                 refresh_dom();
+                 $(this).dialog("close");
+	       	}catch(err){
+	       		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+	       	}finally{
+	       		divi.hideLoader();
+	       	}
         },
         Cancel: function () {
             $(this).dialog("close");
@@ -1447,17 +1450,25 @@ $("#dialog-formula").dialog({
 
 
 divi.insertHtml = function(data){
-	 var val = tinyMCE.activeEditor.getContent();
-	 var current_topic = topic_json[global_topic];
-     var attr_text = $('#html-attr').val();
-     var attr_name = $('#html-attr-name').val();
-     var attr_url = $('#html-attr-url').val();
-     var license = $('#html-attr-lcn').val();
-     var box_type = $('#boxtype').val();
-     var xml_id = parseInt($(".html.xml_id").attr('xml_id'));
-     var box_title = $('#html-box-title').val();
-     var data = {data:val,attribution:attr_text,url:attr_url,name:attr_name,license:license,box_type:box_type,box_title:box_title,xmlId:xml_id};
-     divi.saveInlineImages.call(this,data);
+	try{
+		 divi.showLoader();
+		 var val = tinyMCE.activeEditor.getContent();
+		 var current_topic = topic_json[global_topic];
+	     var attr_text = $('#html-attr').val();
+	     var attr_name = $('#html-attr-name').val();
+	     var attr_url = $('#html-attr-url').val();
+	     var license = $('#html-attr-lcn').val();
+	     var box_type = $('#boxtype').val();
+	     var xml_id = parseInt($(".html.xml_id").attr('xml_id'));
+	     var box_title = $('#html-box-title').val();
+	     var data = {data:val,attribution:attr_text,url:attr_url,name:attr_name,license:license,box_type:box_type,box_title:box_title,xmlId:xml_id};
+	     divi.saveInlineImages.call(this,data);
+		
+	}catch(err){
+		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+	}finally{
+		divi.hideLoader();
+	}
 };
 
 divi.saveInsertHtml = function(data){
@@ -1507,13 +1518,13 @@ divi.saveInsertHtml = function(data){
      tinyMCE.activeEditor.setContent('');
      $('#html-attr').val('');
      $(this).dialog("close");
-	  $("#overlay").hide();
+     divi.hideLoader();
 };
 
 // HTML START
 $("#dialog-html").dialog({
     autoOpen: false,
-    height: 600,
+    height: 700,
     width: 800,
     modal: true,
     buttons: {
@@ -1996,10 +2007,11 @@ divi.imageUploadFileCallback = function(url,formData,deferred){
     xhr.open('POST', url, true);
     xhr.onload = function (e) {
         if (this.status == 200) {
-            $("#overlay").hide();
+        	divi.hideLoader();
             deferred.resolve();
         } else {
-            $("#overlay").hide();
+        	
+        	divi.hideLoader();
             deferred.reject();
         }
     };
