@@ -127,7 +127,7 @@ hr{
             <div class="list-group">
               <a href="#" id="mod-subheading" class="list-group-item plus mod-subheading" >Add Subtopic</a>
               <a href="#" id="mod-heading" class="list-group-item plus testing2">Add Heading 3</a>
-              <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a>
+             <!--  <a href="#" id="mod-formula" class="list-group-item plus mod-formula" >Add Formula</a> -->
               <a href="#" id="mod-image" class="list-group-item plus mod-image" >Add Image</a>
               <a href="#" id="mod-video" class="list-group-item plus mod-video" >Add Video</a>
               <a href="#" id="mod-audio" class="list-group-item plus mod-audio" >Add Audio</a>
@@ -817,7 +817,7 @@ $(document).on('focusin', function(e) {
 		  paste_text_sticky_default: true,
 		  plugins:'imageupload paste formulaupload',
 		  valid_elements : '*[*]',
-		  toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload', 
+		  toolbar1: 'undo redo | styleselect | bold italic underline superscript subscript removeformat| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload', 
 		  height:300,
 		  init_instance_callback:"formulaOnclick"
 	});
