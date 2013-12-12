@@ -29,6 +29,7 @@
 	margin:10px;
 	height: 150px;
     width: 97%;
+    overflow-y:auto;
 }
 
 .formulaUploadConfirmCase {

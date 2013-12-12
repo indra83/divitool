@@ -570,7 +570,7 @@ $(document).on('click', '.mod-html', function (e) {
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-    divi.resetValues(['#html-attr','#html-attr-name','#html-attr-url']);
+    divi.resetValues(['#html-attr','#html-attr-name','#html-attr-url','#html-attr-lcn','#boxtype','#html-box-title']);
     $("#dialog-html").dialog("open");
     e.preventDefault();
 });
