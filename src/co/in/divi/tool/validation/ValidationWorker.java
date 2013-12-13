@@ -140,7 +140,7 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 	}
 
 	private int validateTopic(File chDir, TopicDefinition topDef) {
-		// update to delete.
+		// update toDelete.
 		return 0;
 	}
 
@@ -151,23 +151,24 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 	// Helper methods
 	static String openJSONFile(File jsonFile) {
 		String ret = null;
+		BufferedReader rd = null;
 		try {
 			InputStream is = new FileInputStream(jsonFile);
 			String line = "";
 			StringBuilder total = new StringBuilder();
 
 			// Wrap a BufferedReader around the InputStream
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+			rd = new BufferedReader(new InputStreamReader(is));
 
 			// Read response until the end
 			while ((line = rd.readLine()) != null) {
 				total.append(line);
 			}
 			ret = total.toString();
+			rd.close();
 		} catch (IOException ioe) {
 			return null;
 		}
-		// Return full string
 		return ret;
 	}
 
