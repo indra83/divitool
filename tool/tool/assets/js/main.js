@@ -541,7 +541,7 @@ $(document).on('click', '.mod-video', function (e) {
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-    divi.resetValues(['#videoid','#video-attr','#video-desc','#video-title','#video-attr-name','#video-attr-url']);
+    divi.resetValues(['#videoid','#video-attr','#video-desc','#video-title','#video-attr-name','#video-attr-url','#video_data','#video_xml_id']);
     $("#dialog-video").dialog("open");
     e.preventDefault();
 });
@@ -769,13 +769,14 @@ $(document).on('click', '.editing-video', function (e) {
             $('#video-desc').val(current_topic[i]['description']);
             $('#video-title').val(current_topic[i]['title']);
             $('#video-attr-name').val(current_topic[i]['name']);
+            $('#video-data-thumb').val(current_topic[i]['thumb']);            
             $('#video-attr-url').val(current_topic[i]['url']);
+            $('.video_xml_id').val(xml_id);
+            $('#video_data').val(current_topic[i]['data']);
             break;
         };
     };
 
-
-    $(".video.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };

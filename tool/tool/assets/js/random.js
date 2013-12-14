@@ -1,6 +1,3 @@
-
-
-
 $(document).on('click', '.edit-chp', function (e) {
 
     var chapterid = $(this).attr('chapterid');
@@ -858,28 +855,7 @@ divi.UpdateImgContent = function(data,toRemove){
 	return data;
 };
 
-/*
-
-divi.imageUploadSuccess = function(e,dlg,data){
-   var id = data.xmlId;
-   var xml_id;
-   if(id >= 0){
-	   editing_state = false;
-	   for (var i = 0, len = current_topic.length; i < len; i++) {
-	       if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
-	    	   var topic = current_topic[i];
-	    	   $.extend(topic,data);
-	           topic_json[global_topic] = current_topic;
-	           break;
-	       };
-	   }
-	   divi.hideLoader();
-	   refresh_dom();
-	   dlg.dialog("close");
-   }
-};
-*/
-divi.imageUploadCallBack = function(e,dlg,data){
+divi.contentUploadCallBack = function(dlg,data){
 	var current_topic = topic_json[global_topic];
 	var edit = data.edit;
 	var xmlId = data.xmlId;
@@ -911,36 +887,6 @@ divi.imageUploadCallBack = function(e,dlg,data){
     dlg.dialog("close");
 }
 
-/*
-divi.imageUploadFailure = function(e,dlg,data){
-	for (var i = 0, len = current_topic.length; i < len; i++) {
-        if (i >= current_clicked) {
-            var temp = current_topic[i];
-            temp.xml_id = parseInt(temp.xml_id) + 1;
-            current_topic[i] = temp;
-        }
-    }
-	
-    topic_json[global_topic] = current_topic;
-    topic_json[global_topic].push({
-        "type": "image",
-        "data": data.data,
-        "xml_id": (current_clicked),
-        "attribution": data.attribution,
-        "description": data.description,
-        "allowFullscreen": data.allowFullscreen,
-        "id": data.id,
-        "showBorder": data.showBorder,
-        'title': data.title,
-        'name': data.name,
-        'url': data.url,
-        'license': data.license
-    });
-    divi.hideLoader();
-    refresh_dom();
-    dlg.dialog("close");
-};
-*/
 divi.postFormulaUpload = function(reqData,data){
 	var currLocation = "/./equations/";
 	var currData,location;
@@ -1003,53 +949,113 @@ divi.unique = function(tagName,value){
 };
 
 
-divi.upload = function(e,data,mainData){
+divi.videoUpload = function(e,data,mainData){
 	try{
 		divi.showLoader();
-		var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,baseLoc,passData,imgData;
-		var files = [];
-		var xml_id = parseInt($("#image_xml_id").val());
-			title_text = $('#img-title').val();
-		    attr_text = $('#img-attr').val();
-		    attr_name = $('#img-attr-name').val();
-		    attr_url = $('#img-attr-url').val();
-		    desc_text = $('#img-desc').val();
-		    full_screen = $('#fullscheck').is(':checked');
-		    showBorder = $('#showborder').is(':checked');
-		    license = $('#img-attr-lcn').val();
-		    id = $('#imageid').val();
-		    files = document.getElementById('imagefilemod').files;
-		    imgData = $('#img-data').val();
-		    var edit = (files && files.length > 0) ? false : true;
-		    var file_name = edit ? imgData : files[0].name;		    
-		    passData = {id:id,data:file_name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license,edit:true,type:"image"};
-		    baseLoc = "/savefile/";
-		 var img_dlg = $(this);
-		if(!edit){
-			var uniqueness = divi.unique('id',id);
-			var regex = false;
+		var title_text,attr_text,attr_name,attr_url,desc_text,license,id,baseLoc,passData,fileData,files1thumbData,eachFilesList,eachFile;
+		var files = [],files1=[],comFiles=[];
+		var xmlIdElem = $(".video_xml_id");
+		var xml_id;
+		var edit = false;
+		if(xmlIdElem && xmlIdElem.length > 0){
+			xml_id = parseInt(xmlIdElem.val());
+		}
+		if(xml_id >= 0){
+			edit = true;
+		}
+		title_text = $('#video-title').val();
+		attr_text = $('#video-attr').val();
+		desc_text = $('#video-desc').val();
+		attr_name = $('#video-attr-name').val();
+		attr_url = $('#video-attr-url').val();
+		license = $('#video-attr-lcn').val();
+		files = document.getElementById('videofilemod').files;
+		files1 = document.getElementById('thumbfilemod').files;
+		var filesList = [files,files1];
+		for(var eachFilesListKey in filesList){
+			if(filesList.hasOwnProperty(eachFilesListKey)){
+				eachFilesList = filesList[eachFilesListKey];
+				for(var eachFileKey in eachFilesList){
+					if(eachFilesList.hasOwnProperty(eachFileKey)){
+						eachFile =  eachFilesList[eachFileKey];
+						if(eachFile && eachFile.type){
+							comFiles.push(eachFile);
+						}
+					}
+				}
+			}
+		}
+		
+		id = $('#videoid').val();
 
-			if (editing_state == false && !divi.idMatch(id)) {
-		        alert("The ID is wrong. It can only include alpha numerals and (_)");
-		    } else if (editing_state == false && !uniqueness) {
-		        alert("The ID is not unique");
-		    } else {
-		        var url = divi.imageLocation(baseLoc);
-			   var deferred = new $.Deferred();
-			   defArray.push(deferred);
-			   uploadFilesImage(url, files, deferred);
-			   $.when.apply($, defArray).then(function (e) {
-					divi.imageUploadCallBack(e,img_dlg,passData);
-			    });
-		    }
-		}else{
-			divi.imageUploadCallBack(e,img_dlg,passData);
-		}   		
-   	}catch(err){
+		fileData = $('#video-data').val();
+		thumbData = $('#video-data-thumb').val();
+		
+		var file_name = edit ? fileData : files[0].name;
+		var thumb = edit ? thumbData : files1[0].name;	
+		passData = {id:id,data:file_name,attribution:attr_text,description:desc_text,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license,edit:edit,type:"video",thumb:thumb};
+		baseLoc = "/savefile/";
+	    var video_dlg = $(this);
+	    divi.upload.call(this,comFiles,video_dlg,passData);
+	}catch(err){
    		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
    	}finally{
    		divi.hideLoader();
    	}
+}
+
+
+divi.imgUpload = function(e,data,mainData){
+	try{
+		divi.showLoader();
+	    var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,passData,imgData;
+	    var files = [];
+	    var xml_id = parseInt($("#image_xml_id").val());
+		title_text = $('#img-title').val();
+	    attr_text = $('#img-attr').val();
+	    attr_name = $('#img-attr-name').val();
+	    attr_url = $('#img-attr-url').val();
+	    desc_text = $('#img-desc').val();
+	    full_screen = $('#fullscheck').is(':checked');
+	    showBorder = $('#showborder').is(':checked');
+	    license = $('#img-attr-lcn').val();
+	    id = $('#imageid').val();
+	    files = document.getElementById('imagefilemod').files;
+	    imgData = $('#img-data').val();
+	    var edit = (files && files.length > 0) ? false : true;
+	    var file_name = edit ? imgData : files[0].name;		    
+	    passData = {id:id,data:file_name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license,edit:edit,type:"image"};
+	    
+	    var img_dlg = $(this);
+	    divi.upload.call(this,files,img_dlg,passData);
+	}catch(err){
+   		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
+   	}finally{
+   		divi.hideLoader();
+   	}
+}
+
+
+divi.upload = function(files,dlg,passData){
+	if(!passData.edit){
+		var baseLoc = "/savefile/";
+		var uniqueness = divi.unique('id',passData.id);
+		if (!divi.idMatch(passData.id)) {
+	        alert("The ID is wrong. It can only include alpha numerals and (_)");
+	    } else if (!uniqueness) {
+	        alert("The ID is not unique");
+	    } else {
+	        var url = divi.imageLocation(baseLoc);
+		   var deferred = new $.Deferred();
+		   defArray.push(deferred);
+		   uploadFilesImage(url, files, deferred);
+		   $.when.apply($, defArray).then(function (e) {
+				divi.contentUploadCallBack(dlg,passData);
+		    });
+	    }
+	}else{
+		divi.contentUploadCallBack(dlg,passData);
+	} 
 };
 
 divi.saveInlineFormulae = function(data){
@@ -1125,7 +1131,7 @@ $("#dialog-image").dialog({
     width: 500,
     modal: true,
     buttons: {
-        "Insert Image": divi.upload,
+        "Insert Image": divi.imgUpload,
         Cancel: function () {
             $(this).dialog("close");
         }
@@ -1280,139 +1286,13 @@ $("#dialog-video").dialog({
     width: 500,
     modal: true,
     buttons: {
-        "Insert Video": function () {
-        	try{
-        		divi.showLoader();
-                var id = $('#videoid').val();
-                i = i + 1;
-
-                var uniqueness = true;
-                var regex = false;
-
-                for (var i = 0; i < topic_json[global_topic].length; i++) {
-                    if (topic_json[global_topic][i]['id'] == id) {
-                        uniqueness = false;
-                    }
-                };
-
-                if (editing_state == false && id.match('^[_a-zA-Z0-9]+$') == null) {
-                    alert("The ID is wrong. It can only include alpha numerals and (_)");
-                } else if (editing_state == false && !uniqueness) {
-                    alert("The ID is not unique");
-                } else {
-
-                    var vide_dialog = $(this);
-                    var title_text = $('#video-title').val();
-                    var attr_text = $('#video-attr').val();
-                    var desc_text = $('#video-desc').val();
-                    var attr_name = $('#video-attr-name').val();
-                    var attr_url = $('#video-attr-url').val();
-                    var license = $('#video-attr-lcn').val();
-                    var files = document.getElementById('videofilemod').files;
-                    divi.showLoader();
-                    var fslocation = global_chapter + "/" + global_topic + "/media";
-                    console.log(fslocation);
-                    var file_name = files[0].name;
-                    insert = true;
-
-                    var current_topic = topic_json[global_topic];
-
-                    var files1 = document.getElementById('thumbfilemod').files;
-
-                    var file_name1 = files1[0].name;
-
-                    var deferred = new $.Deferred();
-                    var deferred1 = new $.Deferred();
-                    defArray.push(deferred);
-                    defArray.push(deferred1);
-                    for (var i = 0, f; f = files[i]; i++) {
-                        uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred);
-                    }
-
-                    for (var i = 0, f; f = files1[i]; i++) {
-                        uploadFilesImage('/savefile/' + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'], f, deferred1);
-                    }
-
-                    $.when.apply($, defArray).then(function () {
-                    	divi.hideLoader();
-                        if (editing_state == true) {
-                            xml_id = parseInt($(".video.xml_id").attr('xml_id'));
-                            editing_state = false;
-
-                            for (var i = 0, len = current_topic.length; i < len; i++) {
-                                if (xml_id == parseInt(current_topic[i].xml_id, 10)) {
-                                    current_topic[i].data = file_name;
-                                    current_topic[i].thumb = file_name1;
-                                    current_topic[i].attribution = attr_text;
-                                    current_topic[i].description = desc_text;
-                                    current_topic[i].title = title_text;
-                                    current_topic[i].url = attr_url;
-                                    current_topic[i].name = attr_name;
-                                    current_topic[i].license = license;
-                                    topic_json[global_topic] = current_topic;
-                                    break;
-                                };
-                            }
-
-                            // $('#header_text').val()
-                        } else {
-
-                            for (var i = 0, len = current_topic.length; i < len; i++) {
-                                if (i >= current_clicked) {
-                                    var temp = current_topic[i];
-                                    temp.xml_id = parseInt(temp.xml_id) + 1;
-                                    current_topic[i] = temp;
-                                }
-                            }
-                            var fslocation = global_chapter + "/" + global_topic + "/media";
-                            console.log(fslocation);
-
-                            insert = true;
-
-
-                            topic_json[global_topic] = current_topic;
-                            topic_json[global_topic].push({
-                                "type": "video",
-                                "data": file_name,
-                                "xml_id": (current_clicked),
-                                "attribution": attr_text,
-                                "thumb": file_name1,
-                                "description": desc_text,
-                                'id': id,
-                                'title': title_text,
-                                'name': attr_name,
-                                'url': attr_url,
-                                'license': license
-                            });
-                        }
-                        // $.when.apply($, defArray).then( function() {
-                        //this code is called after all the ajax calls are done
-                        vide_dialog.dialog("close");
-                        refresh_dom();
-                        // });
-                    });
-                }
-	       		
-	       	}catch(err){
-	       		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
-	       	}finally{
-	       		divi.hideLoader();
-	       	}
-        },
+        "Insert Video":divi.videoUpload,
         Cancel: function () {
             $(this).dialog("close");
         }
     },
     close: function () {
-        $('#videoid').val('');
-        $('#videofilemod').val('');
-        $('#thumbfilemod').val('');
-        $('#video-attr').val('');
-        $('#video-title').val('');
-        $('#video-attr-name').val('');
-        $('#video-attr-url').val('');
-        $('#video-desc').val('');
-        $('#video-attr-url').val('');
+    	 divi.resetValues(['#videoid','#video-attr','#video-desc','#video-title','#video-attr-name','#video-attr-url','#video_data','.video_xml_id']);
         $('#dialog-add').dialog("close");
     }
 });
