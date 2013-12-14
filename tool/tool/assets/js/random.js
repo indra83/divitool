@@ -858,8 +858,11 @@ divi.UpdateImgContent = function(data,toRemove){
 	return data;
 };
 
+/*
+
 divi.imageUploadSuccess = function(e,dlg,data){
    var id = data.xmlId;
+   var xml_id;
    if(id >= 0){
 	   editing_state = false;
 	   for (var i = 0, len = current_topic.length; i < len; i++) {
@@ -875,7 +878,40 @@ divi.imageUploadSuccess = function(e,dlg,data){
 	   dlg.dialog("close");
    }
 };
+*/
+divi.imageUploadCallBack = function(e,dlg,data){
+	var current_topic = topic_json[global_topic];
+	var edit = data.edit;
+	var xmlId = data.xmlId;
+	var elemFound;
+	for (var i = 0, len = current_topic.length; i < len; i++) {
+       if (xmlId == parseInt(current_topic[i].xml_id, 10)) {
+    	   elemFound = i;
+    	   break;
+       }
+   }
+    topic_json[global_topic] = current_topic;
+	if(edit && elemFound >= 0){
+		var topic = current_topic[elemFound];
+		$.extend(topic,data);
+	}else{
+		var previousElement = current_topic[current_topic.length-1];
+		xmlId = -1;
+		if(previousElement){
+			xmlId = parseInt(current_topic[current_topic.length-1]['xml_id']);
+		}
+		data['xml_id'] = xmlId+1;
+		var temp = {};
+		$.extend(temp,data);
+		current_topic.push(temp);
+	}
+	topic_json[global_topic] = current_topic;
+    divi.hideLoader();
+    refresh_dom();
+    dlg.dialog("close");
+}
 
+/*
 divi.imageUploadFailure = function(e,dlg,data){
 	for (var i = 0, len = current_topic.length; i < len; i++) {
         if (i >= current_clicked) {
@@ -904,7 +940,7 @@ divi.imageUploadFailure = function(e,dlg,data){
     refresh_dom();
     dlg.dialog("close");
 };
-
+*/
 divi.postFormulaUpload = function(reqData,data){
 	var currLocation = "/./equations/";
 	var currData,location;
@@ -970,9 +1006,9 @@ divi.unique = function(tagName,value){
 divi.upload = function(e,data,mainData){
 	try{
 		divi.showLoader();
-		var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,baseLoc,passData;
+		var title_text,attr_text,attr_name,attr_url,desc_text,full_screen,showBorder,license,id,baseLoc,passData,imgData;
 		var files = [];
-		var xml_id = parseInt($(".image.xml_id").attr('xml_id'));
+		var xml_id = parseInt($("#image_xml_id").val());
 			title_text = $('#img-title').val();
 		    attr_text = $('#img-attr').val();
 		    attr_name = $('#img-attr-name').val();
@@ -983,38 +1019,32 @@ divi.upload = function(e,data,mainData){
 		    license = $('#img-attr-lcn').val();
 		    id = $('#imageid').val();
 		    files = document.getElementById('imagefilemod').files;
-		    var file_name = files[0].name;
-		    passData = {id:id,data:files[0].name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license};
+		    imgData = $('#img-data').val();
+		    var edit = (files && files.length > 0) ? false : true;
+		    var file_name = edit ? imgData : files[0].name;		    
+		    passData = {id:id,data:file_name,attribution:attr_text,description:desc_text,allowFullscreen:full_screen,showBorder:showBorder,title:title_text,xmlId:xml_id,url:attr_url,name:attr_name,license:license,edit:true,type:"image"};
 		    baseLoc = "/savefile/";
+		 var img_dlg = $(this);
+		if(!edit){
+			var uniqueness = divi.unique('id',id);
+			var regex = false;
 
-		var uniqueness = divi.unique('id',id);
-		var regex = false;
-
-		if (editing_state == false && !divi.idMatch(id)) {
-	        alert("The ID is wrong. It can only include alpha numerals and (_)");
-	    } else if (editing_state == false && !uniqueness) {
-	        alert("The ID is not unique");
-	    } else {
-	        insert = true;
-	        var current_topic = topic_json[global_topic];
-
-	        var img_dlg = $(this);
-	        
-	        var url = divi.imageLocation(baseLoc);
-		   var deferred = new $.Deferred();
-		   defArray.push(deferred);
-		   uploadFilesImage(url, files, deferred);
-		   if (editing_state == true) {
-				$.when.apply($, defArray).then(function (e) {
-					divi.imageUploadSuccess(e,img_dlg,passData);
-					});
-			} else {
-				$.when.apply($, defArray).then(function () {
-					divi.imageUploadFailure(e,img_dlg,passData);
-				});
-			}
-	    }
-   		
+			if (editing_state == false && !divi.idMatch(id)) {
+		        alert("The ID is wrong. It can only include alpha numerals and (_)");
+		    } else if (editing_state == false && !uniqueness) {
+		        alert("The ID is not unique");
+		    } else {
+		        var url = divi.imageLocation(baseLoc);
+			   var deferred = new $.Deferred();
+			   defArray.push(deferred);
+			   uploadFilesImage(url, files, deferred);
+			   $.when.apply($, defArray).then(function (e) {
+					divi.imageUploadCallBack(e,img_dlg,passData);
+			    });
+		    }
+		}else{
+			divi.imageUploadCallBack(e,img_dlg,passData);
+		}   		
    	}catch(err){
    		alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n"+err.message);
    	}finally{
@@ -1667,17 +1697,11 @@ function refresh_dom() {
 
         case "image":
             var parent_div = document.createElement("div");
-
             var span = document.createElement("img");
-
             var title_text = current_topic[i].title;
-
             var attr_text = current_topic[i].attribution;
-
             var full_screen = current_topic[i].allowFullscreen;
-
             var showBorder = current_topic[i].showBorder;
-
 
             span.src = "/getfiles/" + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'] + "/" + current_topic[i]['data'];
             console.log(span);

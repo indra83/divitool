@@ -515,7 +515,7 @@ $(document).on('click', '.mod-image', function (e) {
         topic_json[global_topic] = [];
     };
 
-    divi.resetValues(['#img-attr','#imageid','#img-attr','#img-desc','#img-title','#img-attr-name','#img-attr-url']);
+    divi.resetValues(['#img-attr','#imageid','#img-attr','#img-desc','#img-title','#img-attr-name','#img-attr-url','#img-data','#image_xml_id']);
     $("#dialog-image").dialog("open");
     e.preventDefault();
 });
@@ -694,7 +694,6 @@ $(document).on('click', '.editing-html', function (e) {
 
 
 $(document).on('click', '.editing-image', function (e) {
-    editing_state = true;
     console.log(xml_id);
     console.log($(this));
     parent = $(this);
@@ -705,17 +704,15 @@ $(document).on('click', '.editing-image', function (e) {
         if (xml_id == current_topic[i].xml_id) {
             $('#img-attr').val(current_topic[i]['attribution']);
             $('#imageid').val(current_topic[i]['id']);
-            $('#img-attr').val(current_topic[i]['attribution']);
             $('#img-desc').val(current_topic[i]['description']);
             $('#img-title').val(current_topic[i]['title']);
             $('#img-attr-name').val(current_topic[i]['name']);
             $('#img-attr-url').val(current_topic[i]['url']);
+            $('#img-data').val(current_topic[i]['data']);
+            $('#image_xml_id').val(xml_id);
             break;
         };
     };
-
-
-    $(".image.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
