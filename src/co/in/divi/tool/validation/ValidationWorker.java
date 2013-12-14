@@ -30,9 +30,9 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 
 	Gson						gson;
 
-	public ValidationWorker(TextArea logArea) {
+	public ValidationWorker(TextArea logArea, ArrayList<File> toDelete) {
 		this.logArea = logArea;
-		toDelete = new ArrayList<File>();
+		this.toDelete = toDelete;
 		gson = new Gson();
 	}
 
@@ -67,12 +67,36 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 					}
 				}
 			}
-			// TODO: validate topic & assessment id uniqueness!
+
+			HashSet<String> allIds = new HashSet<String>();
+			for (ChapterDefinition chDef : bookDef.chapters) {
+				for (TopicDefinition topDef : chDef.topics) {
+					if (allIds.contains(topDef.id)) {
+						publish("Duplicate topicId found! - " + topDef.id);
+						return 1;
+					}
+					allIds.add(topDef.id);
+				}
+				for (AssessmentDefinition assDef : chDef.assessments) {
+					if (allIds.contains(assDef.id)) {
+						publish("Duplicate assessment Id found! - " + assDef.id);
+						return 1;
+					}
+					allIds.add(assDef.id);
+				}
+			}
+			publish("Passed id uniqueness test!");
 
 			int ret = 0;
 			// Validate each chapter
 			for (ChapterDefinition chDef : bookDef.chapters) {
 				ret += validateChapter(bookDir, chDef);
+			}
+
+			if (ret == 0) {
+				for (File f : toDelete) {
+					publish("Delete - " + f.getAbsolutePath());
+				}
 			}
 
 			return ret;
@@ -140,11 +164,88 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 	}
 
 	private int validateTopic(File chDir, TopicDefinition topDef) {
-		// update toDelete.
+		StringBuilder sb = new StringBuilder();
+		try {
+			File topDir = new File(chDir, topDef.id);
+			if (!topDir.exists()) {
+				publish("!!Topic directory missing - " + topDir.getName());
+				return 1;
+			}
+			File topicXmlFile = new File(topDir, "topic.xml");
+			if (!topicXmlFile.exists()) {
+				publish("!!Topic file missing - " + topicXmlFile.getName());
+				return 1;
+			}
+
+			ArrayList<File> refFiles = new ArrayList<File>();
+			refFiles.add(topicXmlFile);
+			new TopicXmlValidator().validateTopic(topicXmlFile, sb, refFiles);
+			HashSet<String> refFilePaths = new HashSet<String>();
+			HashSet<String> existingFiles = new HashSet<String>();
+			for (File f : refFiles)
+				refFilePaths.add(f.getCanonicalPath());
+			for (File f : topicXmlFile.getParentFile().listFiles()) {
+				if (f.isDirectory()) {
+					for (File f2 : f.listFiles()) {
+						existingFiles.add(f2.getCanonicalPath());
+					}
+				} else {
+					existingFiles.add(f.getCanonicalPath());
+				}
+			}
+
+			for (String path : refFilePaths) {
+				if (!existingFiles.contains(path)) {
+					publish("Referenced file missing! - 	" + path);
+					return 1;
+				}
+			}
+
+			for (String path : existingFiles) {
+				if (!refFilePaths.contains(path)) {
+					toDelete.add(new File(path));
+				}
+			}
+
+		} catch (Exception e) {
+			publish(sb.toString());
+
+		}
+
 		return 0;
 	}
 
 	private int validateAssessment(File chDir, AssessmentDefinition assDef) {
+		File assDir = new File(chDir, assDef.id);
+		if (!assDir.exists()) {
+			publish("!!Assessment directory missing - " + assDir.getName());
+			return 1;
+		}
+		File assDefFile = new File(assDir, "assessments.json");
+		if (!assDefFile.exists()) {
+			publish("!!Assessment def missing - " + assDefFile.getName());
+			return 1;
+		}
+		AssessmentFileModel assFileDef = new Gson().fromJson(openJSONFile(assDefFile), AssessmentFileModel.class);
+		HashSet<String> qIds = new HashSet<String>();
+		qIds.add(assDefFile.getName());
+		for (AssessmentFileModel.Question q : assFileDef.questions) {
+			qIds.add(q.id);
+			File questionFile = new File(new File(assDir, q.id), "question.xml");
+			if (!questionFile.exists()) {
+				publish("Missing question - " + questionFile.getAbsolutePath());
+				return 1;
+			}
+			// TODO: validate question xml
+		}
+
+		for (File f : assDir.listFiles()) {
+			if (!qIds.contains(f.getName())) {
+				toDelete.add(f);
+				publish("Unused question dir found, deleting - " + f.getAbsolutePath());
+			}
+		}
+
 		return 0;
 	}
 

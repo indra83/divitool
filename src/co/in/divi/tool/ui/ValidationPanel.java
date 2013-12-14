@@ -6,6 +6,7 @@ import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -20,10 +21,12 @@ import co.in.divi.tool.validation.ValidationWorker;
 
 public class ValidationPanel extends JPanel {
 
-	ToolServer	mainPanel;
+	ToolServer		mainPanel;
 
-	JButton		validateButton, zipButton;
-	TextArea	logArea;
+	JButton			validateButton, zipButton;
+	TextArea		logArea;
+
+	ArrayList<File>	toDelete;
 
 	public ValidationPanel(ToolServer mainPanel) {
 		super(new BorderLayout(25, 25));
@@ -35,7 +38,8 @@ public class ValidationPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				validateButton.setEnabled(false);
-				new ValidationWorker(logArea).execute();
+				toDelete = new ArrayList<File>();
+				new ValidationWorker(logArea, toDelete).execute();
 			}
 		});
 		gridPanel.add(validateButton);
