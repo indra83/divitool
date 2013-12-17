@@ -703,7 +703,7 @@ $(document).on('click', '.editing-image', function (e) {
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#img-attr').val(current_topic[i]['attribution']);
-            $('#imageid').val(current_topic[i]['id']);
+            $('#imageid').val(current_topic[i]['id']).attr("disabled", true);
             $('#img-desc').val(current_topic[i]['description']);
             $('#img-title').val(current_topic[i]['title']);
             $('#img-attr-name').val(current_topic[i]['name']);
@@ -764,7 +764,7 @@ $(document).on('click', '.editing-video', function (e) {
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
-            $('#videoid').val(current_topic[i]['id']);
+            $('#videoid').val(current_topic[i]['id']).attr("disabled", true);
             $('#video-attr').val(current_topic[i]['attribution']);
             $('#video-desc').val(current_topic[i]['description']);
             $('#video-title').val(current_topic[i]['title']);
