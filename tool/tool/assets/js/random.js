@@ -827,7 +827,7 @@ divi.UpdateImgContent = function(data,toRemove){
 	var dataJ = $(data);
 	var elements = dataJ.find("img");
 	var eachElem,regex,originalsrc;
-	var prefix = divi.imageLocation("/getfiles/");
+	var prefix = divi.imageLocation("/getfiles/")+"/";
 	for(var x in elements){
 		if(elements.hasOwnProperty(x)){
 			eachElem = elements[x];
@@ -888,7 +888,7 @@ divi.contentUploadCallBack = function(dlg,data){
 }
 
 divi.postFormulaUpload = function(reqData,data){
-	var currLocation = "/./equations/";
+	var currLocation = "./equations/";
 	var currData,location;
 	var val = data.data;
 	for(var i=0;i < reqData.length;i++){
@@ -1109,7 +1109,7 @@ divi.saveInlineImages = function(data){
 
 divi.saveInlineSucess = function(data,files){
 	var val = data.data;
-	var currLocation = "/./htmlimages/";
+	var currLocation = "./htmlimages/";
 	var dataQuery = $(val);
 	var matchedElem;
 	for(var i=0;i < files.length;i++){
