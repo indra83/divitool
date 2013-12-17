@@ -75,7 +75,8 @@ public class ValidationPanel extends JPanel {
 			publish("Saving to - " + archiveFile.getAbsolutePath());
 			ZipFile zipFile = new ZipFile(archiveFile);
 			ZipParameters parameters = new ZipParameters();
-			parameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
+			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_FASTEST);
 
 			for (File f : bookDir.listFiles()) {
 				if (f.isDirectory()) {

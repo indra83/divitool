@@ -38,6 +38,8 @@ public class HomePanel extends JPanel implements ActionListener {
 	JFileChooser	chooser;
 	String			choosertitle;
 
+	static Server	server	= null;
+
 	SwingWorker		worker	= new SwingWorker<Void, Void>() {
 								@Override
 								public Void doInBackground() {
@@ -98,6 +100,13 @@ public class HomePanel extends JPanel implements ActionListener {
 		validateButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (server != null) {
+					try {
+						server.stop();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				((CardLayout) mainPanel.getContentPane().getLayout()).show(mainPanel.getContentPane(), mainPanel.CARD_VALIDATION);
 			}
 		});
@@ -107,7 +116,7 @@ public class HomePanel extends JPanel implements ActionListener {
 	}
 
 	private static void startServer() {
-		Server server = new Server();
+		server = new Server();
 		Connector connector = new SelectChannelConnector();
 		connector.setHost("localhost");
 		connector.setPort(8080);

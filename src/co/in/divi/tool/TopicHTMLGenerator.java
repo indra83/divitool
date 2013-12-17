@@ -110,7 +110,7 @@ public class TopicHTMLGenerator {
 	private void processImage(XmlPullParser parser, StringBuilder sb) throws IOException, XmlPullParserException {
 		parser.require(XmlPullParser.START_TAG, ns, TopicXmlTags.IMAGE_TAG);
 		final String _id = parser.getAttributeValue(ns, TopicXmlTags.ID_ATTRIBUTE);
-		final String imageSrc = parser.getAttributeValue(ns, TopicXmlTags.SRC_ATTRIBUTE);
+		final String imageSrc = basePath + parser.getAttributeValue(ns, TopicXmlTags.SRC_ATTRIBUTE);
 		final String showBorder = parser.getAttributeValue(ns, TopicXmlTags.IMAGE_SHOWBORDER_ATTRIBUTE);
 		String tempImageDesc = null;
 		String tempImageTitle = null;
@@ -134,7 +134,7 @@ public class TopicHTMLGenerator {
 		if (showBorder == null || Boolean.parseBoolean(showBorder)) {
 			sb.append(imageTemplate.execute(new Object() {
 				String	id			= _id;
-				String	image_path	= basePath + imageSrc;
+				String	image_path	= imageSrc;
 				String	caption		= imageTitle;
 				String	desc		= imageDesc;
 			}));
@@ -227,7 +227,7 @@ public class TopicHTMLGenerator {
 		}
 		final String data = StringEscapeUtils.unescapeXml(tempData);
 		parser.require(XmlPullParser.END_TAG, ns, TopicXmlTags.HTML_TAG);
-		if (StringUtils.isEmpty(boxType) || boxType.equalsIgnoreCase(TopicXmlTags.HTML_BOXTYPE_NONE)) {
+		if (StringUtils.isEmpty(boxType) || boxType.equalsIgnoreCase(TopicXmlTags.HTML_BOXTYPE_NONE) || boxType.equalsIgnoreCase("null")) {
 			sb.append(textTemplate.execute(new Object() {
 				String	content	= data;
 			}));
