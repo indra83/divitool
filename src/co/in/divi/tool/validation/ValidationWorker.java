@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import co.in.divi.tool.ToolServer;
@@ -119,6 +120,23 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 	protected void done() {
 		try {
 			if (get() == 0) {
+				if (toDelete.size() > 0) {
+					int n = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + toDelete.size() + " file(s)?",
+							"Delete unused files", JOptionPane.YES_NO_OPTION);
+					if (n == JOptionPane.YES_OPTION) {
+						boolean deleteSuccessful = true;
+						for (File f : toDelete)
+							deleteSuccessful = deleteSuccessful && f.delete();
+						if (deleteSuccessful)
+							logArea.append("Deleted files\n");
+						else
+							logArea.append("!!!Delete failed\n");
+					} else {
+						// do nothing
+						logArea.append("!!!There are unused files in book\n");
+						return;
+					}
+				}
 				logArea.append("Validation successuful!\n\n");
 				return;
 			}
