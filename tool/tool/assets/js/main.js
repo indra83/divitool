@@ -560,6 +560,20 @@ divi.resetValues = function(data){
 	}
 }
 
+divi.setDefaultValues = function(data){
+	if(data){
+		var eachValue;
+		for(var key in data){
+			if(data.hasOwnProperty(key)){
+				eachValue = data[key];
+				if(eachValue){
+					$(key).val(eachValue);
+				}
+			}
+		}
+	}
+}
+
 $(document).on('click', '.mod-html', function (e) {
     console.log(xml_id);
     console.log($(this));
@@ -571,6 +585,7 @@ $(document).on('click', '.mod-html', function (e) {
         topic_json[global_topic] = [];
     };
     divi.resetValues(['#html-attr','#html-attr-name','#html-attr-url','#html-attr-lcn','#boxtype','#html-box-title']);
+    divi.setDefaultValues({'#boxtype':'none','#html-attr-lcn':'CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)'});
     $("#dialog-html").dialog("open");
     e.preventDefault();
 });
