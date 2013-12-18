@@ -29,6 +29,8 @@ $('#mod-chapter').click(function () {
 });
 
 
+
+
 $(document).on('click', '.edit-test', function (e) {
 
     var chapterid = $(this).attr('chapterid');
@@ -822,6 +824,21 @@ $("#dialog-sub-heading").dialog({
 });
 
 divi = {};
+
+divi.insertAt = function(array,index,data){
+	if(array){
+		var len = array.length;
+		if(len > index){
+		    var children = array.children().clone(true);
+		    var newArray = $.makeArray(children);
+		    newArray.splice(index, 0, data);
+		    array.empty().append(newArray);
+		}else{
+			array.push(data);
+		}
+	}
+	return array;
+};
 
 divi.UpdateImgContent = function(data,toRemove){
 	var dataJ = $(data);
@@ -1816,7 +1833,7 @@ function refresh_dom() {
 
         }
     }
-    side_bar.append('<button xml_index="' + current_topic.length + '" class="add-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
+    side_bar.append('<button xml_index="' + current_topic.length + '" class="add-btn emptybtn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>');
 
     // $('#side_bar').sortable();
     // $( "#side_bar" ).disableSelection();

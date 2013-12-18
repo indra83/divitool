@@ -51,7 +51,7 @@ var parent;
 i = 0;
 var editing_state = false;
 var master_json = {}
-current_clicked = 0;
+current_clicked = -1;
 chapter_json = {
     'id': '',
     'name': '',
@@ -439,6 +439,9 @@ $('#book-show').on('click', '.topic_link', function () {
 
 $('#sidebar').on('click', '.add-btn', function () {
     current_clicked = parseInt($(this).attr('xml_index'));
+    if(current_clicked && !$(this).hasClass('emptybtn')){
+    	current_clicked = current_clicked+1;
+    }
     $('#dialog-add').dialog('open');
     return false;
 });
@@ -694,6 +697,9 @@ $(document).on('click', '.editing-html', function (e) {
             $('#html-attr').val(current_topic[i]['attribution']);
             $('#html-attr-name').val(current_topic[i]['name']);
             $('#html-attr-url').val(current_topic[i]['url']);
+            $('#html-attr-lcn').val(current_topic[i]['license']);
+            $('#boxtype').val(current_topic[i]['box_type']);
+            $('#html-box-title').val(current_topic[i]['box_title']);
             break;
         };
     };
