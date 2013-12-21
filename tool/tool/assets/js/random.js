@@ -584,7 +584,7 @@ $("#dialog-add").dialog({
 divi = {};
 
 divi.isValidId = function(dlg,data,callBack){
-	if (!(data.xml_id && data.xml_id >= 0)) {
+	if(!(data.hasOwnProperty('xml_id') && data['xml_id'] >= 0)){
         var uniqueness = divi.unique('id', data.id);
         if (!divi.idMatch(data.id)) {
             alert("The ID is wrong. It can only include alpha numerals and (_)");
