@@ -1,43 +1,45 @@
-function formulaOnclick(inst,e,d) {
-	inst.on("click",function(curr,e) {
-		var target = curr.srcElement ? curr.srcElement : curr.target;
-		if(target.localName == "img"){
-			var targetJ = $(target);
-			var text = targetJ.attr("text");
-			if(text){
-				this.execCommand('mceFormulaUpload',null,target.outerHTML);
-			}
-		}
-	});
+function formulaOnclick(inst, e, d) {
+    inst.on("click", function (curr, e) {
+        var target = curr.srcElement ? curr.srcElement : curr.target;
+        if (target.localName == "img") {
+            var targetJ = $(target);
+            var text = targetJ.attr("text");
+            if (text) {
+                this.execCommand('mceFormulaUpload', null, target.outerHTML);
+            }
+        }
+    });
 }
 
 
-divi.filesAttach = function(){
-	return '/getfiles/';
+divi.filesAttach = function () {
+    return '/getfiles/';
 };
 
 
-(function(){
-	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
+(function () {
+    var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
-	EQUATION_ENGINE = http+'latex.codecogs.com';
-	FAVORITE_ENGINE = http+'latex.codecogs.com/json';
-	EDITOR_SRC      = http+'latex.codecogs.com';
-	EMBED_ENGINE    = 'formulaEditor.html';
-	EDIT_ENGINE     = http+'www.codecogs.com/eqnedit.php';
-	EDITOR_SW_FLASH = http+'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
-	EDITOR_SW_PLAYER= http+'www.macromedia.com/go/getflashplayer';
+    EQUATION_ENGINE = http + 'latex.codecogs.com';
+    FAVORITE_ENGINE = http + 'latex.codecogs.com/json';
+    EDITOR_SRC = http + 'latex.codecogs.com';
+    EMBED_ENGINE = 'formulaEditor.html';
+    EDIT_ENGINE = http + 'www.codecogs.com/eqnedit.php';
+    EDITOR_SW_FLASH = http + 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
+    EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
 })();
 
 function S4() {
-	   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 }
 
 function guid() {
-   return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
 idRegex = '^[_a-zA-Z0-9]+$';
+var indexKey = 'xml_id';
+var textEdit = false;
 defaultImgExtension = ".png";
 topic_json = [];
 gl_img = {};
@@ -93,15 +95,11 @@ $("#sidebar").sortable({
         };
 
         current_topic = temp_array;
-
-        for (var i = 0; i < current_topic.length; i++) {
-            current_topic[i].xml_id = i;
-        };
+        divi.resetIndexes(current_topic);
 
         topic_json[global_topic] = current_topic;
-
+        
         refresh_dom();
-
     }
 });
 
@@ -117,15 +115,15 @@ $(".sortchapters").sortable({
 
 
 $.ajax({
-    url: divi.filesAttach()+"master.json",
+    url: divi.filesAttach() + "master.json",
 }).done(function (data) {
 
     console.log("IN");
     console.log(data);
     master_json = JSON.parse(data);
-    var currTopic,imgCount,currChap,currAsses;
+    var currTopic, imgCount, currChap, currAsses;
     for (var i = master_json.chapters.length - 1; i >= 0; i--) {
-    	currChap = master_json.chapters[i];
+        currChap = master_json.chapters[i];
         var a = $('<li>');
         var del_btn_ch = $('<button>').addClass('btn del-chp sidebar-btn btn-danger btn-xs').attr('chapterid', currChap['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
         var edit_btn_ch = $('<button>').addClass('btn edit-chp sidebar-btn btn-warning btn-xs').attr('chapterid', currChap['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
@@ -139,17 +137,17 @@ $.ajax({
         var top = $('<ul>');
         top.addClass('sortchapters');
         if (currChap.topics != undefined) {
-        	
+
             for (var j = currChap.topics.length - 1; j >= 0; j--) {
-            	currTopic = currChap.topics[j];
+                currTopic = currChap.topics[j];
                 var a1 = $('<li>');
                 var link1 = $('<a>').append(currTopic['name']);
                 var del_btn = $('<button>').addClass('btn del-tpc sidebar-btn btn-danger btn-xs').attr('chapterid', currChap['id']).attr('topicid', currTopic['id']).append($('<span>').addClass('glyphicon glyphicon-trash'));
                 var edit_btn = $('<button>').addClass('btn edit-tpc sidebar-btn btn-warning btn-xs').attr('chapterid', currChap['id']).attr('topicid', currTopic['id']).append($('<span>').addClass('glyphicon glyphicon-edit'));
                 //adding image count internally.
-                imgCount = currTopic[imageCount] ? currTopic[imageCount]  :defaultId;
+                imgCount = currTopic[imageCount] ? currTopic[imageCount] : defaultId;
                 edit_btn.attr(imageCount, imgCount);
-                
+
                 var previewBytton = $('<button>').addClass('btn sidebar-btn preview-tpc btn-warning btn-xs').attr('chapterid', currChap['id']).attr('topicid', currTopic['id']).append($('<span>').addClass('glyphicon glyphicon-zoom-in'));
                 link1.addClass('topic_link');
                 link1.attr('chapter-id', i);
@@ -169,7 +167,7 @@ $.ajax({
             };
 
             for (var k = 0; k < currChap.assessments.length; k++) {
-            	currAsses = master_json.chapters[i].assessments[k];
+                currAsses = master_json.chapters[i].assessments[k];
                 var test_el = $('<li style="background-color:wheat;padding:2px;">');
                 var link = $('<a>').append(currAsses['name']).addClass('assess');
                 link.attr('chapter-id', i);
@@ -194,7 +192,7 @@ $.ajax({
     $('#courseid-cont').html(' Course ID : ' + master_json['courseId']);
     $('#bookorder-cont').html(' Book Order : ' + master_json['orderNo']);
     $('#bookversion-cont').html(' Book Version : ' + master_json['version']);
-    $('.preview-tpc').on('click',previewTopic);
+    $('.preview-tpc').on('click', previewTopic);
     $(".sortchapters").sortable({
         start: function (e, ui) {
             // alert("started");
@@ -250,14 +248,14 @@ $.ajax({
 });
 
 
-previewTopic = function(e){
-	var chapterid = $(this).attr('chapterid');
+previewTopic = function (e) {
+    var chapterid = $(this).attr('chapterid');
     var topicid = $(this).attr('topicid');
-	if(!$.isEmptyObject(chapterid) && !$.isEmptyObject(topicid)){
-		window.open("/preview/?/"+chapterid+"/"+topicid+"/topic.xml",'open_window');
-	}else{
-		alert("something went wrong. Please check");
-	}
+    if (!$.isEmptyObject(chapterid) && !$.isEmptyObject(topicid)) {
+        window.open("/preview/?/" + chapterid + "/" + topicid + "/topic.xml", 'open_window');
+    } else {
+        alert("something went wrong. Please check");
+    }
 };
 
 $('#sidebar').on('mouseover', '.sortable', function () {
@@ -300,12 +298,12 @@ $('#book-show').on('click', '.topic_link', function () {
     global_chapter = parseInt($(this).attr('chapter-id'), 10);
     var imgCount = parseInt($(this).attr(imageCount), 10);
     topic_json[global_topic] = [];
-    
+
     var xml_string = "";
     current_topic = topic_json[global_topic] || [];
     $.ajax({
         dataType: "xml",
-        url: divi.filesAttach()+ master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'] + "/topic.xml",
+        url: divi.filesAttach() + master_json.chapters[global_chapter]['id'] + "/" + master_json.chapters[global_chapter].topics[global_topic]['id'] + "/topic.xml",
     }).done(function (data) {
 
         var iterate = data.childNodes[0];
@@ -410,8 +408,6 @@ $('#book-show').on('click', '.topic_link', function () {
                     'title': iterate.children[i].getElementsByTagName('title')[0].textContent
                 });
                 //   var parent_div=document.createElement("div");
-
-
                 break;
             case "formula":
                 current_topic.push({
@@ -438,178 +434,129 @@ $('#book-show').on('click', '.topic_link', function () {
 });
 
 $('#sidebar').on('click', '.add-btn', function () {
-    current_clicked = parseInt($(this).attr('xml_index'));
-    if(current_clicked && !$(this).hasClass('emptybtn')){
-    	current_clicked = current_clicked+1;
-    }
+    divi.setCurrClicked(this, true);
     $('#dialog-add').dialog('open');
     return false;
 });
 
 
 $('#sidebar').on('click', '.del-btn', function () {
-    current_clicked = parseInt($(this).attr('xml_index'), 10);
-    // $('#dialog-add').dialog('open');
-    var result = confirm("Are you sure you want to delete this element?");
-
-    if (result) {
-        current_topic = topic_json[global_topic];
-        for (var i = 0; i < current_topic.length; i++) {
-            if (current_topic[i]['xml_id'] == current_clicked) {
-                current_topic.splice(i, 1);
-                break;
-            }
-        }
+    divi.setCurrClicked(this);
+    var editStatus = divi.getCurrClicked();
+    var index = editStatus.index;
+    current_topic = topic_json[global_topic];
+    if (index >= 0) {
+        divi.deleteAt(current_topic, index);
         topic_json[global_topic] = current_topic;
         refresh_dom();
     }
     return false;
 });
 
-
-
-
 $('#mod-heading').click(function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-
+    $('#headerid').attr("disabled",false);
     $("#dialog-heading").dialog("open");
     e.preventDefault();
 });
 
-
-
 $(document).on('click', '.mod-subheading', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
-    if (topic_json[global_topic] == undefined) {
+	if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
     $("#dialog-sub-heading").dialog("open");
-    e.preventDefault();
-});
-
-$(document).on('click', '.mod-formula', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
-    if (topic_json[global_topic] == undefined) {
-        topic_json[global_topic] = [];
-    };
-    $("#dialog-formula").dialog("open");
+    $('#subheadingid').val(current_topic[i]['id']).attr("disabled",false);
     e.preventDefault();
 });
 
 
 $(document).on('click', '.mod-image', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-
-    divi.resetValues(['#img-attr','#imageid','#img-attr','#img-desc','#img-title','#img-attr-name','#img-attr-url','#img-data','#image_xml_id']);
+    divi.resetValues(['#img-attr', '#imageid', '#img-attr', '#img-desc', '#img-title', '#img-attr-name', '#img-attr-url', '#img-data', '#image_xml_id']);
+    $('#imageid').attr("disabled", false);
     $("#dialog-image").dialog("open");
     e.preventDefault();
 });
 
 $(document).on('click', '.mod-audio', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-    divi.resetValues(['#audioid','#audio-title','#audio-attr','#audio-desc','#audio-attr-name','#audio-attr-url']);
+    divi.resetValues(['#audioid', '#audio-title', '#audio-attr', '#audio-desc', '#audio-attr-name', '#audio-attr-url']);
     $("#dialog-audio").dialog("open");
     e.preventDefault();
 });
 
 $(document).on('click', '.mod-video', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
-
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-    divi.resetValues(['#videoid','#video-attr','#video-desc','#video-title','#video-attr-name','#video-attr-url','#video_data','#video_xml_id']);
+    divi.resetValues(['#videoid', '#video-attr', '#video-desc', '#video-title', '#video-attr-name', '#video-attr-url', '#video_data', '#video_xml_id']);
+    $('#videoid').attr("disabled", false);
     $("#dialog-video").dialog("open");
     e.preventDefault();
 });
 
-divi.resetValues = function(data){
-	if(data){
-		var eachValue;
-		for(var key in data){
-			if(data.hasOwnProperty(key)){
-				eachValue = data[key];
-				if(eachValue){
-					$(eachValue).val('');
-				}
-			}
-		}
-	}
+divi.resetValues = function (data) {
+    if (data) {
+        var eachValue;
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                eachValue = data[key];
+                if (eachValue) {
+                    $(eachValue).val('');
+                }
+            }
+        }
+    }
 }
 
-divi.setDefaultValues = function(data){
-	if(data){
-		var eachValue;
-		for(var key in data){
-			if(data.hasOwnProperty(key)){
-				eachValue = data[key];
-				if(eachValue){
-					$(key).val(eachValue);
-				}
-			}
-		}
-	}
+divi.setDefaultValues = function (data) {
+    if (data) {
+        var eachValue;
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                eachValue = data[key];
+                if (eachValue) {
+                    $(key).val(eachValue);
+                }
+            }
+        }
+    }
 }
 
 $(document).on('click', '.mod-html', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    clicked = $(this);
     tinymce.activeEditor.chapterid = master_json.chapters[global_chapter]['id'];
     tinymce.activeEditor.topic_id = master_json.chapters[global_chapter].topics[global_topic]['id'];
 
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
-    divi.resetValues(['#html-attr','#html-attr-name','#html-attr-url','#html-attr-lcn','#boxtype','#html-box-title']);
-    divi.setDefaultValues({'#boxtype':'none','#html-attr-lcn':'CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)'});
+    divi.resetValues(['#html-attr', '#html-attr-name', '#html-attr-url', '#html-attr-lcn', '#boxtype', '#html-box-title']);
+    divi.setDefaultValues({
+        '#boxtype': 'none',
+        '#html-attr-lcn': 'CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)'
+    });
     $("#dialog-html").dialog("open");
     e.preventDefault();
 });
 
 
 $(document).on('click', '.testing1', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
+	divi.setCurrClicked(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
-            $('#headerid').val(current_topic[i]['id']);
+            $('#headerid').val(current_topic[i]['id']).attr("disabled",true);
             $('#header_text').val(current_topic[i]['data']);
             break;
         };
     };
-
 
     $(".header.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
@@ -620,21 +567,16 @@ $(document).on('click', '.testing1', function (e) {
 });
 
 $(document).on('click', '.editing-subheader', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
+    divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
-            $('#subheadingid').val(current_topic[i]['id']);
+            $('#subheadingid').val(current_topic[i]['id']).attr("disabled",true);
             $('#sub_header_text').val(current_topic[i]['data']);
             break;
         };
     };
-
 
     $(".subheader.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
@@ -658,41 +600,13 @@ window.addEventListener('message', function (event) {
     console.log('received response:  ', event.data);
 }, false);
 
-$(document).on('click', '.editing-formula', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
-    xml_id = parseInt($(this).attr("xml_index"));
-
-    current_topic = topic_json[global_topic];
-    for (var i = 0; i < current_topic.length; i++) {
-        if (xml_id == current_topic[i].xml_id) {
-            $('#formula_text').val(current_topic[i]['data']);
-            break;
-        };
-    };
-
-
-    $(".formula.xml_id").attr('xml_id', xml_id);
-    if (topic_json[global_topic] == undefined) {
-        topic_json[global_topic] = [];
-    };
-    $("#dialog-formula").dialog("open");
-    e.preventDefault();
-});
 
 $(document).on('click', '.editing-html', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
+    divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
-            // $('#sub_header_text').val(current_topic[i]['data']);
             tinyMCE.activeEditor.setContent(divi.UpdateImgContent(unescape(current_topic[i]['data'])));
             $('#html-attr').val(current_topic[i]['attribution']);
             $('#html-attr-name').val(current_topic[i]['name']);
@@ -703,8 +617,7 @@ $(document).on('click', '.editing-html', function (e) {
             break;
         };
     };
-
-
+    
     $(".html.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
@@ -715,11 +628,8 @@ $(document).on('click', '.editing-html', function (e) {
 
 
 $(document).on('click', '.editing-image', function (e) {
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
+    divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
@@ -741,20 +651,13 @@ $(document).on('click', '.editing-image', function (e) {
     e.preventDefault();
 });
 
-
-
-
 $(document).on('click', '.editing-audio', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
+	divi.setCurrClicked(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
-            $('#audioid').val(current_topic[i]['id']);
+            $('#audioid').val(current_topic[i]['id']).attr("disabled", true);
             $('#audio-title').val(current_topic[i]['title']);
             $('#audio-attr').val(current_topic[i]['attribution']);
             $('#audio-desc').val(current_topic[i]['description']);
@@ -763,8 +666,6 @@ $(document).on('click', '.editing-audio', function (e) {
             break;
         };
     };
-
-
     $(".audio.xml_id").attr('xml_id', xml_id);
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
@@ -776,12 +677,8 @@ $(document).on('click', '.editing-audio', function (e) {
 
 
 $(document).on('click', '.editing-video', function (e) {
-    editing_state = true;
-    console.log(xml_id);
-    console.log($(this));
-    parent = $(this);
     xml_id = parseInt($(this).attr("xml_index"));
-
+    divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
@@ -790,7 +687,7 @@ $(document).on('click', '.editing-video', function (e) {
             $('#video-desc').val(current_topic[i]['description']);
             $('#video-title').val(current_topic[i]['title']);
             $('#video-attr-name').val(current_topic[i]['name']);
-            $('#video-data-thumb').val(current_topic[i]['thumb']);            
+            $('#video-data-thumb').val(current_topic[i]['thumb']);
             $('#video-attr-url').val(current_topic[i]['url']);
             $('.video_xml_id').val(xml_id);
             $('#video_data').val(current_topic[i]['data']);
@@ -815,7 +712,6 @@ $(document).on('click', '.del-chp', function (e) {
                 master_json.chapters.splice(i, 1);
                 break;
             };
-            // master_json.chapters[i]
         };
         window.URL = window.webkitURL || window.URL;
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
@@ -846,7 +742,6 @@ $(document).on('click', '.del-tpc', function (e) {
                 };
                 break;
             };
-            // master_json.chapters[i]
         };
         window.URL = window.webkitURL || window.URL;
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
@@ -877,7 +772,6 @@ $(document).on('click', '.del-test', function (e) {
                 };
                 break;
             };
-            // master_json.chapters[i]
         };
         window.URL = window.webkitURL || window.URL;
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
