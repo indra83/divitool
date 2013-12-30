@@ -254,6 +254,35 @@ $('#dialog-topic').dialog({
 });
 
 
+$('#delete-confirm').dialog({
+    autoOpen: false,
+    width: 400,
+    modal: true,
+    buttons: {
+        "Ok": function () {
+        	var editStatus = divi.getCurrClicked();
+            var index = editStatus.index;
+            current_topic = topic_json[global_topic];
+            if (index >= 0) {
+                divi.deleteAt(current_topic, index);
+                topic_json[global_topic] = current_topic;
+                refresh_dom();
+            }
+            $(this).dialog("close");
+            return false;
+        },
+        Cancel: function () {
+            $(this).dialog("close");
+            divi.reseteditStates();
+        }
+    },
+    close: function () {
+    	divi.reseteditStates();
+    }
+});
+
+
+
 $('#dialog-test').dialog({
     autoOpen: false,
     height: 500,
@@ -584,15 +613,18 @@ $("#dialog-add").dialog({
 divi = {};
 
 divi.isValidId = function(dlg,data,callBack){
+	var toCallBack = true;
 	if(!(data.hasOwnProperty('xml_id') && data['xml_id'] >= 0)){
         var uniqueness = divi.unique('id', data.id);
         if (!divi.idMatch(data.id)) {
+        	toCallBack = false;
             alert("The ID is wrong. It can only include alpha numerals and (_)");
         } else if (!uniqueness) {
+        	toCallBack = false;
             alert("The ID is not unique");
         }
     }
-	if(callBack){
+	if(callBack && toCallBack){
 		callBack(dlg,data);
 	}
 	return;

@@ -441,16 +441,9 @@ $('#sidebar').on('click', '.add-btn', function () {
 
 
 $('#sidebar').on('click', '.del-btn', function () {
-    divi.setCurrClicked(this);
-    var editStatus = divi.getCurrClicked();
-    var index = editStatus.index;
-    current_topic = topic_json[global_topic];
-    if (index >= 0) {
-        divi.deleteAt(current_topic, index);
-        topic_json[global_topic] = current_topic;
-        refresh_dom();
-    }
-    return false;
+	divi.setCurrClicked(this);
+	$('#delete-confirm').dialog('open');
+	
 });
 
 $('#mod-heading').click(function (e) {
