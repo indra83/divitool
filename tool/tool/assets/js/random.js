@@ -627,7 +627,7 @@ divi.isValidId = function(dlg,data,callBack){
 	if(callBack && toCallBack){
 		callBack(dlg,data);
 	}
-	return;
+	return toCallBack;
 };
 
 divi.modifyMasterContent = function(){
@@ -873,7 +873,7 @@ divi.unique = function (tagName, value) {
 divi.videoUpload = function (e, data, mainData) {
     try {
         divi.showLoader();
-        var title_text, attr_text, attr_name, attr_url, desc_text, license, id, baseLoc, passData, fileData, files1thumbData, eachFilesList, eachFile;
+        var title_text, attr_text, attr_name, attr_url, desc_text, license, id, baseLoc, passData, fileData, files1thumbData, eachFilesList, eachFile,thumb,filesList,update;
         var files = [],
             files1 = [],
             comFiles = [];
@@ -894,7 +894,22 @@ divi.videoUpload = function (e, data, mainData) {
         license = $('#video-attr-lcn').val();
         files = document.getElementById('videofilemod').files;
         files1 = document.getElementById('thumbfilemod').files;
-        var filesList = [files, files1];
+        
+        id = $('#videoid').val();
+
+        fileData = $('#video-data').val();
+        thumbData = $('#video-data-thumb').val();
+
+        var file_name = edit ? fileData : files[0].name;
+        if(thumbData && files1[0] && files1[0].name != thumbData){
+        	thumb = files1[0].name;
+        	filesList = [files1];
+        	update = true;
+        }else{
+        	 thumb = thumbData;
+        	 filesList = [files, files1];
+        	 update = false;
+        }
         for (var eachFilesListKey in filesList) {
             if (filesList.hasOwnProperty(eachFilesListKey)) {
                 eachFilesList = filesList[eachFilesListKey];
@@ -909,13 +924,6 @@ divi.videoUpload = function (e, data, mainData) {
             }
         }
 
-        id = $('#videoid').val();
-
-        fileData = $('#video-data').val();
-        thumbData = $('#video-data-thumb').val();
-
-        var file_name = edit ? fileData : files[0].name;
-        var thumb = edit ? thumbData : files1[0].name;
         passData = {
             id: id,
             data: file_name,
@@ -928,7 +936,8 @@ divi.videoUpload = function (e, data, mainData) {
             license: license,
             edit: edit,
             type: "video",
-            thumb: thumb
+            thumb: thumb,
+            update:update
         };
         baseLoc = "/savefile/";
         var video_dlg = $(this);
@@ -1038,9 +1047,14 @@ divi.filesUpload = function(files,dlg,data){
 
 
 divi.upload = function (files, dlg, passData) {
-    if (!passData.edit) {
-    	divi.isValidId(dlg,passData);
-    	divi.filesUpload(files,dlg,passData);
+    if (!passData.edit || passData.update) {
+    	var callBack = true;
+    	if(!passData.update){
+    		callBack = divi.isValidId(dlg,passData);
+    	}
+    	if(callBack){
+    		divi.filesUpload(files,dlg,passData);
+    	}
     } else {
         divi.contentUploadCallBack(dlg, passData);
     }

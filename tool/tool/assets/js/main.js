@@ -470,6 +470,7 @@ $(document).on('click', '.mod-image', function (e) {
         topic_json[global_topic] = [];
     };
     divi.resetValues(['#img-attr', '#imageid', '#img-attr', '#img-desc', '#img-title', '#img-attr-name', '#img-attr-url', '#img-data', '#image_xml_id']);
+    divi.resetFileValues(['#imagefilemod']);
     $('#imageid').attr("disabled", false);
     $("#dialog-image").dialog("open");
     e.preventDefault();
@@ -480,6 +481,7 @@ $(document).on('click', '.mod-audio', function (e) {
         topic_json[global_topic] = [];
     };
     divi.resetValues(['#audioid', '#audio-title', '#audio-attr', '#audio-desc', '#audio-attr-name', '#audio-attr-url']);
+    divi.resetFileValues(['#audiofilemod']);
     $("#dialog-audio").dialog("open");
     e.preventDefault();
 });
@@ -489,6 +491,7 @@ $(document).on('click', '.mod-video', function (e) {
         topic_json[global_topic] = [];
     };
     divi.resetValues(['#videoid', '#video-attr', '#video-desc', '#video-title', '#video-attr-name', '#video-attr-url', '#video_data', '#video_xml_id']);
+    divi.resetFileValues(['#videofilemod','#thumbfilemod']);
     $('#videoid').attr("disabled", false);
     $("#dialog-video").dialog("open");
     e.preventDefault();
@@ -502,6 +505,21 @@ divi.resetValues = function (data) {
                 eachValue = data[key];
                 if (eachValue) {
                     $(eachValue).val('');
+                }
+            }
+        }
+    }
+}
+
+divi.resetFileValues = function (data) {
+    if (data) {
+        var eachValue;
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                eachValue = data[key];
+                if (eachValue) {
+                	var eachVal = $(eachValue);
+                	eachVal.replaceWith( eachVal = eachVal.clone( true ) );
                 }
             }
         }
@@ -624,6 +642,7 @@ $(document).on('click', '.editing-image', function (e) {
     xml_id = parseInt($(this).attr("xml_index"));
     divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
+    divi.resetFileValues(['#imagefilemod']);
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#img-attr').val(current_topic[i]['attribution']);
@@ -648,6 +667,7 @@ $(document).on('click', '.editing-audio', function (e) {
 	divi.setCurrClicked(this);
     xml_id = parseInt($(this).attr("xml_index"));
     current_topic = topic_json[global_topic];
+    divi.resetFileValues(['#audiofilemod']);
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#audioid').val(current_topic[i]['id']).attr("disabled", true);
@@ -673,6 +693,7 @@ $(document).on('click', '.editing-video', function (e) {
     xml_id = parseInt($(this).attr("xml_index"));
     divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
+    divi.resetFileValues(['#videofilemod','#thumbfilemod']);
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#videoid').val(current_topic[i]['id']).attr("disabled", true);
