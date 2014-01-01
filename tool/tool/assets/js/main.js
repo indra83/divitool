@@ -472,9 +472,13 @@ $(document).on('click', '.mod-image', function (e) {
     divi.resetValues(['#img-attr', '#imageid', '#img-attr', '#img-desc', '#img-title', '#img-attr-name', '#img-attr-url', '#img-data', '#image_xml_id']);
     divi.resetFileValues(['#imagefilemod']);
     $('#imageid').attr("disabled", false);
+    $('#imagefilemod').unbind('click',divi.fileBlock);
     $("#dialog-image").dialog("open");
     e.preventDefault();
 });
+
+
+
 
 $(document).on('click', '.mod-audio', function (e) {
     if (topic_json[global_topic] == undefined) {
@@ -482,6 +486,7 @@ $(document).on('click', '.mod-audio', function (e) {
     };
     divi.resetValues(['#audioid', '#audio-title', '#audio-attr', '#audio-desc', '#audio-attr-name', '#audio-attr-url']);
     divi.resetFileValues(['#audiofilemod']);
+    $('#audiofilemod').unbind('click',divi.fileBlock);
     $("#dialog-audio").dialog("open");
     e.preventDefault();
 });
@@ -493,6 +498,7 @@ $(document).on('click', '.mod-video', function (e) {
     divi.resetValues(['#videoid', '#video-attr', '#video-desc', '#video-title', '#video-attr-name', '#video-attr-url', '#video_data', '#video_xml_id']);
     divi.resetFileValues(['#videofilemod','#thumbfilemod']);
     $('#videoid').attr("disabled", false);
+    $('#videofilemod').unbind('click',divi.fileBlock);
     $("#dialog-video").dialog("open");
     e.preventDefault();
 });
@@ -659,6 +665,7 @@ $(document).on('click', '.editing-image', function (e) {
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
+    $('#imagefilemod').bind('click',divi.fileBlock);
     $("#dialog-image").dialog("open");
     e.preventDefault();
 });
@@ -668,6 +675,7 @@ $(document).on('click', '.editing-audio', function (e) {
     xml_id = parseInt($(this).attr("xml_index"));
     current_topic = topic_json[global_topic];
     divi.resetFileValues(['#audiofilemod']);
+    $('#audiofilemod').bind('click',divi.fileBlock);
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#audioid').val(current_topic[i]['id']).attr("disabled", true);
@@ -694,6 +702,7 @@ $(document).on('click', '.editing-video', function (e) {
     divi.setCurrClicked(this);
     current_topic = topic_json[global_topic];
     divi.resetFileValues(['#videofilemod','#thumbfilemod']);
+    $('#videofilemod').bind('click',divi.fileBlock);
     for (var i = 0; i < current_topic.length; i++) {
         if (xml_id == current_topic[i].xml_id) {
             $('#videoid').val(current_topic[i]['id']).attr("disabled", true);

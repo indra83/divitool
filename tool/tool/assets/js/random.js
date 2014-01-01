@@ -967,8 +967,10 @@ divi.imgUpload = function (e, data, mainData) {
         id = $('#imageid').val();
         files = document.getElementById('imagefilemod').files;
         imgData = $('#img-data').val();
-        var edit = (files && files.length > 0) ? false : true;
-        var file_name = edit ? imgData : files[0].name;
+
+        var edit = imgData ? true : false;
+        var file_name = edit ? imgData : files[0].name;        
+        
         passData = {
             id: id,
             data: file_name,
@@ -1260,6 +1262,11 @@ divi.setCurrClicked = function (elem, isAdd) {
     } else {
         textEdit = true;
     }
+};
+
+divi.fileBlock = function(e){
+	e.stopPropagation();
+	return false;
 };
 
 divi.saveInsertHtml = function (data) {
