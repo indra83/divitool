@@ -450,6 +450,7 @@ $('#mod-heading').click(function (e) {
     if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
+    divi.resetValues(['#headerid', '#header_text']);
     $('#headerid').attr("disabled",false);
     $("#dialog-heading").dialog("open");
     e.preventDefault();
@@ -459,8 +460,9 @@ $(document).on('click', '.mod-subheading', function (e) {
 	if (topic_json[global_topic] == undefined) {
         topic_json[global_topic] = [];
     };
+    divi.resetValues(['#sub_header_text', '#subheadingid']);
+    $('#subheadingid').attr("disabled",false);
     $("#dialog-sub-heading").dialog("open");
-    $('#subheadingid').val(current_topic[i]['id']).attr("disabled",false);
     e.preventDefault();
 });
 
@@ -563,7 +565,7 @@ $(document).on('click', '.mod-html', function (e) {
 });
 
 
-$(document).on('click', '.testing1', function (e) {
+$(document).on('click', '.editing-header', function (e) {
 	divi.setCurrClicked(this);
     xml_id = parseInt($(this).attr("xml_index"));
     current_topic = topic_json[global_topic];

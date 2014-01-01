@@ -628,45 +628,36 @@ divi.isValidId = function(dlg,data,callBack){
 	return toCallBack;
 };
 
-divi.modifyMasterContent = function(){
-	
-};
-
-$("#dialog-heading").dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    buttons: {
-        "Insert Heading3": divi.headerModify,
-        Cancel: function () {$(this).dialog("close");}
-    },
-    close: function () {
-        $('#header_text').val('');
-        $('#headerid').val('');
-        $('#dialog-add').dialog("close");
-    }
-});
-
-
 divi.subheaderModify = function(){
-	divi.showLoader();
-	var val,xml_id,id,passData;
-	val = $('#sub_header_text').val();
-	id = $('#subheadingid').val();
-	xml_id = parseInt($(".subheader.xml_id").attr('xml_id'));
-	passData = {"type": "subheader","data": val,"xml_id": xml_id,"id": id};
-	divi.isValidId($(this),passData,divi.contentUploadCallBack);
+	try {
+		divi.showLoader();
+		var val,xml_id,id,passData;
+		val = $('#sub_header_text').val();
+		id = $('#subheadingid').val();
+		xml_id = parseInt($(".subheader.xml_id").attr('xml_id'));
+		passData = {"type": "subheader","data": val,"xml_id": xml_id,"id": id};
+		divi.isValidId($(this),passData,divi.contentUploadCallBack);
+    } catch (err) {
+        alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n" + err.message);
+    } finally {
+        divi.hideLoader();
+    }
 };
 
 divi.headerModify = function(){
-	divi.showLoader();
-	var val,xml_id,id,passData;
-	val = $('#header_text').val();
-	id = $('#headerid').val();
-	xml_id = parseInt($(".header.xml_id").attr('xml_id'));
-	passData = {"type": "header","data": val,"xml_id": xml_id,"id": id};
-	divi.isValidId($(this),passData,divi.contentUploadCallBack);	
+	try {
+		divi.showLoader();
+		var val,xml_id,id,passData;
+		val = $('#header_text').val();
+		id = $('#headerid').val();
+		xml_id = parseInt($(".header.xml_id").attr('xml_id'));
+		passData = {"type": "header","data": val,"xml_id": xml_id,"id": id};
+		divi.isValidId($(this),passData,divi.contentUploadCallBack);
+    } catch (err) {
+        alert("something went wrong. Please contact system administrator. \n\n Error Message:  \n\n" + err.message);
+    } finally {
+        divi.hideLoader();
+    }	
 };
 
 divi.insertAt = function (array, index, data) {
@@ -776,6 +767,27 @@ divi.UpdateImgContent = function (data, toRemove) {
     }
     return data;
 };
+
+$("#dialog-heading").dialog({
+    autoOpen: false,
+    height: 300,
+    width: 350,
+    modal: true,
+    buttons: {
+        "Insert Heading": divi.headerModify,
+        "Cancel": function () {
+        	$(this).dialog("close");
+        }
+    },
+    close: function () {
+        $('#header_text').val('');
+        $('#headerid').val('');
+        $('#dialog-add').dialog("close");
+    }
+});
+
+
+
 // SUB HEADING
 $("#dialog-sub-heading").dialog({
     autoOpen: false,
@@ -1343,7 +1355,7 @@ function refresh_dom() {
         case "header":
             preview_pane.append("<h3>" + current_topic[i].data + "</h3> <br><hr>");
 
-            var holder = $('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index=' + current_topic[i].xml_id + ' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="' + current_topic[i].xml_id + '" class="editable testing1 header-d">HEADING 3</a>&nbsp;<button xml_index=' + current_topic[i].xml_id + ' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+            var holder = $('<div></div>').addClass('sortable').addClass('well well-sm').html('<button xml_index=' + current_topic[i].xml_id + ' class="add-btn inner-btn btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>&nbsp;<a href="#" id="header" xml_index="' + current_topic[i].xml_id + '" class="editable editing-header header-d">HEADING</a>&nbsp;<button xml_index=' + current_topic[i].xml_id + ' class="del-btn inner-btn btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
             side_bar.append(holder);
 
 
