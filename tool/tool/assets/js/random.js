@@ -29,8 +29,6 @@ $('#mod-chapter').click(function () {
 });
 
 
-
-
 $(document).on('click', '.edit-test', function (e) {
 
     var chapterid = $(this).attr('chapterid');

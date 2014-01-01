@@ -10,26 +10,44 @@
 }
 .formulaUploadContainer {
     position: fixed;
-    top: 20%;
-    left: 30%;
-    height: 600px;
-    width: 800px;
+    height: 100%;
+    width: 100%;
     opacity: 1;
-    margin-top: -100px;
-    margin-left: -200px;
     z-index: 9999;
-    background: #FFFFFF;
+    background: #FFFFFF;	
+	text-align:center;
 }
 .formulaUploadContainerInner {
     height: 100%;
-    width: 100%;
+    width: 100%;		
+	text-align:center;
 }
 
-.stdContainer{
+.formulaTextContainer{
+	float:left; 
+}
+
+.previewCon{
+ float:right; 
+ border-left:1px solid #DDDDDD;
+ height:300px;
+}
+
+.stcontainer{
 	margin:10px;
-	height: 150px;
-    width: 97%;
+	width: 45%;
     overflow-y:auto;
+}
+
+
+.textareacontainer{
+	width: 85%;
+	overflow-y:auto;
+	height:280px;
+}
+
+.toolbarContainer{
+	height: 40%;
 }
 
 .formulaUploadConfirmCase {
@@ -51,6 +69,7 @@
 
 .toolbarContainer{
    border-bottom:solid 2px black;
+   height:225px;
 }
 
 .prContainerHeader{
