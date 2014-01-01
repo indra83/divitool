@@ -901,12 +901,12 @@ divi.videoUpload = function (e, data, mainData) {
         thumbData = $('#video-data-thumb').val();
 
         var file_name = edit ? fileData : files[0].name;
-        if(thumbData && files1[0] && files1[0].name != thumbData){
+        if(edit && thumbData && files1[0] && files1[0].name != thumbData){
         	thumb = files1[0].name;
         	filesList = [files1];
         	update = true;
         }else{
-        	 thumb = thumbData;
+        	 thumb = files1[0].name;
         	 filesList = [files, files1];
         	 update = false;
         }
