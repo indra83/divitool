@@ -88,7 +88,7 @@ public class HomePanel extends JPanel implements ActionListener {
 				worker.execute();
 				try {
 					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-					desktop.browse(new URI("http://localhost:8080/tool/index.html"));
+					desktop.browse(new URI("http://localhost:8080/tool/home.html"));
 				} catch (Exception ee) {
 					ee.printStackTrace();
 				}

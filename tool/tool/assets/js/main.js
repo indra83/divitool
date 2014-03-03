@@ -1,40 +1,40 @@
 function formulaOnclick(inst, e, d) {
-    inst.on("click", function (curr, e) {
-        var target = curr.srcElement ? curr.srcElement : curr.target;
-        if (target.localName == "img") {
-            var targetJ = $(target);
-            var text = targetJ.attr("text");
-            if (text) {
-                this.execCommand('mceFormulaUpload', null, target.outerHTML);
-            }
-        }
-    });
+	inst.on("click", function(curr, e) {
+		var target = curr.srcElement ? curr.srcElement : curr.target;
+		if (target.localName == "img") {
+			var targetJ = $(target);
+			var text = targetJ.attr("text");
+			if (text) {
+				this.execCommand('mceFormulaUpload', null, target.outerHTML);
+			}
+		}
+	});
 }
 
-
-divi.filesAttach = function () {
-    return '/getfiles/';
+divi.filesAttach = function() {
+	return '/getfiles/';
 };
 
+(function() {
+	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
-(function () {
-    var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
-
-    EQUATION_ENGINE = http + 'latex.codecogs.com';
-    FAVORITE_ENGINE = http + 'latex.codecogs.com/json';
-    EDITOR_SRC = http + 'latex.codecogs.com';
-    EMBED_ENGINE = 'formulaEditor.html';
-    EDIT_ENGINE = http + 'www.codecogs.com/eqnedit.php';
-    EDITOR_SW_FLASH = http + 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
-    EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
+	EQUATION_ENGINE = http + 'latex.codecogs.com';
+	FAVORITE_ENGINE = http + 'latex.codecogs.com/json';
+	EDITOR_SRC = http + 'latex.codecogs.com';
+	EMBED_ENGINE = 'formulaEditor.html';
+	EDIT_ENGINE = http + 'www.codecogs.com/eqnedit.php';
+	EDITOR_SW_FLASH = http
+			+ 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
+	EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
 })();
 
 function S4() {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 }
 
 function guid() {
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4()
+			+ S4() + S4());
 }
 
 idRegex = '^[_a-zA-Z0-9]+$';

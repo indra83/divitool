@@ -1,3 +1,11 @@
+.metro div.ui-dialog{
+	position: absolute;
+	display: block;
+	height: auto;
+	top: 2%;
+	left: 50%;
+}
+
 .formulaUploadBg {
     position: fixed;
     top: 0;

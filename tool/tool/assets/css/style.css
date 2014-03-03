@@ -1,0 +1,313 @@
+body {
+	margin: 0 auto;
+	background-color: #ffffff;
+	font-size: 14px;
+	color:#5E5A55;
+}
+
+span{
+	display:inline-block;
+}
+
+.maincontainer{
+	margin:auto;
+	width:99%;
+	border-left:solid 2px gray;
+	border-right:solid 2px gray;
+}
+
+.homeheader {
+	background-color: #DfDfDf;
+}
+
+.titles{
+	padding-top:1%;
+	vertical-align: middle;
+}
+
+.titles label{
+	font-weight: bold;
+	font-size: 15px;
+}
+.homeheader div{
+	width:17%;
+	vertical-align:top;
+	display:inline-block;
+}
+
+.homeheader div.logo{
+	width:20%;
+}
+
+.homeheader div.titles.bookname{
+	width:45%;
+	vertical-align:middle;
+}
+
+.bookcontent{
+	margin-top:0.25%;
+	height:82%;
+	vertical-align:top;
+}
+
+.bgGray{
+	background-color:#DfDfDf;
+}
+
+.bgBlack{
+	background-color:#5E5A55;
+	color:#ffffff;
+}
+
+.capsOn{
+	text-transform:uppercase;
+}
+
+.maintitle span{
+	vertical-align: middle;
+}
+.maintitle span:before{
+	content:url("./../../assets/images/Picture4.png");
+}
+
+.imageSection{
+	margin-bottom:5px;
+	width:100%;
+}
+
+.titlePreview{
+	height:7%;
+}
+
+.buttonsList{
+	height:10%;
+}
+
+.txBold{
+	font-weight: bold;
+}
+
+.bookContent div.inline{
+	display: inline-block;
+	
+}
+.bookcontent .bookPreview{
+	width:18%;
+	border-right:solid 2px gray;
+	float: left;
+	height:100%;
+}
+
+.bookcontent .contentEditor{
+	width:81.75%;
+	float:right;
+	height:100%;
+	margin-top:-1%;
+}
+
+.bookcontent ul.addButtons{
+	list-style:none;
+	vertical-align: middle;
+}
+
+.bookcontent ul.addButtons li{
+	display: inline;
+	height: 100%;
+	margin:0px 20px;
+}
+
+
+.metro .hidden{
+	display:none;
+}
+
+
+
+.input-control .chosen-container{
+	min-width: 176px;
+	min-height: 30px;
+	text-align: left;
+}
+.input-control .chosen-results{
+	font-size: 13px;
+}
+.input-control .combofield{
+	min-width: 180px;
+	margin-right: 30px;
+}
+.input-control div.form_combovalue{
+	text-align: left;
+	color:black;
+}
+.input-control div.form_combovalue.combo_value{
+	min-height: 30px;
+	color:#545454;
+}
+.input-control .chosen-container-single .chosen-single{
+	height: 25px;
+	color:black;
+}
+.input-control .chosen-container-single .chosen-drop{
+	margin-top: -7px;
+}
+
+.metro div.formfield div.filepreview{
+	height:150px;
+	border: dotted 1px;
+}
+
+.metro div.formfield div.uploadBtn{
+		width:60px;
+		
+}
+
+.metro div.formfield div.input-control .chosen-search input{
+	width: auto;  
+}
+img.toggle{
+	height: 18px;
+}
+
+
+table.tableDiv td.formContent{
+	padding:10px;
+	text-align:center;
+}
+
+table.tableDiv tr.buttonsDiv div.formfield{
+	width:50%;
+	display: inline;
+}
+
+
+
+form.ad3iForm .hidden,div.formfield .hidden
+,div.hidden,table.tableDiv .hidden
+,div.formbuttons .hidden,table.tableDiv tr.buttonsDiv div.formfield.hidden
+,.metro div.formfield.hidden{
+	display:none;
+}
+
+form div.formfield{
+	vertical-align:middle;
+}
+
+.metro .input-control.text input.error{
+	border-color:red;
+}
+
+.metro div.formfield input{
+	border-color: none;
+}
+
+.metro div.formfield{
+	margin: 2px 20px 0px 2px; 
+	font-size:12px;
+	float:left;
+	display: inline;
+}
+
+
+.metro div.formfield div.input-control{
+	margin-left:10px;
+	float:right;
+	display:inline;
+}
+
+.metro div.formfield div.checkbox{
+	float:right;
+}
+
+.metro div.formfield div.input-control input{
+	width:180px;
+	margin-right:30px;
+}
+.metro div.formfield.larger div.input-control input{           
+	width:260px;
+	margin-right:30px;
+}
+.metro div.formfield.larger div.input-control.text .btn-clear{
+	margin-right: 5px;
+}
+.metro .hosreqform div.formfield.larger div.input-control input,
+.metro .docreqform div.formfield.larger div.input-control input{       
+	width:260px;
+	margin-right:0px;
+	padding: 8px;
+}
+.metro .input-control.text input.readonly,
+.metro .input-control.text textarea.readonly{
+	background-color:white;
+	pointer-events:none;
+	box-shadow: none;
+	border:none;
+}
+
+.metro .colapse_icon{
+	float: right;
+	font-weight: bold;
+	cursor: pointer;
+	margin-top: 5px;
+}
+
+
+
+.metro button.imgButton{
+	padding: 2px;
+	margin-left:10px;
+	text-align: center;
+	vertical-align: middle !important;
+	background-color: #d9d9d9;
+	border: 1px transparent solid;
+	color: #222222;
+	border-radius: 0;
+	cursor: pointer;
+	display: inline-block;
+	outbtline: none;
+}
+
+img.toggle{
+	content:url("../images/edit.png");
+}
+
+.metro div.formfield label.labelStyle{
+	width:110px;
+	text-align:left;
+	display:inline-block;
+}
+
+
+.metro div.formfield.larger label.labelStyle{
+	width:250px;
+	font-size: 15px;
+}
+
+.metro div.formfield div.input-control{
+	margin-left:10px;
+	float:right;
+	display:inline;
+	width: auto;
+}
+
+.metro div.formfield div.checkbox{
+	float:right;
+}
+
+.metro div.formfield div.input-control input{
+	width:180px;
+	margin-right:30px;
+	box-shadow: 5px 5px 10px #AAB3C2;
+}
+.metro div.formfield.larger div.input-control input{           
+	width:260px;
+	margin-right:30px;
+}
+.metro div.formfield.larger div.input-control.text .btn-clear{
+	margin-right: 5px;
+}
+
+.metro div.formfield.larger div.input-control input{
+	width: 260px;
+	margin-right: 0px;
+	padding: 8px;
+}
