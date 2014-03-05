@@ -121,8 +121,6 @@ span{
 	display:none;
 }
 
-
-
 .input-control .chosen-container{
 	min-width: 176px;
 	min-height: 30px;
@@ -164,10 +162,6 @@ span{
 .metro div.formfield div.input-control .chosen-search input{
 	width: auto;  
 }
-img.toggle{
-	height: 18px;
-}
-
 
 table.tableDiv td.formContent{
 	padding:10px;
@@ -268,17 +262,19 @@ form div.formfield{
 
 img.toggle{
 	content:url("../images/edit.png");
+	height: 18px;
 }
 
 .metro div.formfield label.labelStyle{
 	width:110px;
 	text-align:left;
 	display:inline-block;
+	text-transform:none;
 }
 
 
 .metro div.formfield.larger label.labelStyle{
-	width:250px;
+	width:255px;
 	font-size: 15px;
 }
 

@@ -1758,7 +1758,6 @@ divi.imageUploadFileCallback = function (url, formData, deferred) {
             divi.hideLoader();
             deferred.resolve();
         } else {
-
             divi.hideLoader();
             deferred.reject();
         }

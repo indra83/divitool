@@ -619,12 +619,20 @@ $.extend(divi.domBase,{
 		}
 	}
 	
-	,append:function(parent,child){
+	,append:function(parent,child,isPrepend){
 		if(parent && child){
 			if(parent instanceof jQuery){
-				parent.append(child);
+				if(isPrepend){
+					parent.before(child);
+				}else{
+					parent.append(child);
+				}
 			}else{
-				parent.appendChild(child);
+				if(isPrepend){
+					parent.insertBefore(child,parent.firstChild);
+				}else{
+					parent.appendChild(child);
+				}
 			}
 		}
 	}

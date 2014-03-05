@@ -1,3 +1,270 @@
+/**
+ * Copyright (c)2005-2009 Matt Kruse (javascripttoolbox.com)
+ * 
+ * Dual licensed under the MIT and GPL licenses. 
+ * This basically means you can use this code however you want for
+ * free, but don't claim to have written it yourself!
+ * Donations always accepted: http://www.JavascriptToolbox.com/donate/
+ * 
+ * Please do not link to the .js files on javascripttoolbox.com from
+ * your site. Copy the files locally to your server instead.
+ * 
+ */
+/**
+ * jquery.contextmenu.js
+ * jQuery Plugin for Context Menus
+ * http://www.JavascriptToolbox.com/lib/contextmenu/
+ *
+ * Copyright (c) 2008 Matt Kruse (javascripttoolbox.com)
+ * Dual licensed under the MIT and GPL licenses. 
+ *
+ * @version 1.1
+ * @history 1.1 2010-01-25 Fixed a problem with 1.4 which caused undesired show/hide animations
+ * @history 1.0 2008-10-20 Initial Release
+ * @todo slideUp doesn't work in IE - because of iframe?
+ * @todo Hide all other menus when contextmenu is shown?
+ * @todo More themes
+ * @todo Nested context menus
+ */
+;(function($){
+	$.contextMenu = {
+		shadow:true,
+		shadowOffset:0,
+		shadowOffsetX:5,
+		shadowOffsetY:5,
+		shadowWidthAdjust:-3,
+		shadowHeightAdjust:-3,
+		shadowOpacity:.2,
+		shadowClass:'context-menu-shadow',
+		shadowColor:'black',
+
+		offsetX:0,
+		offsetY:0,
+		appendTo:'body',
+		direction:'down',
+		constrainToScreen:true,
+				
+		showTransition:'show',
+		hideTransition:'hide',
+		showSpeed:null,
+		hideSpeed:null,
+		showCallback:null,
+		hideCallback:null,
+		
+		className:'context-menu',
+		itemClassName:'context-menu-item',
+		itemHoverClassName:'context-menu-item-hover',
+		disabledItemClassName:'context-menu-item-disabled',
+		disabledItemHoverClassName:'context-menu-item-disabled-hover',
+		separatorClassName:'context-menu-separator',
+		innerDivClassName:'context-menu-item-inner',
+		themePrefix:'context-menu-theme-',
+		theme:'default',
+
+		separator:'context-menu-separator', // A specific key to identify a separator
+		target:null, // The target of the context click, to be populated when triggered
+		menu:null, // The jQuery object containing the HTML object that is the menu itself
+		shadowObj:null, // Shadow object
+		bgiframe:null, // The iframe object for IE6
+		shown:false, // Currently being shown?
+		useIframe:/*@cc_on @*//*@if (@_win32) true, @else @*/false,/*@end @*/ // This is a better check than looking at userAgent!
+		
+		// Create the menu instance
+		create: function(menu,opts) {
+			var cmenu = $.extend({},this,opts); // Clone all default properties to created object
+			
+			// If a selector has been passed in, then use that as the menu
+			if (typeof menu=="string") {
+				cmenu.menu = $(menu);
+			} 
+			// If a function has been passed in, call it each time the menu is shown to create the menu
+			else if (typeof menu=="function") {
+				cmenu.menuFunction = menu;
+			}
+			// Otherwise parse the Array passed in
+			else {
+				cmenu.menu = cmenu.createMenu(menu,cmenu);
+			}
+			if (cmenu.menu) {
+				cmenu.menu.css({display:'none'});
+				$(cmenu.appendTo).append(cmenu.menu);
+			}
+			
+			// Create the shadow object if shadow is enabled
+			if (cmenu.shadow) {
+				cmenu.createShadow(cmenu); // Extracted to method for extensibility
+				if (cmenu.shadowOffset) { cmenu.shadowOffsetX = cmenu.shadowOffsetY = cmenu.shadowOffset; }
+			}
+			$('body').bind('contextmenu',function(){cmenu.hide();}); // If right-clicked somewhere else in the document, hide this menu
+			return cmenu;
+		},
+		
+		// Create an iframe object to go behind the menu
+		createIframe: function() {
+		    return $('<iframe frameborder="0" tabindex="-1" src="javascript:false" style="display:block;position:absolute;z-index:-1;filter:Alpha(Opacity=0);"/>');
+		},
+		
+		// Accept an Array representing a menu structure and turn it into HTML
+		createMenu: function(menu,cmenu) {
+			var className = cmenu.className;
+			$.each(cmenu.theme.split(","),function(i,n){className+=' '+cmenu.themePrefix+n});
+			var $t = $('<table cellspacing=0 cellpadding=0></table>').click(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
+			var $tr = $('<tr></tr>');
+			var $td = $('<td></td>');
+			var $div = $('<div class="'+className+'"></div>');
+			
+			// Each menu item is specified as either:
+			//     title:function
+			// or  title: { property:value ... }
+			for (var i=0; i<menu.length; i++) {
+				var m = menu[i];
+				if (m==$.contextMenu.separator) {
+					$div.append(cmenu.createSeparator());
+				}
+				else {
+					for (var opt in menu[i]) {
+						$div.append(cmenu.createMenuItem(opt,menu[i][opt])); // Extracted to method for extensibility
+					}
+				}
+			}
+			if ( cmenu.useIframe ) {
+				$td.append(cmenu.createIframe());
+			}
+			$t.append($tr.append($td.append($div)))
+			return $t;
+		},
+		
+		// Create an individual menu item
+		createMenuItem: function(label,obj) {
+			var cmenu = this;
+			if (typeof obj=="function") { obj={onclick:obj}; } // If passed a simple function, turn it into a property of an object
+			// Default properties, extended in case properties are passed
+			var o = $.extend({
+				onclick:function() { },
+				className:'',
+				hoverClassName:cmenu.itemHoverClassName,
+				icon:'',
+				disabled:false,
+				title:'',
+				hoverItem:cmenu.hoverItem,
+				hoverItemOut:cmenu.hoverItemOut
+			},obj);
+			// If an icon is specified, hard-code the background-image style. Themes that don't show images should take this into account in their CSS
+			var iconStyle = (o.icon)?'background-image:url('+o.icon+');':'';
+			var $div = $('<div class="'+cmenu.itemClassName+' '+o.className+((o.disabled)?' '+cmenu.disabledItemClassName:'')+'" title="'+o.title+'"></div>')
+							// If the item is disabled, don't do anything when it is clicked
+							.click(function(e){if(cmenu.isItemDisabled(this)){return false;}else{return o.onclick.call(cmenu.target,this,cmenu,e)}})
+							// Change the class of the item when hovered over
+							.hover( function(){ o.hoverItem.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
+									,function(){ o.hoverItemOut.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
+							);
+			var $idiv = $('<div class="'+cmenu.innerDivClassName+'" style="'+iconStyle+'">'+label+'</div>');
+			$div.append($idiv);
+			return $div;
+		},
+		
+		// Create a separator row
+		createSeparator: function() {
+			return $('<div class="'+this.separatorClassName+'"></div>');
+		},
+		
+		// Determine if an individual item is currently disabled. This is called each time the item is hovered or clicked because the disabled status may change at any time
+		isItemDisabled: function(item) { return $(item).is('.'+this.disabledItemClassName); },
+		
+		// Functions to fire on hover. Extracted to methods for extensibility
+		hoverItem: function(c) { $(this).addClass(c); },
+		hoverItemOut: function(c) { $(this).removeClass(c); },
+		
+		// Create the shadow object
+		createShadow: function(cmenu) {
+			cmenu.shadowObj = $('<div class="'+cmenu.shadowClass+'"></div>').css( {display:'none',position:"absolute", zIndex:9998, opacity:cmenu.shadowOpacity, backgroundColor:cmenu.shadowColor } );
+			$(cmenu.appendTo).append(cmenu.shadowObj);
+		},
+		
+		// Display the shadow object, given the position of the menu itself
+		showShadow: function(x,y,e) {
+			var cmenu = this;
+			if (cmenu.shadow) {
+				cmenu.shadowObj.css( {
+					width:(cmenu.menu.width()+cmenu.shadowWidthAdjust)+"px", 
+					height:(cmenu.menu.height()+cmenu.shadowHeightAdjust)+"px", 
+					top:(y+cmenu.shadowOffsetY)+"px", 
+					left:(x+cmenu.shadowOffsetX)+"px"
+				}).addClass(cmenu.shadowClass)[cmenu.showTransition](cmenu.showSpeed);
+			}
+		},
+		
+		// A hook to call before the menu is shown, in case special processing needs to be done.
+		// Return false to cancel the default show operation
+		beforeShow: function() { return true; },
+		
+		// Show the context menu
+		show: function(t,e) {
+			var cmenu=this, x=e.pageX, y=e.pageY;
+			cmenu.target = t; // Preserve the object that triggered this context menu so menu item click methods can see it
+			if (cmenu.beforeShow()!==false) {
+				// If the menu content is a function, call it to populate the menu each time it is displayed
+				if (cmenu.menuFunction) {
+					if (cmenu.menu) { $(cmenu.menu).remove(); }
+					cmenu.menu = cmenu.createMenu(cmenu.menuFunction(cmenu,t),cmenu);
+					cmenu.menu.css({display:'none'});
+					$(cmenu.appendTo).append(cmenu.menu);
+				}
+				var $c = cmenu.menu;
+				x+=cmenu.offsetX; y+=cmenu.offsetY;
+				var pos = cmenu.getPosition(x,y,cmenu,e); // Extracted to method for extensibility
+				cmenu.showShadow(pos.x,pos.y,e);
+				// Resize the iframe if needed
+				if (cmenu.useIframe) {
+					$c.find('iframe').css({width:$c.width()+cmenu.shadowOffsetX+cmenu.shadowWidthAdjust,height:$c.height()+cmenu.shadowOffsetY+cmenu.shadowHeightAdjust});
+				}
+				$c.css( {top:pos.y+"px", left:pos.x+"px", position:"absolute",zIndex:9999} )[cmenu.showTransition](cmenu.showSpeed,((cmenu.showCallback)?function(){cmenu.showCallback.call(cmenu);}:null));
+				cmenu.shown=true;
+				$(document).one('click',null,function(){cmenu.hide()}); // Handle a single click to the document to hide the menu
+			}
+		},
+		
+		// Find the position where the menu should appear, given an x,y of the click event
+		getPosition: function(clickX,clickY,cmenu,e) {
+			var x = clickX+cmenu.offsetX;
+			var y = clickY+cmenu.offsetY
+			var h = $(cmenu.menu).height();
+			var w = $(cmenu.menu).width();
+			var dir = cmenu.direction;
+			if (cmenu.constrainToScreen) {
+				var $w = $(window);
+				var wh = $w.height();
+				var ww = $w.width();
+				if (dir=="down" && (y+h-$w.scrollTop() > wh)) { dir = "up"; }
+				var maxRight = x+w-$w.scrollLeft();
+				if (maxRight > ww) { x -= (maxRight-ww); }
+			}
+			if (dir=="up") { y -= h; }
+			return {'x':x,'y':y};
+		},
+		
+		// Hide the menu, of course
+		hide: function() {
+			var cmenu=this;
+			if (cmenu.shown) {
+				if (cmenu.iframe) { $(cmenu.iframe).hide(); }
+				if (cmenu.menu) { cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed,((cmenu.hideCallback)?function(){cmenu.hideCallback.call(cmenu);}:null)); }
+				if (cmenu.shadow) { cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed); }
+			}
+			cmenu.shown = false;
+		}
+	};
+	
+	// This actually adds the .contextMenu() function to the jQuery namespace
+	$.fn.contextMenu = function(menu,options) {
+		var cmenu = $.contextMenu.create(menu,options);
+		return this.each(function(){
+			$(this).bind('contextmenu',function(e){cmenu.show(this,e);return false;});
+		});
+	};
+})(jQuery);
+
+
 (function($) {
 	$.prepareCombo = function(o) {
 				if (o === null) {
@@ -139,10 +406,10 @@ divi.formPanel = divi.extend(divi.panelBase,{
     formDom:undefined,
     buttons:[],
     combos:[],
+    contentCls:'formContent',
     comboData:[],
     defaults:{tag:'form','class':'diviForm'},
     showBorder:false,
-    sbtdefaults:{submitUrl:divi.core.prepareControllerUrl("multiController"),submitText:'Edit'},
     tText:'',
     submitCls:'',
     toggle:false,
@@ -161,6 +428,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     isFileUpload:false,
     fileFields:[],
 	isMultipleForm:false,
+	scope:undefined,
 	sectionName:"",
 	isCollapsable:true,
     submitOptions:{},
@@ -171,9 +439,6 @@ divi.formPanel = divi.extend(divi.panelBase,{
     encType:'application/x-www-form-urlencoded',
     dependencies:{},
     actionType:divi.actionType.retrieve,
-    afterSubmitCallBack:undefined,
-    afterUpdateCallBack:undefined,
-    afterDeleteCallBack:undefined,
     ignoreSuccess:false,
     largerForm:true
     	
@@ -183,18 +448,13 @@ divi.formPanel = divi.extend(divi.panelBase,{
     	this.initialize();
     	divi.formPanel.superclass.init.call(this);
     	this.initForm();
-    	this.loadSubmitDfts();
 		this.createForm(this.appendToElement);
 	}
     
     ,initialize:function(){
     	this.elementsMap = {};
     }
-    
-    ,loadSubmitDfts:function(){
-    	this.submitOptions = {context: this,succCall:this.postSuccCallBack,actionType:divi.actionType.submit,url:this.sbtdefaults.submitUrl,failCall:this.failCallBack};
-    }
-    
+
     ,initForm:function(){
     	var table = this.data;
     	var tableDet = divi.app[table];
@@ -218,8 +478,6 @@ divi.formPanel = divi.extend(divi.panelBase,{
     		}
     	}
     }
-    
-  
     
     ,fieldLoop:function(fields,callBack,section){
     	var eachField;
@@ -416,12 +674,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			}
 		}
     }
-    ,returnForm: function(){
-    	var scope = this.scope;
-		if(scope.returnBtnCall){
-			scope.returnBtnCall.call(scope.scope);
-		}	
-    }
+    
     ,customButtonListeners: function(callback){
     	var scope = this.scope;
     	if(callback){
@@ -452,13 +705,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     		form = this.scope;
     	}
 		if(form){
-			var isValid = form.validateAndsubmitForm();
-			if(!isValid){
-				$('.load').hide();
-			}
-		/*	if(isValid){
-				form.toggleForm();
-			}*/
+			form.scope.submitForm();
 		}
     }
     
@@ -525,423 +772,6 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			}
 		}
 	}
-    
-    ,failCallBack:function(r){
-    	alert("Please check the form. There is some error with the submit");
-    }
-    
-    ,updateParams:function(input,key,result){
-    	var data = input[key];
-    	var tbNm,fdNm,splts;
-    	for(var eachD in data){
-    		if(data.hasOwnProperty(eachD)){
-    			splts = this.splitName(eachD);
-    			tbNm = splts.table,fdNm =splts.field;
-    			if(!result[tbNm]){result[tbNm] = {}};
-    			if(!result[tbNm][key]){result[tbNm][key] = {}};
-    			result[tbNm][key][fdNm] = data[eachD];
-    		}
-    	}
-    }
-    
-    ,splitName:function(name){
-    	var tb,field,splts;
-    	if(name){
-    		splts = name.split('_');
-    		tb = splts[0],field =splts[1];
-    	}
-    	return  {table:tb,field:field}
-    }
-    
-    
-    ,filterParams:function(values){
-    	var eachParams = {};
-    	this.updateParams(values,'filters',eachParams);
-    	this.updateParams(values,'values',eachParams);
-    	return eachParams;
-    }
-    
-    ,prepareParams:function(formValues){
-    	var form = this;
-    	var filValues;
-    	var inputObject;
-    	if(form){
-    		var dataObj = {};
-	    	if(formValues && formValues.values){
-				var values = dataObj.values || {};
-				$.extend(values,formValues.values);
-				dataObj.values = values;
-			}
-			if(formValues && formValues.filters){
-				var filters = dataObj.filters || {};
-				$.extend(filters,formValues.filters);
-				dataObj.filters = filters;
-			}
-			filValues = form.filterParams(dataObj);
-    	}
-    	return this.prepareSbtParams(filValues);
-    }
-    
-    ,prepareSbtParams:function(filValues){
-    	var inputObject = this.prepareSubmitObject(filValues);
-    	var dependencies = this.dependencies;
-    	return {details:$.toJSON(inputObject),dependencies:$.toJSON(dependencies)};
-    }
-    
-    ,validateAndsubmitForm:function(){
-    	var isValidForm = this.validateForm();
-    	if(isValidForm){
-			this.submitValidForm();
-    	}
-    	return isValidForm;
-    }
-    ,submitValidForm: function(){
-    	var form  = this;
-    	var params = this.submitOptions;
-		var inputParams = form.getValues({form:form});
-		form.setTableProps(divi.actionType.submit);
-		form.submitOptions.data = form.prepareParams(inputParams);
-    	this._submitForm({form:form});
-    }
-    ,_submitForm:function(options){
-    	var form = options.form || this;
-    	//setTimeout(function() {
-			var params = form.submitOptions;
-			var context = form.submitOptions.context || form;
-    		params.data.Action = form.submitOptions.actionType || divi.actionType.submit;   		
-            divi.core.ajax.call(context,params);
-		//},100);
-    }
-    
-    ,setTableProps:function(actionType){
-    	var form = this;
-    	var tabProps = form.tableProps;
-    	if(tabProps){
-			var val;
-			for(var key in tabProps){
-				if(tabProps.hasOwnProperty(key)){
-					tabProps[key].actionType = actionType;
-				}
-			}
-		}
-    }
-    
-    ,retrieve: function (options) {
-    	options = options || {};
-    	var values = options.values;
-    	var retrieveOpts = options.retrieveOpts || {};
-    	form = this;
-    	var actionProps = form.actionProps;
-    	$.extend_deep(true,form.tableProps,retrieveOpts);
-    	var newProps;
-		if(form.isNew){
-			newProps = actionProps? actionProps['new'] : {}; 
-			var values = form.prepareDataObject(values);
-			form.setValues(values);
-			form.enableButton(form.submitBtn,true);
-		}else{
-			newProps = actionProps? actionProps['edit'] : {};
-			form.setTableProps(divi.actionType.retrieve);
-			$.extend(form.submitOptions,{succCall:form.retrieveValuesSucess,actionType:divi.actionType.retrieve,data:form.prepareSbtParams.call(form,values)});
-			form._submitForm({form:form});
-		}
-		form.applyFormProps(newProps);
-    }
-    
-    ,hideShowElement:function(elem,toShow){
-    	if(elem){
-    		var jElem = $(elem);
-	    	if(toShow){
-	    		jElem.removeClass('hidden');
-	    	}else{
-	    		jElem.addClass('hidden');
-	    	}
-    	}
-    }
-    
-    ,hideShowSections:function(section,toShow){
-    	if(section && !$.isEmptyObject(section.doms)){
-    		this.hideShowElement(section.doms.header,toShow);
-    		this.hideShowElement(section.doms.content,toShow);
-    	}
-    }
-    
-    ,checkforSections:function(){
-    	var eachsection,hide;
-    	for(var eachSec in this.sections){
-    		if(this.sections.hasOwnProperty(eachSec)){
-    			hide = true;
-    			eachsection =  this.sections[eachSec];
-	    		for(var key in eachsection.keys){
-					if(eachsection.keys.hasOwnProperty(key)){
-						eachField = this.elementsMap[eachsection.keys[key]];
-						hide = hide*eachField.hidden;
-					}
-				}
-	    		if(hide){
-	    			this.hideShowSections(eachsection,false);
-	    		}
-    		}
-    	}
-    }
-    
-    ,applyFormProps:function(props){
-    	if(props){
-    		for(var key in props){
-    			if(props.hasOwnProperty(key)){
-					this.hideFieldsByKey(props[key].hide,key);
-    			}
-    		}
-    	}
-    	this.checkforSections();
-    }
-    
-    ,hideFieldsByKey:function(toHide,prefix){
-    	var form = this;
-    	var name,splts,prfName;
-    	for(var key in form.elementsMap){
-    		if(form.elementsMap.hasOwnProperty(key)){
-    			eachField = form.elementsMap[key];
-    			name = eachField.name;
-    			prfName = form.splitName(name)['table'];
-    			if(prfName === prefix){
-    				if(toHide){
-    					eachField.hide();
-    				}else{
-    					eachField.show();
-    				}
-    			}
-    			
-    		}
-    	}
-    }
-    
-    ,prepareDataObject:function(values){
-    	if(values){
-    		var returnObject = {};
-    		for(var key in values){
-    			if(values.hasOwnProperty(key)){
-    				$.extend(returnObject,this.constructValues(key, values[key].filters));
-    				$.extend(returnObject,this.constructValues(key, values[key].values));
-    			}
-    		}
-    	}
-    	return returnObject;
-    }
-    
-    ,constructValues:function(prefix,values){
-    	var returnObject = {};
-    	if(values){
-    		for(var key in values){
-    			if(values.hasOwnProperty(key)){
-    				returnObject[prefix+'_'+key] = values[key];
-    			}
-    		}
-    	}
-    	return returnObject;
-    }
-	,shouldSetValues: function(success) {
-		var setvalues = false;
-		if(this.ignoreSuccess) {
-			setvalues = true;
-		}
-		else if((!this.ignoreSuccess) && success) {
-			setvalues = true;
-		}
-		return setvalues;
-	}
-    ,retrieveValuesSucess:function(data){
-    	var form = this;
-    	var shouldset = this.shouldSetValues(data.Success);
-		if (shouldset) {
-			form.setValues(data);
-			form.setReadOnly(form);
-			form.enableButton(form.submitBtn,false);
-			form.editMode = false;
-			setTimeout(function() {
-				$('.load').hide();
-				form.displaySuccessMessage();
-				form.afterCrudCallBack(form);
-			},300);
-		}
-		else{
-			form.enableButton(form.submitBtn,true);
-			form.editMode = true;
-		}
-	}
-    ,afterCrudCallBack: function(form){
-    	var actionType = this.actionType;
-		var messageText = '', header = 'Success';
-		switch(actionType){
-			case divi.actionType.insert:
-				if(form.afterSubmitCallBack){
-					form.afterSubmitCallBack.call(this.scope);
-				}
-				break;
-			case divi.actionType.update:
-				if(form.afterUpdateCallBack){
-					form.afterUpdateCallBack.call(this.scope);
-				}
-				break;
-			case divi.actionType.deleted:
-				if(form.afterDeleteCallBack){
-					form.afterDeleteCallBack.call(this.scope);
-				}
-				break;
-		}
-    }
-    ,submit:function(options){
-    	var scope = this;
-    	options = options || {};
-    	var tbPrpop = options.tableProps || {};
-    	$.extend_deep(true,this.tableProps,tbPrpop);
-    	//mergeOnKey('name',this.tableProps,tbPrpop);
-    	var sbOpts = {};
-    	if(options.callback){
-    		sbOpts['succCall'] = options.callback;
-    	}
-    	if(options.context){
-    		sbOpts['context'] = options.context;
-    	}
-    	if(options.actionType){
-    		sbOpts['actionType'] = options.actionType;
-    	}
-		$.extend(this.submitOptions,sbOpts);
-    }
-    ,postSuccCallBack: function(data){
-		this.retrieveValuesSucess(data);	
-    }
-    
-    ,preSubmit:function(postParams){
-		return postParams;
-	}
-    
-    ,getSubmitActionType:function(form){
-		var eachField,value,actionType ;
-		if(form.elementsMap.hasOwnProperty('id')){
-			eachField = form.elementsMap['id'];
-			value = eachField.getValue();
-			if(value){
-				actionType = divi.actionType.update;
-			}else{
-				actionType = divi.actionType.insert;
-			}
-		}
-		return actionType;
-	}
-	
-	,shuffleOrder:function(params){
-		var form = this;
-		var shuffled = params;
-		var eachKey;
-		var sortOrder = form.tableProps.sortOrder;
-		if(sortOrder){
-			shuffled = {};
-			for(var key in sortOrder){
-				if(sortOrder.hasOwnProperty(key)){
-					eachKey = sortOrder[key];
-					if(params[eachKey]){
-						shuffled[eachKey] = params[eachKey];
-					}
-				}
-			}
-		}
-		return shuffled;
-	}
-	
-	
-    
-    ,checkIdentity:function(options,key){
-    	var options = options || {};
-    	var form = options.form || this;
-    	var actionType = divi.actionType.update;
-    	var tbProps = form.tableProps[key] || {}
-    	var identityCols = tbProps.identityCols;
-    	var eachCol,value,field;
-    	if(identityCols){
-    		for(var each in identityCols){
-    			if(identityCols.hasOwnProperty(each)){
-    				eachCol = identityCols[each];
-    				if(eachCol){
-    					field = form.elementsMap[eachCol];
-    					if(field){
-    						value = field.getValue();
-        					if(field.isEmpty(value)){
-        						actionType = divi.actionType.insert;
-        						break;
-        					}
-    					}
-    				}
-    			}
-    		}
-    	}
-    	return actionType;
-    }
-    
-    ,setActionType:function(data,actionType){
-    	this.actionType = actionType;
-    	var filters = data.filters|| {};
-    	var values = data.values|| {};
-    	switch(actionType){
-    		case divi.actionType.insert:
-    			$.extend(values,filters);
-    			delete data['filters'];
-    			delete data['values'];
-    			data["formdetails"] = $.toJSON(values);
-    			break;
-    		case divi.actionType.update:
-    			delete data['values'];
-    			data["formdetails"] = $.toJSON(values);
-    			data["filters"] = $.toJSON(filters);
-    			break;
-    		case divi.actionType.deleted:
-    			data["filters"] = $.toJSON(filters);
-    			delete data['values'];
-    			break;
-    		case divi.actionType.retrieve:
-    			data["filters"] = $.toJSON(filters);
-    			delete data['values'];
-    			break;
-    	}
-    	return data;
-    }
-    
-    ,setParams:function(data,tbName){
-    	var tbPrps = this.tableProps || {};
-    	var tableprops = tbPrps[tbName] || {};
-    	var actionType =  (tableprops['actionType']) ?  tableprops.actionType : this.submitOptions.actionType;
-    	if(!actionType || actionType == divi.actionType.submit){
-    		actionType = this.checkIdentity(data,tbName);
-    	}
-    	data = this.setActionType(data,actionType);
-    	var resultName = tableprops.resultName? tableprops.resultName : tbName+'result';
-    	var controllerName = tableprops.url ?  tableprops.url : 'RetrieveController';
-    	var returndata = {params:$.toJSON(data),resultName:resultName,controllerName:controllerName,action:actionType};
-    	var addParams = tableprops.params ?  tableprops.params : {};
-    	$.extend(returndata,addParams);
-    	return returndata;
-    }
-    
-    ,prepareSubmitObject:function(data){
-    	var eachData,returnData,mainData = {}; 
-    	if(data){
-    		for(var key in data){
-    			if(data.hasOwnProperty(key)){
-    				eachData = data[key];
-    				returnData = this.setParams(eachData,key);
-    				mainData[key] = returnData;
-    			}
-    		}
-    	}
-    	mainData = this.shuffleOrder(mainData);    	
-    	return mainData;
-    }
-    
-    
-    
-    ,submitcallback:function(resp){
-    	//do nothing
-    }
     
     ,hookFields:function(eachField){
     	var type = eachField.type;
@@ -1022,7 +852,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
 	}
 	
 	
-	,createRow:function(appendTo,trops,tdOps){
+	,createRow:function(appendTo,trops,tdOps,isPrepend){
 		var row,cell;
 		if(appendTo){
 			row = document.createElement('tr');
@@ -1033,8 +863,8 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			var jCell = $(cell);
 			divi.domBase.attachAttrs(jCell,tdOps);
 			divi.domBase.append(row,cell);
+			divi.domBase.append(appendTo,row,isPrepend);
 			
-			divi.domBase.append(appendTo,row);
 		}
 		return {td:cell,tr:row};
 	}
@@ -1044,13 +874,13 @@ divi.formPanel = divi.extend(divi.panelBase,{
 	}
 	
 	,getToggleText:function(parent){
-		 var buttons = [{tag:'button',defaultCss:'textLeft',baseCss:'imgButton',value:'<img class="toggle"/>',hidden:this.editMode,listeners:{'click':[this.toggleForm]}}];
+		 var buttons = [{tag:'button',defaultCss:'place-right',baseCss:'imgButton',value:'<img class="toggle"/>',hidden:this.editMode,listeners:{'click':[this.toggleForm]}}];
    		 this.createButtons(buttons,parent);
 	}
 	
 	,createSections:function(parent){
 		parent = parent || this.formdom.dom;
-		var contentCls = 'formContent';
+		var contentCls = this.contentCls;
 		var tdCls = ''; 
 		var sections = this.sections;
 		if(sections){
@@ -1103,21 +933,24 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			var section = '<div class="sectionname">'+this.getSectionText()+'</div>';
 			divi.domBase.attachAttrs(rowElem.td,{value:section});
 		}
-		
-		if(this.toggle){
-			rowElem = this.createRow(jtableElem, {}, {});
-			this.getToggleText(rowElem.td);
-		}
-		
-		
-		
 		this.createSections(jtableElem);
 		this.getFormButtons(jtableElem);
 		if(this.showBorder){
 			$(jtableElem).find('tbody').addClass('border');
 		}
+		this.createToggle(jtableElem);
     	this.appendFormTo(appendToTag);
     	this.afterFormRender();
+	}
+	
+	,createToggle:function(jtableElem){
+		jtableElem = jtableElem || divi.domBase.fetchJSel(this.id);
+		if(this.toggle){
+			var cls = '.'+this.contentCls;
+			var appendElem = jtableElem.find(cls).parent();
+			var rowElem = this.createRow(appendElem, {}, {},true);
+			this.getToggleText(rowElem.td);
+		}
 	}
 	
 	,getElementDimens:function(toAttachElem){
@@ -1142,10 +975,6 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			$(appendTo).append(this.dom);
 			this.setSectionsReadOnly();
 			this.setFocus();
-			/*if(!this.editMode){
-				this.editMode = !this.editMode;
-				this.toggleForm();
-			}*/
 		}
 	}
 	
@@ -1220,24 +1049,6 @@ divi.formPanel = divi.extend(divi.panelBase,{
 			});
 		}
     }
-	,displaySuccessMessage: function(options){
-		var actionType = this.actionType;
-		var messageText = '', header = 'Success';
-		switch(actionType){
-			case divi.actionType.insert:
-				messageText = "Inserted";
-				break;
-			case divi.actionType.update:
-				messageText = "Updated";
-				break;
-			case divi.actionType.deleted:
-				messageText = "Deleted";
-				break;
-		}
-		if(actionType!=divi.actionType.retrieve){
-			divi.core.alert({text:"Record "+messageText+" successfully",header:header});
-		}
-	}
 });  
 
 pageUnloaded = function(){

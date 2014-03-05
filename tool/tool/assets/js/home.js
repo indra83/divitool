@@ -101,15 +101,40 @@ divi.bookBase = divi.extend(divi.appBase,{
 	updated:true,
 	parent:undefined,
 	callback:undefined,
+	stdState:{'state':{'opened':false,'selected':false}},
 	values:{},
 	isBook:false,
 	selector:undefined,
-	table:'book',
+	table:'',
 	children:[],
 	constructor: function (cfg) {
 		divi.bookBase.superclass.constructor.call(this);
 		this.init();
 		this.initializeValues();
+	}
+	
+	,retrieveTree:function(){
+		var book = this.retrieveBook();
+		var output;
+		if(book){
+			output = this.retrieveTreeString(output);
+		}
+		return output;
+	}
+	
+	,retrieveTreeString:function(){
+		var output = [];
+		if(this.isBook){
+			var children = this.children['chapters'];
+			for(var i=0;children && i< children.length;i++){
+				var currChild = children[i];
+				var values = currChild.getValues();
+				var currString = {id:values['id'],text:values['name']};
+				$.extend(currString,this.stdState);
+				output.push(currString);
+			}
+		}
+		return output;
 	}
 	
 	,init:function(){
@@ -132,8 +157,15 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,showContent:function(appendTo){
-		this.formPanel = new divi.formPanel({data:this.table,appendToElement:appendTo});
+	,showContent:function(appendTo,showToggle){
+		if(!this.formPanel){
+			this.formPanel = new divi.formPanel({data:this.table,scope:this});
+		}
+		if(!this.formPanel.toggle && showToggle){
+			$.extend(this.formPanel,{toggle:true});
+			this.formPanel.createToggle();
+		}
+		this.formPanel.draw(appendTo);
 		this.formPanel.setValues(this.getValues());
 	}
 	
@@ -317,11 +349,19 @@ divi.bookBase = divi.extend(divi.appBase,{
 
 divi.book = divi.extend(divi.bookBase,{
 	parent:undefined,
+	prviwForm:'.btnAthr',
 	isBook:true,
 	prefix:'book',
+	table:'book',
 	childrenKeys:['chapters'],
 	constructor : function (cfg) {
 		divi.book.superclass.constructor.call(this);
+	}
+
+	,draw:function(){
+		divi.bookBase.prototype.draw.call(this);
+		$(this.prviwForm).removeClass('button').empty().off('click');
+		this.showContent(this.prviwForm,true);
 	}
 });
 
@@ -401,10 +441,53 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,readBook:function(data){
-		var master_json = JSON.parse(data);
-		if(master_json){
-			this.book.load(master_json);
+		if(data){
+			var master_json = JSON.parse(data);
+			if(master_json){
+				this.book.load(master_json);
+				this.showTree();
+			}
 		}
+	}
+	
+	,fetchTree:function(obj,cb){
+		var output = home.book.retrieveTree();
+		cb.call(this,output);
+	}
+	
+	,showTree:function(){
+		$('#jstree_demo').jstree({
+			  "core" : {
+			    "animation" : 0,
+			    "check_callback" : true,
+			    "themes" : { "stripes" : true },
+			    'data' :this.fetchTree /* function (obj, cb) {
+	            		cb.call(this,['Root 1', 'Root 2']);
+	              }*/
+			  },
+			  "types" : {
+			    "#" : {
+			      "max_children" : 1, 
+			      "max_depth" : 2, 
+			      "valid_children" : ["root"]
+			    },
+			    "root" : {
+			      "icon" : "assets/images/tree_icon.png",
+			      "valid_children" : ["default"]
+			    },
+			    "default" : {
+			      "valid_children" : ["default","file"]
+			    },
+			    "file" : {
+			      "icon" : "glyphicon glyphicon-file",
+			      "valid_children" : []
+			    }
+			  },
+			  "plugins" : [
+			    "contextmenu", "dnd", "search",
+			    "state", "types", "wholerow"
+			  ]
+			});
 	}
 	
 	,bookreadFail:function(){
@@ -487,4 +570,6 @@ divi.home =  divi.extend(divi.appBase,{
 		
 	}
 });
-new divi.home({});
+var home = new divi.home({});
+
+
