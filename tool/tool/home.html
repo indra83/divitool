@@ -4,6 +4,7 @@
 	  <link rel="stylesheet" href="assets/css/Normalize.css">
       <link rel="stylesheet" href="assets/css/style.css">
       <link rel="stylesheet" href="assets/css/metro-bootstrap.css" media="screen">
+      <link rel="stylesheet" href="assets/css/metro-bootstrap-responsive.css" rel="stylesheet">
       <link href="assets/css/equation-embed.css" rel="stylesheet" media="screen">
       <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
       <link href="assets/css/style.min.css" rel="stylesheet" media="screen">
@@ -24,16 +25,15 @@
 	      		<div class="maintitle titlePreview imageSection large txBold capsOn bg-white"><span>Book Progress</span></div>
 	      		<div class="maintitle titlePreview imageSection button success large txBold capsOn"><span>Book Cover</span></div>
 	      		<div class="maintitle titlePreview imageSection button success large capsOn"><span>chapters Progress</span></div>
-	      		<div id="jstree_demo"></div>
+	      		<div class="treepreview"></div>
 	         </div>
 	         <div class="contentEditor inline">
 	      		<div class="titlePreview imageSection">
 	      			<ul class="addButtons">
 	      				<li>select actions</li>
 	      				<li><button class="button info large maintitle capsOn addchapter">chapter</button></li>
-	      				<li><button class="button info large maintitle capsOn">topic</button></li>
-	      				<li><button class="button info large maintitle capsOn" >assessment</button></li>
-	      				<li><button class="button info large maintitle capsOn">chapter</button></li>
+	      				<li><button class="button info large maintitle disabled capsOn addtopic">topic</button></li>
+	      				<li><button class="button info large maintitle disabled capsOn addassessment" >assessment</button></li>
 	      			</ul>
 	      		</div>
 	      		<div class="titlePreview imageSection buttonsList bgBlack"><span>Book Cover</span></div>
@@ -59,6 +59,9 @@
       <div class="dialog-html hidden">
        	<textarea class="html_input"></textarea>
       </div>
+      <div class="contextmenu hidden" unselectable="on">
+		
+	 </div>
 	<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
 	<script src="assets/js/jquery.js"></script>
 	<script src="assets/js/chosen.jquery.js"></script>

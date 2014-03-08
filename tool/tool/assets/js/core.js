@@ -542,7 +542,7 @@ $.extend(divi.domBase,{
 	jSel:'jSel',
 	sel:'sel',
     scope:'scope',
-    ignore:['attachLis','tag','scope','listeners'],
+    ignore:['attachLis','tag','scope','listeners','prefix'],
 	add:function(key,elem,jqElem,scope){
 		if(elem && key){
 			var cElem = {};
@@ -737,7 +737,9 @@ $.extend(divi.eventBase,{
 			var jTarget = $(target);
 			var val = jTarget.val();
 			var evtBase = data.evtBase;
-			scope.validateField(event,val,jTarget);
+			if($.isFunction(scope.validateField)){
+				scope.validateField(event,val,jTarget);
+			}
 			var listeners = evtBase.listeners[this.id];
 			if(listeners && listeners[type]){
 				var eachListener;
@@ -768,7 +770,7 @@ $.extend(divi.eventBase,{
 	,attachDefaultListeners:function(options){
 		var scope = options.scope;
 		var ref = options.ref || {};
-		var toAddListener,avlListeners = scope.events;
+		var toAddListener,avlListeners = options.events || scope.events;
 		var totListeners = {};
 		if(avlListeners){
 			 for(var eachkey in avlListeners){
@@ -1090,29 +1092,6 @@ divi.extend(divi.componentBase,divi.base, {
 		return css;
 	}
 });
-
-
-
-
-divi.appBase = divi.extend(divi.base, {
-    title: ''
-    
-    ,constructor: function (cfg) {
-    	$.extend(this, cfg);
-        divi.appBase.superclass.constructor.call(this);
-        this.startup();
-    }
-	
-	,startup:function(cfg){
-		
-	}
-	
-	
-	
-    
-});
-
-
 
 
 divi.crossPageBase = divi.extend(divi.componentBase, {

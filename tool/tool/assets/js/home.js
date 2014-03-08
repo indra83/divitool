@@ -95,52 +95,224 @@ function guid() {
 	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4()+ S4() + S4());
 }
 
+divi.appBase = divi.extend(divi.base, {
+    title: '',
+    cmKey:'.contextmenu',
+	popupKey:'.popup',
+	htmlKey:'.dialog-html',
+	
+    constructor: function (cfg) {
+    	$.extend(this, cfg);
+        divi.appBase.superclass.constructor.call(this);
+        this.startup();
+    }
+
+	,startup:function(){
+		
+	}
+	
+	,pluralize:function(key){
+		if(key){
+			key = key+'s';
+		}
+		return key;
+	}
+	
+	,removechars:function(key){
+		if(key){
+			key = key.replace('.','').replace('#','');
+		}
+		return key;
+	}
+	
+	,retrievePopUpDiv:function(){
+		return this.getSelector(this.popupKey);
+	}
+	
+	,cancelDailog:function(b,e){
+		var jB = $(b);
+		var elem = (jB.hasClass('ui-dialog-content')) ? jB : jB.find("ui-dialog-content");
+		if(elem){
+			elem.superDialog("close");
+		}
+	}
+	
+	,closeCmMenu:function(){
+		this.getSelector(this.cmKey).hide();
+	}
+	
+	,blockcmMenu:function(cfg,event){
+		event.preventDefault();
+		event.stopPropagation();
+	}
+	
+	,getSelector:function(key){
+		var refKey = this.removechars(key);
+		if(!this[refKey]){
+			this[refKey] = $(key);
+		}
+		return this[refKey];
+	}
+	
+	,launchEditor:function(instance,homeScope){
+		if(instance){
+			var sel = this.getSelector(this.htmlKey);
+			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.insert,scope:this},Cancel: {fn:homeScope.cancelDailog,scope:homeScope}},close: function () {homeScope.cancelDailog();}};
+			sel.empty().superDialog(dlgConfig).superDialog('open').removeClass('hidden');
+		}
+	}
+	
+	,prepareSideBar:function(book){
+		var parentCont = this.getSelector(this.previewSel);
+		parentCont.empty();
+		book.retrieveTree(parentCont);
+		this.prepareDropDown(parentCont);
+	}
+	
+	,prepareDropDown:function(parentCont){
+		 var elem = parentCont.find("[data-role=slidedown]");
+		 elem.each(function(idx, li) {
+		    var b = $(li);
+	        b.find("li.disabled a").on("click", function (a) {
+	             a.preventDefault()
+	        });
+		});
+	}
+	
+	,launchPopUp:function(instance){
+		if(instance){
+			var popupDiv = this.retrievePopUpDiv();
+			var mydialog = popupDiv.superDialog();
+			var buttons = mydialog.superDialog("option", "buttons");
+			var newButtons = {};
+			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm}},buttons);
+			mydialog.superDialog("option", "buttons", newButtons);
+			popupDiv.empty().superDialog('open');
+			instance.showContent(popupDiv);
+		}
+	}
+	
+    
+});
+
+
 
 divi.bookBase = divi.extend(divi.appBase,{
+	home:undefined,
 	fileName:'master.json',
+	events:['click','contextmenu'],
+	treeKey:'tree',
+	cmSelector:undefined,
+	isNew:false,
+	cmDom:undefined,
+	ddEffect:'slide',
+	cmItems:{},
+	cmItemDflts:{tag:'div','class':'item'},
+	contextMenu:undefined,
+	doms:{},
 	updated:true,
+	hasChildren:false,
 	parent:undefined,
 	callback:undefined,
 	stdState:{'state':{'opened':false,'selected':false}},
+	listeners:this.listeners,
 	values:{},
 	isBook:false,
 	selector:undefined,
 	table:'',
-	children:[],
+	children:{},
 	constructor: function (cfg) {
+		$.extend(this,cfg);
 		divi.bookBase.superclass.constructor.call(this);
 		this.init();
 		this.initializeValues();
 	}
 	
-	,retrieveTree:function(){
+	,retrieveTree:function(parent){
 		var book = this.retrieveBook();
 		var output;
 		if(book){
-			output = this.retrieveTreeString(output);
+			book.prepareSideBar(parent);
 		}
 		return output;
 	}
 	
-	,retrieveTreeString:function(){
-		var output = [];
-		if(this.isBook){
-			var children = this.children['chapters'];
-			for(var i=0;children && i< children.length;i++){
-				var currChild = children[i];
-				var values = currChild.getValues();
-				var currString = {id:values['id'],text:values['name']};
-				$.extend(currString,this.stdState);
-				output.push(currString);
+	,sidebarClick:function(d,val,jTarget){
+		if(this.home){
+			this.home.updateSelected(this);
+		} 
+		if(this.table == 'chapter'){
+			d.preventDefault();
+			d.stopPropagation();
+			var a = this,b =jTarget.parent().children('ul.slidedown-menu');
+            "block" != b.css("display") || b.hasClass("keep-open") ? ($(".slidedown-menu").each(function (d, e) {
+                b.parents(".slidedown-menu").is(e) || ($(e).hasClass("keep-open") ||
+                    "block" != $(e).css("display")) || a._close(e)
+            }), a._open(b)) : a._close(b)
+		}
+	}
+	
+	,_open: function (a) {
+        switch (this.ddEffect) {
+        case "fade":
+            a.fadeIn("fast");
+            break;
+        case "slide":
+           a.slideDown("fast");
+            break;
+        default:
+            a.hide()
+        }
+    },
+    _close: function (a) {
+    	var c = $(a);
+        switch (this.ddEffect) {
+        case "fade":
+            c.fadeOut("fast");
+            break;
+        case "slide":
+           c.slideUp("fast");
+            break;
+        default:
+            c.hide()
+        }
+    }
+	
+	,toggleContextMenu:function(event,val,jTarget){
+		event.preventDefault();
+		event.stopPropagation();
+		var text = jTarget.val();
+		if(this.cmDom){
+			this.getSelector(this.cmKey).hide().empty().append(this.cmDom.dom).css({top: event.pageY + "px", left: event.pageX + "px"}).show();
+		}
+		/*
+		$(document).on("contextmenu", function(event) { 
+			event.preventDefault();
+			
+		}).on("click", function(event) {$(".contextmenu").hide();});*/
+		 /*
+		*/
+	}
+	
+	,onCmClick:function(event,val,jTarget){
+		event.preventDefault();
+		event.stopPropagation();
+		var text = jTarget.html();
+		this.getSelector(this.cmKey).hide();
+		if(text && this.cmItems[text]){
+			var cfg = this.cmItems[text];
+			if(cfg && cfg.fn){
+				cfg.fn.apply(this,[event,val,jTarget,cfg.key]);
 			}
 		}
-		return output;
 	}
 	
 	,init:function(){
+		this.listeners = {'click':[this.sidebarClick],'contextmenu':this.toggleContextMenu};
 		this.children = {};
 		this.values = {};
 		this.updated = true;
+		this.doms = {};
 	}
 	
 	,initializeValues:function(){
@@ -171,6 +343,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,submitForm:function(b,e){
 		var scope = this;
+		if(scope.isNew){
+			var key = scope.table;
+			var lookupKey = this.pluralize(key);
+			this.initilizeChild(scope.parent,lookupKey);
+			this.addChild(scope.parent,lookupKey,scope);
+		}
 		var form = scope.formPanel;
 		if(form){
 			var isValidForm = form.validateForm();
@@ -209,23 +387,33 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 	,draw:function(){
-		var values = this.getValues();
-		var mainKey = "";
-		for(var key in values){
-			if(values.hasOwnProperty(key)){
-				mainKey = "."+this.prefix+key;
-				$(mainKey).html(values[key]);
-			}
+		if(this.isNew && $.isEmptyObject(this.doms)){
+			this.drawNew();
+		}else{
+			this.drawUpdate();
 		}
 	}
+	
+	,drawNew:function(){
+		var parDom = this.parent.doms[this.parent.divs['ulDiv']].dom;
+		var currKey = this.pluralize(this.table);
+		var children = this.parent.children[currKey];
+		if(children){
+			var currSeq = children.length-1;//already children are updated
+			this.prepareSideBar(parDom,currKey,currSeq);
+			this.isNew = false;
+		}
+	}
+
+	
+	,drawUpdate:function(){
+		
+	}
+	
 	
 	,load:function(data){
 		this.read(data);
 		this.draw();
-	}
-	
-	,read:function(){
-		
 	}
 	
 	,stringify:function(input){
@@ -234,7 +422,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 		return masterObj;
 	}
 	
-	
+	,add:function(event,val,jTarget,key){}
+	,edit:function(event,val,jTarget){}
+	,deletefn:function(event,val,jTarget,key){}
 	,persist:function(url, file){
 		var formData = new FormData();
 	    formData.append(file.name, file, file.name);
@@ -256,11 +446,17 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	
 	,persistData:function(){
-		 window.URL = window.webkitURL || window.URL;
-         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-         var file = new Blob([JSON.stringify(this.stringify(), undefined, 2)]);
-         file.name = this.fileName;
-         this.persist('/savefile/',file);
+		 var book = this.retrieveBook(this);
+		 if(book){
+			 window.URL = window.webkitURL || window.URL;
+	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+	         var file = new Blob([JSON.stringify(this.stringify(), undefined, 2)]);
+	         file.name = this.fileName;
+	         book.persist('/savefile/',file);
+		 }else{
+			 alert("Please Contact administrator. Could not save the changes");
+		 }
+		
 	}
 	
 	,setValues:function(updated){
@@ -269,15 +465,24 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,getChildren:function(key){
-		if(this.children){
-			if(key){
-				return this.children[key];
-			}else{
-				return this.children;
+	,initilizeChild:function(input,key,skipChild){
+		input = input || this;
+		if(key){
+			if(!skipChild && !input.children[key]){
+				input.children[key] = [];
+			}else if(!input[key]){
+				input[key] = [];
 			}
 		}
 	}
+	
+	,addChild:function(input,key,child){
+		var input = input  || this;
+		if(key && input.children[key]){
+			input.children[key].push(child);
+		}
+	}
+	
 	
 	,fetchCat:function(key){
 		return key ? key.substring(0, key.length - 1) : key;
@@ -285,50 +490,85 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,readEachChild:function(children,currKey){
 		var eachChild;
-		if(!this.children[currKey]){
-			this.children[currKey] = [];
-		}
+		this.initilizeChild(this,currKey)
 		var elemKey = this.fetchCat(currKey);
 		if(divi[elemKey]){
-			for(var i=0;children && i < children.length;i++){
-				eachChild = new divi[elemKey]({parent:this});
+			for(var i=0;children && children && i < children.length;i++){
+				if(!this.hasChildren){
+					this.hasChildren = true;
+				}
+				eachChild = new divi[elemKey]({parent:this,home:this.home});
 				eachChild.read(children[i]);
-				this.children[currKey].push(eachChild);
+				this.addChild(this, currKey, eachChild);
 			}
 		}
 	}
 	
-	,attachChildren:function(input){
+	,attachChildren:function(input,callback,initialize,addParams,skipChildren){
 		var currKey;
 		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
 			currKey = this.childrenKeys[i];
-			this.attachEachChild(input,currKey);
+			/*if(!input.children){
+				input.children = {};
+			}*/
+			addParams = addParams || [];
+			this.attachEachChild(callback,input,currKey,initialize,addParams,skipChildren);
 		}
 	}
 	
-	,attachEachChild:function(input,currKey){
+	,attachEachChild:function(callback,input,currKey,initialize,addParams,skipChildren){
 		var eachChild;
-		if(!input.currKey){
-			input[currKey] = [];
+		if(initialize){
+			this.initilizeChild(input,currKey,skipChildren)
 		}
 		var currChildren = this.children[currKey];
 		for(var i=0;currChildren && i < currChildren.length;i++){
 			eachChild = currChildren[i];
-			eachChild.prepareData(input[currKey],true);
+			var params = [input,currKey,i].concat(addParams).concat([skipChildren]);
+			eachChild[callback].apply(eachChild,params);
 		}
 	}
-
-	,prepareData:function(input,isArray){
+	
+	,prepareData:function(input,currKey,index,isArray,skipChildren){
 		if(input){
+			if(isArray){
+				if(skipChildren){
+					input = input[currKey];
+				}else{
+					input = input.children[currKey];
+				}
+			}
 			var newObj = {};
 			$.extend(newObj,this.getValues());
-			this.attachChildren(newObj);
+			this.attachChildren(newObj,'prepareData',true,[true],true);
 			if(isArray){
 				input.push(newObj);
 			}else{
 				$.extend(input,newObj);
 			}
 		}
+	}
+	
+	,add:function(event,val,jTarget,key){
+		if(key){
+			var eachChild = new divi[key]({parent:this,isNew:true,home:this.home});
+			/*var lookupKey = this.pluralize(key);
+			this.initilizeChild(this,lookupKey);
+			this.addChild(this,key,eachChild);*/
+			this.launchPopUp(eachChild,this);
+		}
+	}
+	
+	,edit:function(event,val,jTarget){
+		this.launchPopUp(this,this);
+	}
+	
+	,deletefn:function(event,val,jTarget){
+		this.beforeDelete(event,val,jTarget);
+		this.persistData();
+	}
+	,beforeDelete:function(event,val,jTarget){
+		
 	}
 	
 	,read:function(input){
@@ -354,32 +594,164 @@ divi.book = divi.extend(divi.bookBase,{
 	prefix:'book',
 	table:'book',
 	childrenKeys:['chapters'],
+	navDflts:{tag:'nav','class':'sidebar light'},
+	ulDflts:{tag:'ul'},
+	divs:{'navDiv':'navDiv','ulDiv':'ul'},
 	constructor : function (cfg) {
+		$.extend(this,cfg);
 		divi.book.superclass.constructor.call(this);
+	}
+	
+	,drawonScreen:function(){
+		var values = this.getValues();
+		var mainKey = "";
+		for(var key in values){
+			if(values.hasOwnProperty(key)){
+				mainKey = "."+this.prefix+key;
+				$(mainKey).html(values[key]);
+			}
+		}
 	}
 
 	,draw:function(){
-		divi.bookBase.prototype.draw.call(this);
+		this.drawonScreen();
 		$(this.prviwForm).removeClass('button').empty().off('click');
 		this.showContent(this.prviwForm,true);
+	}
+	
+	,prepareSideBar:function(parent){
+		var navDiv,ulDiv;
+		navDiv = this.doms[this.divs['navDiv']] = divi.domBase.create(this.navDflts,parent);
+		ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create(this.ulDflts,navDiv.dom);
+		this.attachChildren(ulDiv.dom,'prepareSideBar',false,false);
 	}
 });
 
 divi.chapter = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'chapter',
+	sequence:undefined,
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','ulDiv':'iUlDiv'},
 	childrenKeys:['topics','assessments'],
+	lidDefaults:{tag:"li",'class':"stick bg-yellow",prefix:'sidebar_'},
+	aDefaults:{tag:"a",'class':"slidedown-toggle",href:"#",prefix:'sidebar_',attachLis:true},
+	ulDefaults:{tag:"ul",'class':"slidedown-menu",'data-role':"slidedown",prefix:'sidebar_'},
 	constructor : function (cfg) {
+		$.extend(this,cfg);
+		this.cmListeners = {'click':[this.onCmClick]};
 		divi.chapter.superclass.constructor.call(this);
+		var parent = $('.contextmenu');
+		this.cmItems = {'Add Topic':{fn:this.add,key:'topic'},'Add Assessment':{fn:this.add,key:'assessment'},'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.createContextMenu(this.cmItems);
+	}
+	
+	,beforeDelete:function(event,val,jTarget){
+		var lookupKey = this.pluralize(this.table);
+		var children = this.parent.children[lookupKey];
+		if(children){
+			var index = this.sequence;
+			this.parent.children[lookupKey] = children.slice(index+1,children.length);
+		}
+		var doms = this.doms[this.divs['liDiv']];
+		var currDom = $(doms.dom);
+		currDom.remove();
+		this.destroydoms();
+		this.updateSequence(this.parent.children[lookupKey]);
+	}
+	
+	,destroydoms:function(){
+		var crr,crref,doms = this.divs;
+		for(var ech in doms){
+			if(doms.hasOwnProperty(ech)){
+				crr = this.doms[doms[ech]];
+				if(crr && crr.id){
+					crref =  crr.id;
+					divi.domBase.destroy(crref);
+				}
+			}
+		}
+	}
+
+	,updateSequence:function(children){
+		var currChild;
+		for(var i=0;i< children.length;i++){
+			currChild = children[i];
+			$.extend(currChild,{sequence:i});
+			currChild.draw();
+		}
+	}
+	
+	,drawUpdate:function(){
+		var valueDom = this.doms[this.divs['aDiv']];
+		if(valueDom && valueDom.dom){
+			var values = this.getValues();
+			$(valueDom.dom).html(this.prepareValue(values['name']));
+		}
+	}
+	
+	,prepareValue:function(val){
+		var rtn = "";
+		if(!divi.util.isEmptyId(this.sequence)){
+			rtn += (this.sequence +1) +'.  ';
+		}
+		rtn += val;
+		return rtn;
+	}
+	
+	
+	,createContextMenu:function(items){
+		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
+		if(items){
+			for(var ech in items){
+				if(items.hasOwnProperty(ech)){
+					childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.cmListeners}),parDom.dom);
+					childDom.dom.setAttribute('id',childDom.id);
+				}
+			}
+		}
+		this.cmDom = parDom;
+	}
+	
+
+	,prepareSideBar:function(parent,currKey,index){
+		var livDiv,values,dflts,aDiv,ulDiv;
+		livDiv = this.doms[this.divs['liDiv']] = divi.domBase.create($.extend(this.lidDefaults,{scope:this}),parent);
+		values = this.getValues();
+		this.sequence = index;
+		dflts = $.extend(this.aDefaults,{value:this.prepareValue(values['name']),scope:this,listeners:this.listeners});
+		aDiv = this.doms[this.divs['aDiv']] = divi.domBase.create(dflts,livDiv.dom);
+		aDiv.dom.setAttribute('id',aDiv.id);
+		if(this.hasChildren){
+			ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create($.extend(this.ulDefaults,{scope:this}),livDiv.dom);
+			this.attachChildren(ulDiv.dom,'prepareSideBar',false,false);
+		}
 	}
 });
 
 
 divi.topic = divi.extend(divi.bookBase,{
 	parent:undefined,
-	table:'topics',
+	table:'topic',
+	sequence:undefined,
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
+	lidDefaults:{tag:"li",prefix:'sidebar_'},
+	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
+	iconDefaults:{tag:'i','class':"icon-tree-view",prefix:'sidebar_'},
 	constructor : function (cfg) {
+		$.extend(this,cfg);
 		divi.topic.superclass.constructor.call(this);
+	}
+
+
+	,prepareSideBar:function(parent,currKey,index){
+		var livDiv,values,dflts,aDiv,iconDiv;
+		this.sequence = this.index;
+		livDiv = this.doms[this.divs['liDiv']] = divi.domBase.create($.extend(this.lidDefaults,{scope:this}),parent);
+		aDiv = this.doms[this.divs['aDiv']] = divi.domBase.create( $.extend(this.aDefaults,{scope:this,listeners:this.listeners}),livDiv.dom);
+		aDiv.dom.setAttribute('id',aDiv.id);
+		iconDiv = this.doms[this.divs['iconDiv']] = divi.domBase.create( $.extend(this.iconDefaults,{scope:this}),aDiv.dom);
+		values = this.getValues();
+		aDiv.dom.innerHTML += values['name'];
 	}
 });
 
@@ -387,8 +759,14 @@ divi.topic = divi.extend(divi.bookBase,{
 divi.assessment = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'assessment',
+	sequence:undefined,
 	constructor : function (cfg) {
+		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
+	}
+
+	,prepareSideBar:function(parent,currKey,index){
+		this.sequence = this.index;
 	}
 });
 
@@ -405,18 +783,46 @@ divi.contentEditor = divi.extend(divi.appBase,{
 
 divi.home =  divi.extend(divi.appBase,{
 	parent:undefined,
+	selected:undefined,
 	book:undefined,
 	callback:undefined,
 	selector:'textarea.html_input',
+	previewSel:'.treepreview',
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
 	}
 	
+	,retrieveChapter:function(melem){
+		var tryChap = melem || this;
+		var chap = (tryChap.table === 'chapter') ? tryChap : this.retrieveChapter(tryChap.parent);
+		return chap;
+	}
+	
+	,updateSelected:function(selected){
+		this.selected = selected;
+		this.enableTopBtns(selected);
+	}
+	
+	,btnListeners:function(scope){
+		 return [{tag:'.addtopic',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'topic',mapTo:scope},
+	        {tag:'.addassessment',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'assessment',mapTo:scope}];
+	}
+	
+	,enableTopBtns:function(selected){
+		var chapter;
+		if(selected){
+			chapter = this.retrieveChapter(selected);
+			if(chapter){
+				this.attachListeners(this.btnListeners(chapter));
+			}
+		}
+	}
+	
 	,startup:function(){
-		this.book = new divi.book({});
+		this.book = new divi.book({home:this});
 		this.loadBook();
 		this.initiliazeEditor();
-		this.attachListeners();
+		this.attachListeners(this.defaultListeners());
 		this.preparepopUp();
 	}
 	
@@ -426,68 +832,15 @@ divi.home =  divi.extend(divi.appBase,{
 		popupDiv.empty().superDialog(dlgConfig);
 	}
 	
-	,prepareFormUp:function(lstnCfg){
-		var popupDiv = lstnCfg.scope.retrievePopUpDiv.call(lstnCfg.scope);
-		if(popupDiv && lstnCfg && lstnCfg.tag && lstnCfg.mapTo){
-			var mapTo = lstnCfg.mapTo;
-			popupDiv.empty().superDialog('open');
-			var mydialog = popupDiv.superDialog();
-			var buttons = mydialog.superDialog("option", "buttons");
-			var newButtons = {};
-			$.extend(newButtons,{ 'Submit':{scope:mapTo,fn:mapTo.submitForm}},buttons);
-			mydialog.superDialog("option", "buttons", newButtons);
-			mapTo.showContent(popupDiv);
-		}
-	}
 	
 	,readBook:function(data){
 		if(data){
 			var master_json = JSON.parse(data);
 			if(master_json){
 				this.book.load(master_json);
-				this.showTree();
+				this.prepareSideBar(home.book);
 			}
 		}
-	}
-	
-	,fetchTree:function(obj,cb){
-		var output = home.book.retrieveTree();
-		cb.call(this,output);
-	}
-	
-	,showTree:function(){
-		$('#jstree_demo').jstree({
-			  "core" : {
-			    "animation" : 0,
-			    "check_callback" : true,
-			    "themes" : { "stripes" : true },
-			    'data' :this.fetchTree /* function (obj, cb) {
-	            		cb.call(this,['Root 1', 'Root 2']);
-	              }*/
-			  },
-			  "types" : {
-			    "#" : {
-			      "max_children" : 1, 
-			      "max_depth" : 2, 
-			      "valid_children" : ["root"]
-			    },
-			    "root" : {
-			      "icon" : "assets/images/tree_icon.png",
-			      "valid_children" : ["default"]
-			    },
-			    "default" : {
-			      "valid_children" : ["default","file"]
-			    },
-			    "file" : {
-			      "icon" : "glyphicon glyphicon-file",
-			      "valid_children" : []
-			    }
-			  },
-			  "plugins" : [
-			    "contextmenu", "dnd", "search",
-			    "state", "types", "wholerow"
-			  ]
-			});
 	}
 	
 	,bookreadFail:function(){
@@ -500,19 +853,27 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,defaultListeners:function(){
-		return [{tag:'.btnAthr',listType:'click',scope:this,mapTo:this.book,listenerFn:'prepareFormUp'},
-		        {tag:'.btnBkOverview',listType:'click',scope:this,mapTo:this.book,listenerFn:'launchEditor'},
-		        {tag:'.addchapter',listType:'click',scope:this,mapTo:'chapter',listenerFn:'prepareFormUp',add:true}];
+		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
+		        {tag:'.btnBkOverview',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
+		        {tag:'.addchapter',listType:'click',parent:divi.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
+		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
+		        //{tag:this.previewSel,listType:'contextmenu',scope:this,listenerFn:'blockcmMenu'}];
 	}
 	
-	,launchEditor:function(lstnCfg){
-		var popupDiv = '.dialog-html';
-		if(lstnCfg && lstnCfg.tag && (lstnCfg.mapTo || lstnCfg.add)){
-			var tag = lstnCfg.tag;
-			var mapTo = lstnCfg.mapTo;
-			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:mapTo.insert,scope:this},Cancel: {fn:lstnCfg.scope.cancelDailog,scope:lstnCfg.scope}},close: function () {lstnCfg.scope.cancelDailog();}};
-			$(popupDiv).superDialog(dlgConfig);
-			$(popupDiv).superDialog('open').removeClass('hidden');
+	,addcontent:function(cfg){
+		var scope = cfg.mapTo;
+		if(scope){
+			scope.add(scope,null,null,cfg.key);
+		}
+	}
+	
+	,prepareFormUp:function(lstnCfg){
+		this.launchPopUp(lstnCfg.mapTo);
+	}
+	
+	,showEditor:function(lstnCfg){
+		if(lstnCfg && lstnCfg.mapTo){
+			this.launchEditor(lstnCfg.mapTo,lstnCfg.scope);
 		}
 	}
 	
@@ -533,43 +894,23 @@ divi.home =  divi.extend(divi.appBase,{
 		}
 	}
 	
-	
-	,attachListeners:function(){
-		var standardListeners = this.defaultListeners();
-		if (standardListeners != null) {
-			$.each(standardListeners, function(k, v) {
+	,attachListeners:function(listeners){
+		if (listeners != null) {
+			var scope = this;
+			$.each(listeners, function(k, v) {
+				v.scope = v.scope || scope;
 				var callback = v.scope[v.listenerFn];
-				$(v.tag).bind(v.listType,$.proxy(function (d,e,f,g) {
+				$(v.tag).unbind(v.listType).bind(v.listType,$.proxy(function (d,e,f,g) {
 					if(callback){
-						callback.apply(this,[v])};
+						callback.apply(this,[v,d])};
 					}
-				,v.scope));
+				,v.scope)).removeClass('disabled');
 			});
 		}
 	}
-	
-	,retrievePopUpDiv:function(){
-		this.popupDiv = this.popupDiv || $('.popup');
-		return this.popupDiv;
-	}
-	
-	,retrieveEditorDiv:function(){
-		this.editorDiv = this.editorDiv || $('.dialog-html');
-		return this.editorDiv;
-	}
-	
-	,cancelDailog:function(b,e){
-		var jB = $(b);
-		var elem = (jB.hasClass('ui-dialog-content')) ? jB : jB.find("ui-dialog-content");
-		if(elem){
-			elem.superDialog("close");
-		}
-	}
-	
+
 	,insertContent:function(){
 		
 	}
 });
 var home = new divi.home({});
-
-

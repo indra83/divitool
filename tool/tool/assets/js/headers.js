@@ -12,8 +12,17 @@ divi.app.book = new divi.pageBase({
 	}
 });
 
+
+divi.app.topic = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"name", "desc": "Chapter Name", "type": "textfield","isRequired": true},
+		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true}];
+	}
+});
+
 divi.app.chapter = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"name", "desc": "Chapter Name", "type": "textfield","isRequired": true}];
+		 return [{name:"name", "desc": "Name", "type": "textfield","isRequired": true},
+		         {name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true}];
 	}
 });
