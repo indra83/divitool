@@ -3655,7 +3655,6 @@ a {
   list-style: none;
   position: absolute;
   display: none;
-  z-index: 1000;
   background: #ffffff;
   min-width: 220px;
   width: auto;
@@ -5803,7 +5802,6 @@ a {
   list-style: none;
   position: absolute;
   display: none;
-  z-index: 1000;
   background: #ffffff;
   min-width: 220px;
   width: auto;

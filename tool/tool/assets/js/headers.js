@@ -4,7 +4,7 @@ divi.app.book = new divi.pageBase({
 		 return [{name:"name", "desc": "Author Name/Organization Name", "type": "textfield","isRequired": true},
 		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield","isRequired": true},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
-		 	    {name:"License", "desc": "License", "type": "textfield","isRequired": true},
+		 	    {name:"License", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},
 		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true},
 		 	    {name:"bookId", "desc": "Book Version", "type": "numberfield",hidden:true},
 		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true}
@@ -15,14 +15,15 @@ divi.app.book = new divi.pageBase({
 
 divi.app.topic = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"name", "desc": "Chapter Name", "type": "textfield","isRequired": true},
-		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true}];
+		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
+		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true}];
 	}
 });
 
 divi.app.chapter = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"name", "desc": "Name", "type": "textfield","isRequired": true},
-		         {name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true}];
+		 return [{name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		         {name:"name", "desc": "Name", "type": "textfield","isRequired": true}];
 	}
 });

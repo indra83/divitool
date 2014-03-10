@@ -100,15 +100,92 @@ divi.appBase = divi.extend(divi.base, {
     cmKey:'.contextmenu',
 	popupKey:'.popup',
 	htmlKey:'.dialog-html',
+	comboMaster:{},
+	data:{},
 	
     constructor: function (cfg) {
     	$.extend(this, cfg);
-        divi.appBase.superclass.constructor.call(this);
+    	data = {};
+    	divi.appBase.superclass.constructor.call(this);
         this.startup();
     }
+	
+	
 
 	,startup:function(){
-		
+	}
+	
+	,licenseData:function(){
+		var licenseData = [{description:"CC Attribution (CC BY)",id:"CC Attribution (CC BY)"},
+		  	{description:"CC Attribution - Sharealike (CC BY-SA)",id:"CC Attribution - Sharealike (CC BY-SA)"},
+		  	{description:"CC Attribution - Noderivs (CC BY-ND)",id:"CC Attribution - Noderivs (CC BY-ND)"},
+		  	{description:"CC Attribution - NonCommercial (CC BY-NC)",id:"CC Attribution - NonCommercial (CC BY-NC)"},
+		  	{description:"CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)",id:"CC Attribution - NonCommercial Sharealike (CC BY-NC-SA)"},
+		  	{description:"CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)",id:"CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)"},
+		  	{description:"Public Domain",id:"Public Domain"},
+		  	{description:"GNU Free License",id:"GNU Free License"}];
+		this.setData({'license':licenseData});
+	}
+	
+	,loadinitialCombos:function(){
+		this.stringify();//need this initialize combos.(masterObj);
+	}
+	
+	,loadCombos:function(book){
+		if(book){
+			this.setData({});
+			this.setComboMaster({});
+			this.licenseData();
+			
+		}
+	}
+	
+	,setComboMasterData:function(newObj){
+		if(this.comboKey){
+			var data = this.getComboMaster();
+			if(!data[this.comboKey]){
+				data[this.comboKey] = {};
+			} 
+			data[this.comboKey][newObj.id] = this;
+		}
+	}
+	
+	,setData:function(values){
+		divi.appBase.prototype.data = values;
+	}
+	
+	,setComboMaster:function(values){
+		divi.appBase.prototype.comboMaster = values;
+	}
+	
+	,getData:function(){
+		return divi.appBase.prototype.data;
+	}
+	
+	,getComboMaster:function(){
+		return divi.appBase.prototype.comboMaster;
+	}
+	
+	,getComboMasterValue:function(comboKey,key){
+		var value,combo;
+		if(key){
+			combo = divi.appBase.prototype.comboMaster[comboKey];
+			if(combo){
+				value = combo[key];
+			}
+		}
+		return value;
+	}
+	
+	,setComboData:function(newObj){
+		if(this.comboKey){
+			var data = this.getData();
+			if(!data[this.comboKey]){
+				data[this.comboKey] = [];
+			} 
+			var comboElem = {id:newObj.id,'description': newObj[this.descKey]};
+			data[this.comboKey].push(comboElem);
+		}
 	}
 	
 	,pluralize:function(key){
@@ -204,6 +281,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	treeKey:'tree',
 	cmSelector:undefined,
 	isNew:false,
+	comboKey:undefined,
 	cmDom:undefined,
 	ddEffect:'slide',
 	cmItems:{},
@@ -217,6 +295,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	stdState:{'state':{'opened':false,'selected':false}},
 	listeners:this.listeners,
 	values:{},
+	descKey:'name',
 	isBook:false,
 	selector:undefined,
 	table:'',
@@ -331,7 +410,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,showContent:function(appendTo,showToggle){
 		if(!this.formPanel){
-			this.formPanel = new divi.formPanel({data:this.table,scope:this});
+			this.formPanel = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
 		}
 		if(!this.formPanel.toggle && showToggle){
 			$.extend(this.formPanel,{toggle:true});
@@ -343,16 +422,21 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,submitForm:function(b,e){
 		var scope = this;
-		if(scope.isNew){
-			var key = scope.table;
-			var lookupKey = this.pluralize(key);
-			this.initilizeChild(scope.parent,lookupKey);
-			this.addChild(scope.parent,lookupKey,scope);
-		}
 		var form = scope.formPanel;
 		if(form){
 			var isValidForm = form.validateForm();
 	    	if(isValidForm){
+	    		if(scope.isNew){
+					var values = form.getValues({});
+					var parent = this.getComboMasterValue(this.parent.comboKey,values[this.parent.comboKey]);
+					if(parent){
+						scope.parent = parent;
+						var key = scope.table;
+						var lookupKey = this.pluralize(key);
+						this.initilizeChild(scope.parent,lookupKey);
+						this.addChild(scope.parent,lookupKey,scope);
+					}
+				}
 	    		if(form){
 	    			scope.update(form);
 	    		}
@@ -386,6 +470,10 @@ divi.bookBase = divi.extend(divi.appBase,{
 		return this.values;
 	}
 	
+	,getFieldValue:function(key){
+		return this.values[key];
+	}
+	
 	,draw:function(){
 		if(this.isNew && $.isEmptyObject(this.doms)){
 			this.drawNew();
@@ -413,12 +501,15 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,load:function(data){
 		this.read(data);
+		this.loadinitialCombos(this);//need this initialize combos.
 		this.draw();
 	}
 	
 	,stringify:function(input){
 		var masterObj =  {};
-		this.retrieveBook().prepareData(masterObj);
+		var book = this.retrieveBook() 
+		this.loadCombos(book);
+		book.prepareData(masterObj);
 		return masterObj;
 	}
 	
@@ -539,7 +630,10 @@ divi.bookBase = divi.extend(divi.appBase,{
 				}
 			}
 			var newObj = {};
-			$.extend(newObj,this.getValues());
+			var values = this.getValues();
+			$.extend(newObj,values);
+			this.setComboMasterData(values);
+			this.setComboData(values);
 			this.attachChildren(newObj,'prepareData',true,[true],true);
 			if(isArray){
 				input.push(newObj);
@@ -556,6 +650,8 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.initilizeChild(this,lookupKey);
 			this.addChild(this,key,eachChild);*/
 			this.launchPopUp(eachChild,this);
+			var currId = this.getFieldValue('id');
+			eachChild.formPanel.setValue(this.comboKey, currId);
 		}
 	}
 	
@@ -631,6 +727,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'chapter',
 	sequence:undefined,
+	comboKey:'chapter',
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','ulDiv':'iUlDiv'},
 	childrenKeys:['topics','assessments'],
 	lidDefaults:{tag:"li",'class':"stick bg-yellow",prefix:'sidebar_'},
@@ -737,12 +834,12 @@ divi.topic = divi.extend(divi.bookBase,{
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-tree-view",prefix:'sidebar_'},
+	comboKey:'topic',
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.topic.superclass.constructor.call(this);
 	}
-
-
+	
 	,prepareSideBar:function(parent,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -759,6 +856,7 @@ divi.topic = divi.extend(divi.bookBase,{
 divi.assessment = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'assessment',
+	comboKey:'assessment',
 	sequence:undefined,
 	constructor : function (cfg) {
 		$.extend(this,cfg);
@@ -791,7 +889,7 @@ divi.home =  divi.extend(divi.appBase,{
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
 	}
-	
+
 	,retrieveChapter:function(melem){
 		var tryChap = melem || this;
 		var chap = (tryChap.table === 'chapter') ? tryChap : this.retrieveChapter(tryChap.parent);

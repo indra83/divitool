@@ -756,6 +756,7 @@
 				var defaultText = o.defaultText ? o.defaultText : 'Select a value';
 				var listener = o.listener ? o.listener : 'listener';
 				var name = o.name ?  o.name : "";
+				var rendered = o.rendered ?  o.rendered : false;
 				var minWidth = o.minWidth ? o.minWidth : '180';
 				var isMultiple = o.isMultiple ? o.isMultiple : false;
 				var isRequired = o.isRequired ? o.isRequired : false;
@@ -779,8 +780,9 @@
 						}
 					}
 				}
-				prepareCombo += '</select>';				
-				$("."+dataElement).append(prepareCombo);
+				prepareCombo += '</select>';	
+				$("."+dataElement).empty().append(prepareCombo);
+				
 				if(isMultiple){
 					$('.'+listener).attr("multiple",true)
 				}
@@ -878,6 +880,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     fieldCount:-1,
     isNew:false,
     fieldcmps:{},
+    comboData:{},
     dom:undefined,
     fields:{},
     tableProps:{},
@@ -891,6 +894,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     tText:'',
     submitCls:'',
     toggle:false,
+    rendered:false,
     topbar:true,
     method : 'POST',
     postUrl:'',
@@ -1418,7 +1422,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
 		}
 		this.createToggle(jtableElem);
     	this.appendFormTo(appendToTag);
-    	this.afterFormRender();
+    	
 	}
 	
 	,createToggle:function(jtableElem){
@@ -1446,13 +1450,15 @@ divi.formPanel = divi.extend(divi.panelBase,{
 		}
 		return {height:height,width:width};
 	}
-	
 
 	,appendFormTo:function(appendTo){
 		if(appendTo != null){
 			$(appendTo).append(this.dom);
 			this.setSectionsReadOnly();
 			this.setFocus();
+			//if(!this.rendered){
+				this.afterFormRender();
+			//}
 		}
 	}
 	
@@ -1474,58 +1480,22 @@ divi.formPanel = divi.extend(divi.panelBase,{
 	,afterFormRender: function(){
 		var eachField, scope=this;
     	var elements = this.elementsMap || {}, params=[];
-    	scope.comboFiledData = [];
     	$.each(elements, function(key, element) {
-    		var keysplt = key.split('_');
-			var fieldName = (keysplt.length > 1) ? keysplt[1] : keysplt[0];
-			var prefix = (keysplt.length > 1) ? keysplt[0] : "";
+    		var comboData = scope.comboData;
     		if(element && element.type == "combofield") {
-    			var handler=element.listener ? element.listener : element.name;
-    			$.prepareCombo({defaultText : 'Select a Value',tag : element.name+'DD', name : element.name,listener:handler, minWidth:"176"});
+    			var handler = element.listener ? element.listener : element.name;
+    			$.prepareCombo({defaultText : 'Select a Value',tag : element.name+'DD',data:comboData[handler],name : element.name,listener:handler, minWidth:"176",rendered:this.scope.rendered});
     		}
     		else if(element && element.type=="datefield"){
 				  $("."+element.name+'_date').customDatePicker({format:"yyyy-mm-dd"});
 		  }
     	});
-    	scope.loadComboData(scope.comboFiledData);
+    	this.rendered = true;
 	}
+	
     ,draw:function(appendToTag){
     	this.appendToElement = appendToTag;
     	this.appendFormTo(appendToTag);
-    }
-    ,filterComboData: function(comboVal,o){
-    	var filterListener = o.filterListener;
-    	var key = o.filterKey ? o.filterKey+"id" : "id";
-    	var filterredData = this.filterData({key:key,value:comboVal},this.comboFiledData[filterListener].data);
-    	$("."+filterListener).loadComboData({data:filterredData});
-    }
-    ,filterData: function(op,data){
-		var filtrdData = [];
-		$.each(data, function(i,rec){
-			if(rec.hasOwnProperty(op.key) && op.value==rec[op.key]){
-				filtrdData.push(rec);
-			}
-		});
-		return filtrdData;
-	}
-    ,prepareComboParams:function(name,handler){
-    	var params={params : $.toJSON({key : name}),controllerName : name,resultName : handler};
-    	return params;
-    }
-	,loadComboData:function(params){
-		if(params && params.length>0){
-			divi.core.ajax.call(this, {data : {'data' : $.toJSON(params)},url : "Controllers/combo",succCall : this.onComboLoadSuccess});
-		}
-	},
-	onComboLoadSuccess:function(data){
-		var scope = this;
-		scope.comboFiledData = {};
-		if(data){
-			$.each(data, function(k,v){
-				$("."+k).loadComboData({data:v.data});
-				scope.comboFiledData[k] = v;
-			});
-		}
     }
 });  
 
@@ -1826,6 +1796,8 @@ divi.form.combofield  = divi.extend(divi.baseField, {
 		if(this.isRequired && !divi.util.isEmpty(target)){
 			if(divi.util.isEmpty(target.value)){
 				this.isValid = false;
+			}else{
+				this.isValid = true;
 			}
 		}
 		return this.isValid;

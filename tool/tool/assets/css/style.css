@@ -122,7 +122,8 @@ span{
 }
 
 .input-control .chosen-container{
-	min-width: 176px;
+	width:0px;
+	min-width:300px;
 	min-height: 30px;
 	text-align: left;
 }
@@ -142,7 +143,6 @@ span{
 	color:#545454;
 }
 .input-control .chosen-container-single .chosen-single{
-	height: 25px;
 	color:black;
 }
 .input-control .chosen-container-single .chosen-drop{
@@ -295,15 +295,35 @@ img.toggle{
 	box-shadow: 5px 5px 10px #AAB3C2;
 }
 .metro div.formfield.larger div.input-control input{           
-	width:260px;
+	width:300px;
 	margin-right:30px;
 }
 .metro div.formfield.larger div.input-control.text .btn-clear{
 	margin-right: 5px;
 }
 
-.metro div.formfield.larger div.input-control input{
-	width: 260px;
+.metro div.formfield.larger div.input-control input,.metro .input-control .combofield{
+	width: 300px;
 	margin-right: 0px;
-	padding: 8px;
+}
+
+.metro .ad3iForm .chosen-container{
+	padding:7px 0px 6px 0px;
+
+}
+
+.metro .input-control .chosen-container-single .chosen-drop{
+	margin-top: -7px;
+}
+
+
+.metro .input-control .chosen-container-single .chosen-single{
+	color:black;
+}
+
+metro .chosen-single{
+	-moz-box-sizing: content-box;
+}
+
+.metro div.popup table{
 }
