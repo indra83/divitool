@@ -429,13 +429,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 	    		if(scope.isNew){
 					var values = form.getValues({});
 					var parent = this.getComboMasterValue(this.parent.comboKey,values[this.parent.comboKey]);
-					if(parent){
-						scope.parent = parent;
-						var key = scope.table;
-						var lookupKey = this.pluralize(key);
-						this.initilizeChild(scope.parent,lookupKey);
-						this.addChild(scope.parent,lookupKey,scope);
-					}
+					if(!parent){ parent = this.parent;}
+					scope.parent = parent;
+					var key = scope.table;
+					var lookupKey = this.pluralize(key);
+					this.initilizeChild(scope.parent,lookupKey);
+					this.addChild(scope.parent,lookupKey,scope);
 				}
 	    		if(form){
 	    			scope.update(form);
@@ -547,7 +546,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		 }else{
 			 alert("Please Contact administrator. Could not save the changes");
 		 }
-		
 	}
 	
 	,setValues:function(updated){
@@ -651,7 +649,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.addChild(this,key,eachChild);*/
 			this.launchPopUp(eachChild,this);
 			var currId = this.getFieldValue('id');
-			eachChild.formPanel.setValue(this.comboKey, currId);
+			if(this.comboKey){
+				eachChild.formPanel.setValue(this.comboKey, currId);
+			}
 		}
 	}
 	
@@ -698,8 +698,7 @@ divi.book = divi.extend(divi.bookBase,{
 		divi.book.superclass.constructor.call(this);
 	}
 	
-	,drawonScreen:function(){
-		var values = this.getValues();
+	,drawonScreen:function(values){
 		var mainKey = "";
 		for(var key in values){
 			if(values.hasOwnProperty(key)){
@@ -710,9 +709,13 @@ divi.book = divi.extend(divi.bookBase,{
 	}
 
 	,draw:function(){
-		this.drawonScreen();
-		$(this.prviwForm).removeClass('button').empty().off('click');
-		this.showContent(this.prviwForm,true);
+		var values = this.getValues();
+		if(!divi.util.isEmptyObject(values)){
+			this.drawonScreen(values);
+			$(this.prviwForm).removeClass('button').empty().off('click');
+			this.showContent(this.prviwForm,true);
+		}
+		
 	}
 	
 	,prepareSideBar:function(parent){
@@ -938,6 +941,8 @@ divi.home =  divi.extend(divi.appBase,{
 				this.book.load(master_json);
 				this.prepareSideBar(home.book);
 			}
+		}else{
+				this.book.load({});
 		}
 	}
 	

@@ -16,14 +16,22 @@ divi.app.book = new divi.pageBase({
 divi.app.topic = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
-		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true},
 		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true}];
+	}
+});
+
+divi.app.assessment = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
+		         {name:"id", "desc": "Assessment ID", "type": "numberfield","isRequired": true},
+		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true}];
 	}
 });
 
 divi.app.chapter = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		 return [{name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true},
 		         {name:"name", "desc": "Name", "type": "textfield","isRequired": true}];
 	}
 });

@@ -826,11 +826,20 @@ divi.util = {
 		return value;
 	}
 	
+	,isEmptyObject:function(values){
+		var isEmpty = true;
+		if(values){
+			for(var key in values){
+				if(values.hasOwnProperty(key)){
+					if(values[key]){isEmpty = false;break;}
+				}
+			}
+		}
+		return isEmpty;
+	}
+	
 	,isEmpty : function(v){
 	    return v === null || v === undefined || v == "";
-	}
-	,isEmptyObject :function(v){	
-		return (!v || Object.keys(v).length === 0);
 	}
 
 	,callSections:function(multiForm,sections,callBack,options){
