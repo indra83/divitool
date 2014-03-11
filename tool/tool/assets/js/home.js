@@ -258,6 +258,7 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,launchPopUp:function(instance){
 		if(instance){
+			instance.home.preparepopUp.call(instance.home);
 			var popupDiv = this.retrievePopUpDiv();
 			var mydialog = popupDiv.superDialog();
 			var buttons = mydialog.superDialog("option", "buttons");
@@ -511,10 +512,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		book.prepareData(masterObj);
 		return masterObj;
 	}
-	
-	,add:function(event,val,jTarget,key){}
-	,edit:function(event,val,jTarget){}
-	,deletefn:function(event,val,jTarget,key){}
+
 	,persist:function(url, file){
 		var formData = new FormData();
 	    formData.append(file.name, file, file.name);
@@ -647,7 +645,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			/*var lookupKey = this.pluralize(key);
 			this.initilizeChild(this,lookupKey);
 			this.addChild(this,key,eachChild);*/
-			this.launchPopUp(eachChild,this);
+			this.launchPopUp.call(eachChild,eachChild);
 			var currId = this.getFieldValue('id');
 			if(this.comboKey){
 				eachChild.formPanel.setValue(this.comboKey, currId);
@@ -710,8 +708,8 @@ divi.book = divi.extend(divi.bookBase,{
 
 	,draw:function(){
 		var values = this.getValues();
+		this.drawonScreen(values);
 		if(!divi.util.isEmptyObject(values)){
-			this.drawonScreen(values);
 			$(this.prviwForm).removeClass('button').empty().off('click');
 			this.showContent(this.prviwForm,true);
 		}
@@ -821,8 +819,8 @@ divi.chapter = divi.extend(divi.bookBase,{
 		dflts = $.extend(this.aDefaults,{value:this.prepareValue(values['name']),scope:this,listeners:this.listeners});
 		aDiv = this.doms[this.divs['aDiv']] = divi.domBase.create(dflts,livDiv.dom);
 		aDiv.dom.setAttribute('id',aDiv.id);
+		ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create($.extend(this.ulDefaults,{scope:this}),livDiv.dom);
 		if(this.hasChildren){
-			ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create($.extend(this.ulDefaults,{scope:this}),livDiv.dom);
 			this.attachChildren(ulDiv.dom,'prepareSideBar',false,false);
 		}
 	}
@@ -924,7 +922,6 @@ divi.home =  divi.extend(divi.appBase,{
 		this.loadBook();
 		this.initiliazeEditor();
 		this.attachListeners(this.defaultListeners());
-		this.preparepopUp();
 	}
 	
 	,preparepopUp:function(lstnCfg){
@@ -935,15 +932,12 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	
 	,readBook:function(data){
+		var master_json = {};
 		if(data){
-			var master_json = JSON.parse(data);
-			if(master_json){
-				this.book.load(master_json);
-				this.prepareSideBar(home.book);
-			}
-		}else{
-				this.book.load({});
+			master_json = JSON.parse(data);
 		}
+		this.book.load(master_json);
+		this.prepareSideBar(home.book);
 	}
 	
 	,bookreadFail:function(){
