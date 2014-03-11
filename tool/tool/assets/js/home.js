@@ -277,6 +277,9 @@ divi.appBase = divi.extend(divi.base, {
 
 divi.bookBase = divi.extend(divi.appBase,{
 	home:undefined,
+	idPrefix:undefined,
+	idCount:undefined,
+	padMax:3,
 	fileName:'master.json',
 	events:['click','contextmenu'],
 	treeKey:'tree',
@@ -482,8 +485,24 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
+	,prepareCompleteId:function(){
+		var rtnId;
+		if(this.table == 'chapter'){
+			rtnId = this.getValues()['id'];
+		}else{
+			rtnId = this.prepareCompleteId.call(this.parent);
+		}
+		return !rtnId? '' : rtnId+"_" ;
+	}
+	
+	,prepareId:function(){
+		var prefix = this.idPrefix;
+		var id = this.idPrefix+this.prepareCompleteId()+divi.util.pad(this.getCount(),this.padMax);
+		return id;
+	}
+	
 	,drawNew:function(){
-		var parDom = this.parent.doms[this.parent.divs['ulDiv']].dom;
+		var parDom = this.parent.doms[this.parent.divs['ulDiv']].dom;	
 		var currKey = this.pluralize(this.table);
 		var children = this.parent.children[currKey];
 		if(children){
@@ -492,7 +511,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.isNew = false;
 		}
 	}
-
 	
 	,drawUpdate:function(){
 		
@@ -567,6 +585,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var input = input  || this;
 		if(key && input.children[key]){
 			input.children[key].push(child);
+			child.addToCount();
 		}
 	}
 	
@@ -650,6 +669,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			if(this.comboKey){
 				eachChild.formPanel.setValue(this.comboKey, currId);
 			}
+			eachChild.formPanel.setValue('id', eachChild.prepareId());
 		}
 	}
 	
@@ -679,6 +699,24 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.readEachChild(currElem,currKey);
 		}
 	}
+	
+	,getCount:function(){
+		return divi[this.table].prototype.idCount;
+	}
+	
+	,addToCount:function(){
+		var cnt = this.getCount();
+		if(cnt >= 0){
+			this.setCount(cnt+1);
+		}
+	}
+	
+	,setCount:function(id){
+		if(id){
+			divi[this.table].prototype.idCount = id;
+		}
+	}
+	
 });
 
 divi.book = divi.extend(divi.bookBase,{
@@ -727,6 +765,8 @@ divi.book = divi.extend(divi.bookBase,{
 divi.chapter = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'chapter',
+	idPrefix:'',
+	idCount:1,
 	sequence:undefined,
 	comboKey:'chapter',
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','ulDiv':'iUlDiv'},
@@ -742,6 +782,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 		this.cmItems = {'Add Topic':{fn:this.add,key:'topic'},'Add Assessment':{fn:this.add,key:'assessment'},'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
 	}
+	
 	
 	,beforeDelete:function(event,val,jTarget){
 		var lookupKey = this.pluralize(this.table);
@@ -830,6 +871,8 @@ divi.chapter = divi.extend(divi.bookBase,{
 divi.topic = divi.extend(divi.bookBase,{
 	parent:undefined,
 	table:'topic',
+	idPrefix:'t',
+	idCount:1,
 	sequence:undefined,
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
@@ -839,6 +882,13 @@ divi.topic = divi.extend(divi.bookBase,{
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.topic.superclass.constructor.call(this);
+	}
+	
+	,getValues:function(){
+		var values = {};
+		$.extend(values,this.values);
+		delete values.chapter;
+		return values;
 	}
 	
 	,prepareSideBar:function(parent,currKey,index){
@@ -856,12 +906,21 @@ divi.topic = divi.extend(divi.bookBase,{
 
 divi.assessment = divi.extend(divi.bookBase,{
 	parent:undefined,
+	idPrefix:'a',
+	idCount:0,
 	table:'assessment',
 	comboKey:'assessment',
 	sequence:undefined,
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
+	}
+
+	,getValues:function(){
+		var values = {};
+		$.extend(values,this.values);
+		delete values.chapter;
+		return values;
 	}
 
 	,prepareSideBar:function(parent,currKey,index){

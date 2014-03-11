@@ -815,6 +815,11 @@ divi.util = {
 		return (!id && id < 0);
 	}
 
+	,pad:function(str, max) {
+	  str = str.toString();
+	  return str.length < max ? divi.util.pad("0" + str, max) : str;
+	}
+
 	,fetchValue:function(json,key,prefix){
 		var value;
 		if(prefix){
