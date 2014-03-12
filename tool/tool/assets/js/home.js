@@ -101,6 +101,8 @@ divi.appBase = divi.extend(divi.base, {
 	popupKey:'.popup',
 	htmlKey:'.dialog-html',
 	comboMaster:{},
+	getFileAction:'/getfiles',
+	savefileAction:'/savefile/',
 	data:{},
 	
     constructor: function (cfg) {
@@ -109,8 +111,6 @@ divi.appBase = divi.extend(divi.base, {
     	divi.appBase.superclass.constructor.call(this);
         this.startup();
     }
-	
-	
 
 	,startup:function(){
 	}
@@ -273,14 +273,12 @@ divi.appBase = divi.extend(divi.base, {
     
 });
 
-
-
 divi.bookBase = divi.extend(divi.appBase,{
 	home:undefined,
 	idPrefix:undefined,
 	idCount:undefined,
 	padMax:3,
-	fileName:'master.json',
+	masterFile:'master.json',
 	events:['click','contextmenu'],
 	treeKey:'tree',
 	cmSelector:undefined,
@@ -492,12 +490,16 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}else{
 			rtnId = this.prepareCompleteId.call(this.parent);
 		}
-		return !rtnId? '' : rtnId+"_" ;
+		return !rtnId? '' : rtnId;
 	}
 	
 	,prepareId:function(){
 		var prefix = this.idPrefix;
-		var id = this.idPrefix+this.prepareCompleteId()+divi.util.pad(this.getCount(),this.padMax);
+		var parentId = this.prepareCompleteId();
+		if(parentId){
+			parentId += "_";
+		}
+		var id = this.idPrefix+parentId+divi.util.pad(this.getCount(),this.padMax);
 		return id;
 	}
 	
@@ -557,8 +559,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 			 window.URL = window.webkitURL || window.URL;
 	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
 	         var file = new Blob([JSON.stringify(this.stringify(), undefined, 2)]);
-	         file.name = this.fileName;
-	         book.persist('/savefile/',file);
+	         file.name = this.masterFile;
+	         book.persist(this.savefileAction,file);
+	         this.persistChild();
 		 }else{
 			 alert("Please Contact administrator. Could not save the changes");
 		 }
@@ -632,6 +635,26 @@ divi.bookBase = divi.extend(divi.appBase,{
 			eachChild = currChildren[i];
 			var params = [input,currKey,i].concat(addParams).concat([skipChildren]);
 			eachChild[callback].apply(eachChild,params);
+		}
+	}
+	
+	,persistChild:function(){
+		var url = this.savefileAction;
+		if(this.fileName){
+			var elemId,eachElem,elements = this.elements;
+			elemId =  this.getFieldValue('id');
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="' + elemId+ '"/>');
+			for(var index = 0; index  < elements.length;index++){
+				eachElem = elements[index];
+				if(eachElem){
+					
+				}
+			}
+			var chapterId = this.prepareCompleteId();
+			url += "/"+chapterId+"/"+elemId;
+			var file = new Blob([jsxml.toXml(dom)]);
+			file.name = this.fileName;
+			this.persist(url,file);
 		}
 	}
 	
@@ -870,6 +893,8 @@ divi.chapter = divi.extend(divi.bookBase,{
 
 divi.topic = divi.extend(divi.bookBase,{
 	parent:undefined,
+	fileName:'topic.xml',
+	elements:[],
 	table:'topic',
 	idPrefix:'t',
 	idCount:1,
@@ -879,6 +904,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-tree-view",prefix:'sidebar_'},
 	comboKey:'topic',
+	
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.topic.superclass.constructor.call(this);
@@ -890,6 +916,7 @@ divi.topic = divi.extend(divi.bookBase,{
 		delete values.chapter;
 		return values;
 	}
+	
 	
 	,prepareSideBar:function(parent,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
@@ -999,13 +1026,18 @@ divi.home =  divi.extend(divi.appBase,{
 		this.prepareSideBar(home.book);
 	}
 	
-	,bookreadFail:function(){
-		alert("Unable to read the book. Please contact administrator");
+	,bookreadFail:function(r){
+		if(r.status == "404"){
+			this.book.persistData();
+			this.prepareSideBar(this.book);
+		}else{
+			alert("Unable to read the book. Please contact administrator");
+		}
 	}
 	
 	,loadBook:function(){
 		var scope = this;
-		$.ajax({url: divi.core.prepareUrl('/getfiles',"master.json"),}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
+		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.masterFile),}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
 	}
 	
 	,defaultListeners:function(){
