@@ -80,7 +80,15 @@ span{
 }
 
 .buttonsList{
-	height:10%;
+	height:13%;
+}
+
+.editContent{
+	height:5%;
+}
+
+.dottedLine{
+	border-bottom:dotted 1px;
 }
 
 .txBold{
@@ -92,16 +100,17 @@ span{
 	
 }
 .bookcontent .bookPreview{
-	width:18%;
+	width:21%;
 	border-right:solid 2px gray;
 	float: left;
 	height:100%;
 }
 
 .bookcontent .contentEditor{
-	width:81.75%;
+	width:77.75%;
 	float:right;
 	height:100%;
+	margin-left:1%;
 	margin-top:-1%;
 }
 

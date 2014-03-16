@@ -2180,8 +2180,6 @@ a {
   font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
   font-size: 14px;
   line-height: 16px;
-  height: 92px;
-  width: 92px;
   text-align: center;
   font-size: 12pt;
   border: 0;
@@ -2920,7 +2918,6 @@ a {
 }
 .metro .input-control.text input,
 .metro .input-control.password input,
-.metro .input-control.file input,
 .metro .input-control.email input,
 .metro .input-control.tel input {
   border: 1px #d9d9d9 solid;
@@ -3143,14 +3140,7 @@ a {
 .metro .input-control.file {
   overflow: hidden;
 }
-.metro .input-control.file input[type="file"] {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-  bottom: 0;
-  right: 0;
-}
+
 .metro input[type="button"],
 .metro input[type="submit"],
 .metro input[type="reset"] {

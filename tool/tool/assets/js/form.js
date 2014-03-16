@@ -1031,11 +1031,15 @@ divi.formPanel = divi.extend(divi.panelBase,{
     ,getValues:function(options){
 		var form = options.form || this;
     	var values = {},filterValues={},eachField,value;
+    	form.files = [];
     	for(var key in form.elementsMap){
     		if(form.elementsMap.hasOwnProperty(key)){
     			eachField = form.elementsMap[key];
     			if(eachField){
     					value = eachField.getValue();
+    					if(eachField.isFileField){
+    						form.files = form.files.concat(eachField.files);
+    					}
 	    				if(eachField.isEncrypt){
 	    					value = $.base64.encode(value);
     				}
@@ -1276,10 +1280,9 @@ divi.formPanel = divi.extend(divi.panelBase,{
     			}
     			this.tableProps[splts.table]['identityCols'].push(eachField.name);
     		}
-    		if(type == "image" || type == "file"){
+    		if(type == "imagefield" || type == "videofield" || type == "imagefield"  || type == "file"){
     			this.isFileUpload = true;
     			this.fileFields.push(elem);
-    			$.extend(eachField,{hidden:true});
     		}
     		elem = new checkElem(eachField);
     	}
@@ -1881,55 +1884,144 @@ divi.form.formlabel  = divi.extend(divi.baseField, {
 	}
 });
 
-divi.form.image  = divi.extend(divi.baseField, {
-	tag:'img',
-	fieldType:'file',
-	baseCss:'pic',
-	isFormField:true,
-	init:function(cfg){
-		$.extend(this,cfg);
-		divi.form.image.superclass.init.call(this);
-	}
-	,configureFieldElement:function(options){
-		var inputTxt = {};
-		this.tag = "input";
-		options.attribs.push({name:"style", value:"position:relative; width:60%; height:85%;"});
-		options.attribs.push({name:"id", value:"uploadimage"});
-		options.attribs.push({name:"name", value:"sampleImage"});
-		options.attribs.push({name:"accept", value:"image/jpeg"});
-		inputTxt.inputCfg = [{tag:this.tag, attribs:options.attribs}];
-		inputTxt.buttonCfg = this._createBtnCfg("btn-file", options.btnID);
-		options.cls = "file";
-		options.role = "input-control";
-		inputTxt.divAttribs = this._createDivCtrlAttrib(options);
-		return inputTxt;
-	}
-});
 
-divi.form.file  = divi.extend(divi.baseField, {
-	tag:'img',
-	fieldType:'file',
-	baseCss:'pic',
-	isFormField:true,
+
+divi.form.file = divi.extend(divi.baseField, {
+	events:['change'],
+	files:[],
+	validTypes:[],
+	defaults:{tag:"input",type: 'file',attachLis:true},
+	inputDivdflts:{tag:"div","class":"input-control file"},
+	lbldfts:{tag:"label","class":"labelStyle",attachLis:false},
+	spnDefaults:{tag:"span","class": 'bg-darkCobalt fg-white upload'},
+	spanText:'Upload a File',
+	outputDvDflts:{tag:"div","class":"fileUploadbox"},
+	innerDvDflts:{tag:"div","class":"fileUpload file"},
+	innerDiv:'innerDiv',
+	isFileField:true,
 	init:function(cfg){
 		$.extend(this,cfg);
 		divi.form.file.superclass.init.call(this);
 	}
-	,configureFieldElement:function(options){
-		var inputTxt = {};
-		this.tag = "input";
-		options.attribs.push({name:"style", value:"position:relative; width:60%; height:85%;"});
-		options.attribs.push({name:"id", value:"uploadimage"});
-		options.attribs.push({name:"name", value:"sampleImage"});
-		options.attribs.push({name:"accept", value:"image/jpeg"});
-		inputTxt.inputCfg = [{tag:this.tag, attribs:options.attribs}];
-		inputTxt.buttonCfg = this._createBtnCfg("btn-file", options.btnID);
-		options.cls = "file";
-		options.role = "input-control";
-		inputTxt.divAttribs = this._createDivCtrlAttrib(options);
-		return inputTxt;
+	
+	,setEditable:function(){
+		var name = this.name;
+		var tag = this.tag;
+		var value;
+		var field = this.retrieveJInputDom();		
+		if(field){
+			this.setEditableCss(field);
+		}
+	}
+	
+	,draw:function(options,parent){
+		var parDom,labeldiv,lblDfts,text,inputDiv,dflts;
+		var attribs = [];
+		
+		var mainDiv = divi.domBase.create({tag:'div'},parent);
+		if(mainDiv && mainDiv.dom){
+			this.dom = parDom = mainDiv.dom;
+			this.elemId = mainDiv.id;
+			parDom.setAttribute("class",this.defaultCss+this.checkHidden()+this.addLarger());
+			var inputDiv = this.createInputDiv(options,parDom);
+			var labelDom = this.createLabel(options,inputDiv);
+			this.createField(options,inputDiv);
+			this.setProperties(options);
+		}
+	}
+	
+	,setValue:function(value){
+		this.value = value;
+	}
+	
+	,validateField:function(event,value,jTarget){
+		var target = divi.util.getTarget(event);
+		var isValid = this.checkValid(target,jTarget,value);
+		if(isValid){
+			this.readData(event,value,jTarget,target);
+			this.setValue(this.files[0].name);
+		}
+		return isValid;
+	}
+	
+	,readData:function(event,targetVal,jTarget,target){
+		this.files = [target.files[0]];
+	}
+	
+	,checkValid:function(target,jTarget,value){
+		var isValid = true;
+		if(target){
+			var files = target .files;
+			if(files && files.length > 0){
+				var baseFile = files[0];
+				if(baseFile && !$.isEmptyObject(this.validTypes)){
+					if(this.validTypes.indexOf(baseFile.type) == -1){
+						isValid = false;
+					}
+					if(!isValid && this.isRequired && !divi.util.isEmpty(target)){
+						jTarget.remove();
+						var inputDiv = this.doms[this.inputDiv];
+						this.createField({},inputDiv.dom);
+						alert('File format is not expected.Please select relevent file');
+					}
+				}
+			}
+			this.isValid = isValid;
+		}
+		return this.isValid;
+		
+	}
+	
+	,setProperties:function(options){
+		var input = this.doms[this.inputdom];
+		if(input){
+			input.dom.setAttribute('id',input.id);
+			input.dom.setAttribute('name',this.name);
+		}
+	}
+	
+	,createField:function(options,parDom){
+		var dflts,inputdom,buttonDiv;
+		dflts = $.extend({},this.defaults,{disabled:this.isReadOnly,scope:this,tabIndex:this.tabIndex});
+		inputdom = divi.domBase.create(dflts,parDom);
+		this.doms[this.inputdom] = inputdom;
+	}
+	
+	,createInputDiv:function(options,parent){
+		var dflts = $.extend({},this.inputDivdflts,{scope:this});
+		var inputDiv = divi.domBase.create(dflts,parent);
+		this.doms[this.inputDiv] = inputDiv;
+		return inputDiv.dom;
 	}
 });
+
+
+divi.form.videofield  = divi.extend(divi.form.file, {
+	validTypes:['video/mp4'],
+	isFormField:true,
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.videofield.superclass.init.call(this);
+	}
+});
+
+divi.form.audiofield  = divi.extend(divi.form.file, {
+	validTypes:['audio/mp3'],
+	isFormField:true,
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.audiofield.superclass.init.call(this);
+	}
+});
+
+divi.form.imagefield  = divi.extend(divi.form.file, {
+	validTypes:['image/png','image/jpg','image/jpeg'],
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.imagefield.superclass.init.call(this);
+	}
+});
+
 
 
 divi.button  = divi.extend(divi.baseField, {
