@@ -41,7 +41,7 @@ divi.app.references = new divi.pageBase({
 		 return [{name:"source", "desc": "Author Name/ID/Organization Name", "type": "textfield"},
 		         {name:"name", "desc": "Name/Title", "type": "textfield"},
 		         {name:"url","desc": "Website URL", "type": "textfield"},
-		         {name:"License", "desc": "License", "type": "combofield","listener":"license"}];
+		         {name:"license", "desc": "License", "type": "combofield","listener":"license"}];
 	}
 });
 
@@ -59,6 +59,7 @@ divi.app.videoAlone = new divi.pageBase({
 		 return [{name:"src", "desc": "Video File", "type": "videofield","isRequired": true},
 		         {name:"thumb", "desc": "Thumbnail", "type": "imagefield","isRequired": true},
 		         {name:"id", "desc": "Video ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
 		         {name:"title", "desc": "Title", "type": "textfield"},
 		         {name:"url","desc": "URL", "type": "textfield"}];
 	}
@@ -74,4 +75,12 @@ divi.app.audioHybrid = new divi.crossPageBase({
 	 tables:["audioAlone","references"],
 	 sections:{"":{name:"", incAll:["audioAlone","references"]}}
 });
+
+divi.namespace("divi.tpl");
+
+divi.tpl.reference = '<span class="labelheader">Author Name/ID/Organization Name:</span>${source}<span class="labelheader">Name:</span>${name}<span class="labelheader">Website URL:</span>${url}<span class="labelheader">License:</span>${license}';
+divi.tpl.video = '<span class="labelheader">Title:</span>${title}';
+
+
+
 
