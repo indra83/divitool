@@ -362,3 +362,13 @@ metro .chosen-single{
 
 .metro div.popup table{
 }
+
+span.labelheader{
+	width:150px;
+	font-weight: bold;
+}
+
+span.lblValue{
+	width:150px;
+	margin:0px 5px;
+}

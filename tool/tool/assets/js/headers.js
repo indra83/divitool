@@ -78,8 +78,10 @@ divi.app.audioHybrid = new divi.crossPageBase({
 
 divi.namespace("divi.tpl");
 
-divi.tpl.reference = '<span class="labelheader">Author Name/ID/Organization Name:</span>${source}<span class="labelheader">Name:</span>${name}<span class="labelheader">Website URL:</span>${url}<span class="labelheader">License:</span>${license}';
-divi.tpl.video = '<span class="labelheader">Title:</span>${title}';
+divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Author Name/ID/Organization Name:</span><span class="lblValue">${source}</span></div><div class="formfield larger"><span class="labelStyle">Name:</span><span class="lblValue">${name}</span></div><div class="formfield larger"><span class="labelStyle">Website URL:</span><span class="lblValue">${url}</span></div><div class="formfield larger"><span class="labelStyle">License:</span><span class="lblValue">${license}</span></div>';
+divi.tpl.video = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
+divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
+divi.tpl.eachHeader = '<div class="previewElem"></div>'
 
 
 

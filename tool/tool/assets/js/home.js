@@ -98,6 +98,7 @@ function guid() {
 divi.appBase = divi.extend(divi.base, {
     title: '',
     padMax:3,
+    contentPreview:'.contentPreview',
     contents:{},
     cmKey:'.contextmenu',
     //fileFields:['videofield','audiofield','imagefield'],
@@ -284,7 +285,6 @@ divi.appBase = divi.extend(divi.base, {
 	,persistChild:function(){
 		var scope = this.elements ? this : this.parent;
 		if(scope && scope.fileName){
-			var url = scope.savefileAction;
 			var eachSet;
 			var elemId,eachElem;
 			var elements = scope.elements;
@@ -300,13 +300,22 @@ divi.appBase = divi.extend(divi.base, {
 					files = files.concat(elemFiles);
 				}
 			}
-			var chapterId = scope.prepareCompleteId();
-			url += "/"+chapterId+"/"+elemId;
+			
+			var url = this.prepareFilePath(this,url);
 			var file = new Blob([jsxml.toXml(dom)]);
 			file.name = scope.fileName;
 			scope.persist(url,file);
 			scope.persist(url,files,true);
 		}
+	}
+	
+	,prepareFilePath:function(scope,url,action){
+		url = url || "";
+		url = action || scope.savefileAction;
+		var elemId =  scope.getFieldValue('id');
+		var chapterId = scope.prepareCompleteId();
+		url += "/"+chapterId+"/"+elemId;
+		return url;
 	}
 	
 	,getCount:function(){
@@ -430,19 +439,33 @@ divi.appBase = divi.extend(divi.base, {
 
 divi.elementbase = divi.extend(divi.appBase,{
 	table:'',
-	ignoreFields:['id','src','thumb'],
+	elemTable:'eachHeader',
+	ignoreFields:['id','src','thumb','references'],
 	referenceFields:['source','name','url','license'],
-	tpl:undefined,	
+	tpl:undefined,
+	elemTpl:undefined,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.elementbase.superclass.constructor.call(this);
 		this.initialTpl();
+		this.initElemTpl();
+	}
+
+	,initElemTpl:function(){
+		var table = this.elemTable;
+		this.elemTpl = currTpl = divi.tpl[table];
+		if(currTpl){
+			$.template(table,currTpl);
+		}
 	}
 
 	,initialTpl:function(){
-		
+		var table = this.table;
+		this.tpl = currTpl = divi.tpl[table];
+		if(currTpl){
+			$.template(this.table,currTpl);
+		}
 	}
-	
 	,initializeValues:function(){
 		var table = divi.app[this.table];
 		var eachCfg,condition;		
@@ -470,15 +493,61 @@ divi.elementbase = divi.extend(divi.appBase,{
 		
 	}
 	
-	,drawElement:function(sel){
-		if(sel){
-			
+	,drawElement:function(selector){
+		var currSel = selector;
+		if(selector && this.tpl){
+			var values = this.getValues();
+			if(this.reference){
+				this.previewElement(values,selector);
+				currSel =  elemDom = $('<div class="contentElem place-right"></div>');
+				selector.append(elemDom);
+				this.reference.drawElement(currSel);
+			}
+			var results = $.tmpl(this.table,values);
+			currSel.append(results);
 		}
-		
+	}
+	
+	,loadElement:function(currNode,appendSel){
+		var values = {};
+		var children = currNode.children;
+		var attributes = currNode.attributes;
+		var refNode;
+		if(children){
+			for(var index = 0;index < children.length;index++){
+				var key = children[index];
+				if(key.tagName == "references"){
+					refNode = key;
+				}else{
+					values[key.tagName] = key.textContent;
+				}
+			}
+			for(var index = 0;index < attributes.length;index++){
+				var key = attributes[index];
+				values[key.nodeName] = key.nodeValue;
+			}
+			this.setValues(values);
+			if(this.reference){
+				this.reference.loadElement(refNode,appendSel);
+				var elemDom = $.tmpl(this.elemTable,{});
+				appendSel.append(elemDom);
+				this.drawElement(elemDom);
+			}
+		}
+	}
+	
+	,previewElement:function(values,appendSel){
+		var tag = document.createElement(this.table);
+		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
+		if(values['src']){
+			tag.setAttribute('src',url+'/'+values['src']);
+			tag.setAttribute('controls','');
+		}
+		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
 	}
 
 	,persistData:function(){
-		   this.persistChild();
+		  this.persistChild();
 	}
 	
 	,setValues:function(updated){
@@ -504,16 +573,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		
 	}
 	
-	,drawElement:function(selector){
-		if(selector && this.tpl){
-			var values = this.getValues();
-			var results = $.tmpl(this.table,values);
-			selector.append(results);
-			if(this.reference){
-				this.reference.drawElement(selector);
-			}
-		}
-	}
+	
 	
 	,prepareDomValues:function(dom,child,values,parent){
 		var key,val;
@@ -615,13 +675,6 @@ divi.element = divi.extend(divi.elementbase,{
 		this.reference = new divi.references({parent:this});
 	
 	}
-	,initialTpl:function(){
-		var table = this.table;
-		var currTpl = divi.tpl[table];
-		if(currTpl){
-			$.template(this.table,currTpl);
-		}
-	}
 });
 
 divi.video = divi.extend(divi.element,{
@@ -641,7 +694,7 @@ divi.audio = divi.extend(divi.element,{
 	idPrefix:'aud',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		divi.video.superclass.constructor.call(this);
+		divi.audio.superclass.constructor.call(this);
 	}
 });
 
@@ -736,13 +789,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		if(this.cmDom){
 			this.getSelector(this.cmKey).hide().empty().append(this.cmDom.dom).css({top: event.pageY + "px", left: event.pageX + "px"}).show();
 		}
-		/*
-		$(document).on("contextmenu", function(event) { 
-			event.preventDefault();
-			
-		}).on("click", function(event) {$(".contextmenu").hide();});*/
-		 /*
-		*/
 	}
 	
 	,onCmClick:function(event,val,jTarget){
@@ -995,6 +1041,35 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
+	,loadFile:function(){
+		var scope = this;
+		var url = this.prepareFilePath(this,null,this.getFileAction);
+		$.ajax({dataType: "xml",url:divi.core.prepareUrl(url,this.fileName)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+	}
+	
+	,readFile:function(data){
+		var topicChild = data.firstChild;
+		if(topicChild){
+			var selected = this;
+			var parentCont = this.getSelector(this.contentPreview);
+			parentCont.empty();
+			selected.elements = [];//resetting the elems
+			var eachChild,eachElem,children = topicChild.children;
+			for(var index = 0; index  < children.length;index++){
+				eachChild = children[index];
+				if(eachChild){
+					var key = eachChild.tagName;
+					var eachElem = new divi[key]({parent:selected,home:selected.home});
+					eachElem.loadElement(eachChild,parentCont);
+				}
+			}
+		}
+	}
+	
+	,readFileFail:function(data){
+		
+	}
+	
 });
 
 divi.book = divi.extend(divi.bookBase,{
@@ -1173,6 +1248,9 @@ divi.topic = divi.extend(divi.bookBase,{
 	}
 	
 	
+	
+	
+	
 	,prepareSideBar:function(parent,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -1228,7 +1306,6 @@ divi.home =  divi.extend(divi.appBase,{
 	callback:undefined,
 	selector:'textarea.html_input',
 	previewSel:'.treepreview',
-	contentPreview:'.contentPreview',
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
 	}
@@ -1256,15 +1333,7 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,previewContent:function(selected){
 		if(selected && selected.table == 'topic'){
-			var parentCont = this.getSelector(this.contentPreview);
-			var elements = selected.elements;
-			parentCont.empty();
-			for(var index = 0; index  < elements.length;index++){
-				eachElem = elements[index];
-				if(eachElem){
-					eachElem.drawElement(parentCont);
-				}
-			}
+			selected.loadFile();
 		}
 	}
 	
@@ -1334,7 +1403,7 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,loadBook:function(){
 		var scope = this;
-		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.masterFile),}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
+		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
 	}
 	
 	,defaultListeners:function(){
