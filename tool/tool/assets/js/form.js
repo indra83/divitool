@@ -1796,7 +1796,7 @@ divi.form.combofield  = divi.extend(divi.baseField, {
 	}
 	,checkValid:function(target,value){
 		target = this.retrieveInputDom();
-		if(this.isRequired && !divi.util.isEmpty(target)){
+		if(this.isRequired && !divi.util.isjQEmpty(target)){
 			if(divi.util.isEmpty(target.value)){
 				this.isValid = false;
 			}else{
@@ -1958,10 +1958,11 @@ divi.form.file = divi.extend(divi.baseField, {
 					if(this.validTypes.indexOf(baseFile.type) == -1){
 						isValid = false;
 					}
-					if(!isValid && this.isRequired && !divi.util.isEmpty(target)){
+					if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
 						jTarget.remove();
 						var inputDiv = this.doms[this.inputDiv];
 						this.createField({},inputDiv.dom);
+						this.setProperties({});
 						alert('File format is not expected.Please select relevent file');
 					}
 				}
@@ -2006,7 +2007,7 @@ divi.form.videofield  = divi.extend(divi.form.file, {
 });
 
 divi.form.audiofield  = divi.extend(divi.form.file, {
-	validTypes:['audio/mp3'],
+	validTypes:['audio/mp3','audio/m4a'],
 	isFormField:true,
 	init:function(cfg){
 		$.extend(this,cfg);

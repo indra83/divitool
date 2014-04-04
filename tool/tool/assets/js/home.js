@@ -152,6 +152,18 @@ divi.appBase = divi.extend(divi.base, {
 		this.stringify();//need this initialize combos.(masterObj);
 	}
 	
+	,readFileIntoDataUrl :function (fileInfo) {
+		var loader = $.Deferred(),
+			fReader = new FileReader();
+		fReader.onload = function (e) {
+			loader.resolve(e.target.result);
+		};
+		fReader.onerror = loader.reject;
+		fReader.onprogress = loader.notify;
+		fReader.readAsDataURL(fileInfo);
+		return loader.promise();
+	}
+	
 	,loadCombos:function(book){
 		if(book){
 			this.setData({});
@@ -182,6 +194,7 @@ divi.appBase = divi.extend(divi.base, {
 	,setData:function(values){
 		divi.appBase.prototype.data = values;
 	}
+	
 	
 	,setComboMaster:function(values){
 		divi.appBase.prototype.comboMaster = values;
@@ -263,8 +276,9 @@ divi.appBase = divi.extend(divi.base, {
 	,launchEditor:function(instance,homeScope){
 		if(instance){
 			var sel = this.getSelector(this.htmlKey);
-			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.insert,scope:this},Cancel: {fn:homeScope.cancelDailog,scope:homeScope}},close: function () {homeScope.cancelDailog();}};
-			sel.empty().superDialog(dlgConfig).superDialog('open').removeClass('hidden');
+			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:homeScope.cancelDailog,scope:homeScope}},close: function () {homeScope.cancelDailog();}};
+			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
+			instance.createEditor(sel);
 		}
 	}
 	
@@ -280,6 +294,17 @@ divi.appBase = divi.extend(divi.base, {
 		 }else{
 			 alert("Please Contact administrator. Could not save the changes");
 		 }
+	}
+	
+	,editorCBack:function(uidialog,b){
+		var scope = this;
+		var editor = scope.editor;
+		var value = "";
+		if(editor){
+			var sortedKeys = Object.keys(editor.editors).sort();
+			var first = editor.editors[sortedKeys[0]];
+			value = first.value;
+		}
 	}
 
 	,persistChild:function(){
@@ -309,11 +334,16 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
+	,isTopic:function(elem){
+		return (elem && elem.table == "topic");
+	}
+	
 	,prepareFilePath:function(scope,url,action){
 		url = url || "";
 		url = action || scope.savefileAction;
-		var elemId =  scope.getFieldValue('id');
-		var chapterId = scope.prepareCompleteId();
+		var topic = scope.isTopic(scope) ? scope : scope.parent;
+		var elemId =  topic.getFieldValue('id');
+		var chapterId = topic.prepareCompleteId();
 		url += "/"+chapterId+"/"+elemId;
 		return url;
 	}
@@ -371,7 +401,7 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,update:function(form){
-		var values = form.getValues({});
+		var values = form ? form.getValues({}) : this.getValues();
 		if(!$.isEmptyObject(values)){
 			this.updated = true;
 			this.setValues(values);
@@ -490,7 +520,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 	
 	,draw:function(){
-		
+		var parent = this.parent;
+		if(this.isTopic(parent)){
+			parent.loadFile();
+		}
 	}
 	
 	,drawElement:function(selector){
@@ -537,7 +570,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 	
 	,previewElement:function(values,appendSel){
-		var tag = document.createElement(this.table);
+		var tag = document.createElement(this.tag || this.table);
 		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
 		if(values['src']){
 			tag.setAttribute('src',url+'/'+values['src']);
@@ -572,8 +605,6 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,draw:function(){
 		
 	}
-	
-	
 	
 	,prepareDomValues:function(dom,child,values,parent){
 		var key,val;
@@ -697,6 +728,29 @@ divi.audio = divi.extend(divi.element,{
 		divi.audio.superclass.constructor.call(this);
 	}
 });
+
+
+divi.image = divi.extend(divi.element,{
+	tag:'img',
+	table:'image',
+	idCount:1,
+	idPrefix:'img',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.image.superclass.constructor.call(this);
+	}
+
+
+	,previewElement:function(values,appendSel){
+		var tag = document.createElement(this.tag || this.table);
+		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
+		if(values['src']){
+			tag.setAttribute('src',url+'/'+values['src']);
+		}
+		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
+	}
+});
+
 
 
 divi.bookBase = divi.extend(divi.appBase,{
@@ -996,9 +1050,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 	,add:function(event,val,jTarget,key){
 		if(key){
 			var eachChild = new divi[key]({parent:this,isNew:true,home:this.home});
-			/*var lookupKey = this.pluralize(key);
-			this.initilizeChild(this,lookupKey);
-			this.addChild(this,key,eachChild);*/
 			this.launchPopUp.call(eachChild,eachChild);
 			var currId = this.getFieldValue('id');
 			if(this.comboKey){
@@ -1060,7 +1111,10 @@ divi.bookBase = divi.extend(divi.appBase,{
 				if(eachChild){
 					var key = eachChild.tagName;
 					var eachElem = new divi[key]({parent:selected,home:selected.home});
-					eachElem.loadElement(eachChild,parentCont);
+					if(eachElem){
+						eachElem.loadElement(eachChild,parentCont);
+						eachElem.addChild(selected,'',eachElem);
+					}
 				}
 			}
 		}
@@ -1076,6 +1130,9 @@ divi.book = divi.extend(divi.bookBase,{
 	parent:undefined,
 	prviwForm:'.btnAthr',
 	isBook:true,
+	bookoverview:'.bookoverview',
+	bookoverviewkey:'overview',
+	bookheader:'.bookheader',
 	prefix:'book',
 	table:'book',
 	childrenKeys:['chapters'],
@@ -1087,16 +1144,54 @@ divi.book = divi.extend(divi.bookBase,{
 		divi.book.superclass.constructor.call(this);
 	}
 	
+	,createEditor:function(sel){
+		if(sel){
+			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
+			sel.append(editorDom.dom);
+			var value = this.getFieldValue(this.bookoverviewkey);
+			var params = {};
+			params['editors'] = {};
+			$(editorDom.dom).attr('ref',editorDom.id);
+			params['editors'][editorDom.id] = {'editor':editorDom.dom,value:value};
+			$.apply(params,{toolbardomCls:'.toolbarCls'});
+			this.editor = new divi.contentEditor(params);
+		}
+	}
+	
+	
 	,drawonScreen:function(values){
-		var mainKey = "";
+		var mainKey = "",jMainKey,parse;
 		for(var key in values){
 			if(values.hasOwnProperty(key)){
 				mainKey = "."+this.prefix+key;
-				$(mainKey).html(values[key]);
+				jMainKey = $(mainKey);
+				parse = (key !== this.bookoverviewkey || !divi.util.isEmpty(values[key])) ? true : false;
+				if(parse){
+					jMainKey.html(values[key]);
+					if(key == this.bookoverviewkey){
+						$(this.bookheader).removeClass('hidden');
+					}
+				}
 			}
 		}
 	}
 
+	,editorCBack:function(uidialog,b){
+		var scope = this;
+		var editor = scope.editor;
+		var value = "";
+		if(editor){
+			var sortedKeys = Object.keys(editor.editors).sort();
+			var first = editor.editors[sortedKeys[0]];
+			var values = this.getValues();
+			values[this.bookoverviewkey] = first.value;
+			this.setValues(values);
+			this.update();
+			scope.home.cancelDailog(uidialog);
+			delete scope.editor;
+		}
+	}
+	
 	,draw:function(){
 		var values = this.getValues();
 		this.drawonScreen(values);
@@ -1290,19 +1385,333 @@ divi.assessment = divi.extend(divi.bookBase,{
 
 
 divi.contentEditor = divi.extend(divi.appBase,{
-	parent:undefined,
-	callback:undefined,
-	isBook:false,
-	selector:undefined,
+	editors:{},
+	toolbar:undefined,
+	activeEditor:undefined,
+	events:'click',
+	value:'',
+	listeners:{},
+	toolbarBtnSelector:undefined,
+	hotKeys: {
+		'ctrl+b': 'bold',
+		'ctrl+i': 'italic',
+		'ctrl+u': 'underline',
+		'ctrl+z': 'undo',
+		'ctrl+y': 'redo',
+		'ctrl+l': 'justifyleft',
+		'ctrl+r': 'justifyright',
+		'ctrl+e': 'justifycenter',
+		'ctrl+j': 'justifyfull',
+		'shift+tab': 'outdent',
+		'tab': 'indent'
+	},
+	toolbarSelector: '[data-role=editor-toolbar]',
+	commandRole: 'edit',
+	activeToolbarClass: 'btn-info',
+	selectionMarker: 'edit-focus-marker',
+	selectionColor: 'darkgrey',
+	options:undefined,
+	toolbardomCls:undefined,
 	constructor : function (cfg) {
+		$.extend(this,cfg);
 		divi.contentEditor.superclass.constructor.call(this);
+		this.initialize();
 	}
+	
+	,setActiveToolbar:function(event,target,jTarget){
+		var scope = event.data.scope;
+		var currEditor = jTarget.hasClass('editableDiv') ? jTarget : jTarget.closest('div.editableDiv');
+		if(!scope.activeEditor || currEditor.get(0) != scope.activeEditor.editor.get(0)){
+			scope.removeActiveToolbar.call(scope);
+			var value = scope.editors[currEditor.attr('ref')].value;
+			scope.activeEditor = new divi.indEditor({editor:currEditor,parent:scope,value:value});
+		}
+	}
+	
+	,execCommand:function (commandWithArgs, valueArg) {
+		var commandArr = commandWithArgs.split(' '),command = commandArr.shift(),args = commandArr.join(' ') + (valueArg || '');
+		document.execCommand(command, 0, args);
+		var par = this.parent ? this.parent : this;
+		par.updateToolbar();
+		var editor = this.parent ? this : this.activeEditor;
+		editor.updateValue();
+	}
+	
+	,updateToolbar:function () {
+		if (this.activeToolbarClass) {
+			var scope = this;
+			$(this.toolbarSelector).find(scope.toolbarBtnSelector).each(function () {
+				var command = $(this).data(scope.commandRole);
+				if (document.queryCommandState(command)) {
+					$(this).addClass(scope.activeToolbarClass);
+				} else {
+					$(this).removeClass(scope.activeToolbarClass);
+				}
+			});
+		}
+	}
+	
+	,update:function(ref,value){
+		if(ref){
+			this.editors[ref].value = value;
+		}
+	}
+	
+	,removeActiveToolbar:function(){
+		if(this.activeEditor){
+			this.activeEditor.destroy();
+			var ref = this.activeEditor.ref;
+			delete this.activeEditor;
+		}
+	}
+	
+	,contentStdListener:function(event,b,f,g){
+		var target = divi.util.getTarget(event);
+		var type = divi.util.getEvtType(event);
+		var data = event.data;
+		if(data){
+			var scope = data.scope;
+			var jTarget = $(target);
+			if(scope.listeners[type]){
+				var evtListeners = scope.listeners[type];
+				if(evtListeners){
+					for(var key in evtListeners){
+						 if(evtListeners.hasOwnProperty(key)){
+							 eachListener =  evtListeners[key];
+							 if(eachListener){
+								 scope = scope || this;
+								 eachListener.apply(scope,[event,target,jTarget]);
+							 }
+						 }
+					 }
+				}else{
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			}
+		}
+	 }
+	
+	,attachListeners:function(elements){
+		var avlListeners = this.events;
+		if(avlListeners && elements){
+			 for(var eachEditor in elements){
+				 if(elements.hasOwnProperty(eachEditor)){
+					 $(elements[eachEditor]).on(avlListeners,null,{scope:this},this.contentStdListener);
+				 }
+			 }
+		}
+	}
+	
+	,startup:function(){
+		this.toolbarBtnSelector = 'a[data-' + this.commandRole + '],button[data-' + this.commandRole + '],input[type=button][data-' + this.commandRole + ']';
+		this.listeners['click'] = [this.setActiveToolbar];
+	}
+	
+	,initiateEditors:function(){
+		var editors = [],eachEdit;
+		for(var ind in this.editors){
+			if(this.editors.hasOwnProperty(ind)){
+				eachEdit = this.editors[ind];
+				if(eachEdit){
+					editors.push(eachEdit.editor);
+					$(eachEdit.editor).html(eachEdit.value);
+				}
+			}
+		}
+		return editors;
+	}
+	
+	,initialize:function(){
+		this.attachListeners(this.initiateEditors());
+		this.bindToolbar();
+	}
+	
+	,onToolBarclick:function(event,target,scope){
+		var scope = event.data.scope;
+		if(scope.activeEditor){
+			var target = event.currentTarget;
+			scope.activeEditor.restoreSelection();
+			scope.activeEditor.activate();
+			scope.execCommand($(target).data(scope.commandRole));
+			scope.activeEditor.saveSelection();
+		}
+	}
+	
+	,onRestoreSel:function(event,target,scope){
+		var scope = event.data.scope;
+		if(scope.activeEditor){
+			scope.activeEditor.restoreSelection();
+		}
+	}
+	
+	,insertFiles:function (files,event) {
+		var scope = event.data.scope;
+		if(scope.activeEditor){
+			scope.activeEditor.activate();
+		}
+		$.each(files, function (idx, fileInfo) {
+			if (/^image\//.test(fileInfo.type)) {
+				$.when(scope.readFileIntoDataUrl(fileInfo)).done(function (dataUrl) {
+					scope.execCommand.call(scope,'insertimage', dataUrl);
+				}).fail(function (e) {
+					scope.fileUploadError("file-reader", e);
+				});
+			} else {
+				scope.fileUploadError("unsupported-file-type", fileInfo.type);
+			}
+		});
+	}
+	
+	,onFileChange:function(event,target,scope){
+		var scope = event.data.scope;
+		scope.onRestoreSel(event,target,scope);
+		if (this.type === 'file' && this.files && this.files.length > 0) {
+			scope.insertFiles(this.files,event);
+		}
+		if(scope.activeEditor){
+			scope.activeEditor.saveSelection();
+			this.value = '';
+		}
+	}
+	
+	,bindToolbar:function () {
+		var toolbar = $(this.toolbarSelector);
+		toolbar.find(this.toolbarBtnSelector).on('click',null,{scope:this},this.onToolBarclick);
+		toolbar.find('[data-toggle=dropdown]').on('click',null,{scope:this},this.onRestoreSel);
+		toolbar.find('input[type=file][data-' + this.commandRole + ']').on('change',null,{scope:this},this.onFileChange);
+	}
+});
+
+
+divi.indEditor = divi.extend(divi.contentEditor,{
+	editor:undefined,
+	selectedRange:undefined,
+	parent:undefined,
+	value:'',
+	ref:undefined,
+	events:'mouseup keyup keydown mouseout',
+	editable:false,
+	constructor : function (cfg) {
+		$.extend(this,cfg);
+		divi.indEditor.superclass.constructor.call(this);
+		this.ref = this.editor.attr('ref');
+	}
+
+	,getValue:function(){
+		var val = this.value;
+		if(this.editor){
+			val = this.editor.html();
+		}
+		return val;
+	}
+	
+	,updateValue:function(){
+		this.parent.update(this.ref,this.getValue());
+	}
+
+	,restoreSelection:function () {
+		var scope = this;
+		var selection = window.getSelection();
+		if(scope.editor){
+			var selectedRange = scope.getCurrentRange();
+			if (selectedRange) {
+				try {
+					selection.removeAllRanges();
+				} catch (ex) {
+					document.body.createTextRange().select();
+					document.selection.empty();
+				}
+	
+				selection.addRange(selectedRange);
+			}
+		}
+	}
+
+	,activate:function(){
+		if(this.editor){
+			this.editor.attr('contenteditable', true);
+			this.editor.focus();
+		}
+	}
+	
+	,destroy:function(){
+		if(this.editor){
+			this.editor.attr('contenteditable', false);
+			this.removeListeners();
+			this.editor = undefined;
+		}
+	}
+
+	,startup:function(){
+		if(this.value){
+			this.editor.empty().append(this.value);
+		}
+		this.activate();
+		this.listeners['keydown'] = [this.triggerCommand];
+		this.listeners['keyup'] = [this.triggerCommand,this.editorListener];
+		this.listeners['mouseup'] = [this.editorListener];
+		this.listeners['mouseout'] = [this.editorListener];
+		this.attachListeners([this.editor]);
+	}
+
+	,getCurrentRange:function () {
+		var sel = window.getSelection();
+		if (sel.getRangeAt && sel.rangeCount) {
+			return sel.getRangeAt(0);
+		}
+	}
+	
+	,triggerCommand:function(event,target,jTarget){
+		var scope = this;
+		var activeEditor = scope.activeEditor;
+		var keytype = event.keyCode;
+		var hotKey = "";
+		if(event.ctrlKey || event.shiftKey || event.tabKey){
+			if(event.ctrlKey){
+				hotKey = "ctrl+";
+			}else if(event.shiftKey){
+				hotKey = "shift+";
+			}if(event.tabKey){
+				hotKey = "tab+";
+			}
+			var char = String.fromCharCode(event.which);
+			if(!divi.util.isEmpty(char)){
+				hotKey += char.toLowerCase();
+			}
+		}
+		
+		if(this.hotKeys[hotKey]){
+			event.preventDefault();
+			event.stopPropagation();
+			scope.restoreSelection();
+			scope.execCommand(scope.hotKeys[hotKey]);
+			scope.saveSelection();
+		}
+	}
+	
+	,editorListener:function(event,target,jTarget){
+		this.saveSelection();
+		this.parent.updateToolbar();
+	}
+	
+	,removeListeners:function(){
+		if(this.editor){
+			this.editor.off(this.events,null);
+		}
+	}
+	
+	,saveSelection:function () {
+		this.selectedRange = this.getCurrentRange();
+	}
+	
 });
 
 divi.home =  divi.extend(divi.appBase,{
 	parent:undefined,
 	selected:undefined,
 	book:undefined,
+	editors:1,
 	callback:undefined,
 	selector:'textarea.html_input',
 	previewSel:'.treepreview',
@@ -1332,7 +1741,7 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,previewContent:function(selected){
-		if(selected && selected.table == 'topic'){
+		if(selected && this.isTopic(selected)){
 			selected.loadFile();
 		}
 	}
@@ -1409,9 +1818,9 @@ divi.home =  divi.extend(divi.appBase,{
 	,defaultListeners:function(){
 		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
 		        {tag:'.btnBkOverview',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
+		        {tag:'.bookEdit',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.addchapter',listType:'click',parent:divi.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
 		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
-		        //{tag:this.previewSel,listType:'contextmenu',scope:this,listenerFn:'blockcmMenu'}];
 	}
 	
 	,addcontent:function(cfg){

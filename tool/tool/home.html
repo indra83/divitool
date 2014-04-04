@@ -2,13 +2,11 @@
    <head>
       <title>Divi Editor</title>
 	  <link rel="stylesheet" href="assets/css/Normalize.css">
-      <link rel="stylesheet" href="assets/css/style.css">
+	  <link rel="stylesheet" href="assets/css/style.css">
       <link rel="stylesheet" href="assets/css/metro-bootstrap.css" media="screen">
-      <link rel="stylesheet" href="assets/css/metro-bootstrap-responsive.css" rel="stylesheet">
-      <link rel="stylesheet" href="assets/css/chosen.css" media="screen">
       <link href="assets/css/equation-embed.css" rel="stylesheet" media="screen">
       <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
-      <link href="assets/css/style.min.css" rel="stylesheet" media="screen">
+      <link rel="stylesheet" href="assets/css/divi.css" media="screen">
    </head>
    <body class="metro">
       <div class="container">
@@ -46,22 +44,18 @@
 	      			<span>you are editing '<span class="fg-blue">topic1</span>' in Chapter '<span class="fg-blue">topic1</span>'</span>
 	      		</div>
 	      		<div class="imageSection contentPreview">
-	      			<div class="previewElem">
-	      				<div class="mainElem place-left">
-							<audio src="/getfiles/56666/fgdf/Rangapura Vihara_5099907110252.mp3"/>	      				
-	      				</div>
-	      				<div class="contentElem place-right">
-								    asdas ad sadasd sadas dsdsad  asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsad  				
-	      				</div>
+	      		
+	      			<div class="bookheader hidden">BOOK OVERVIEW<div class="place-right"><button class="imgButton bookEdit"><img class="toggle"></button></div></div>
+	      			<br/><br/>
+	      			<div class="imageSection bookoverview">
+	      			
+		      			Welcome to Divi's content editor to create books to be read on the DIVI platform.
+	
+						Please enter an overview for the book you are creating.<br/>
+		      			<div class="btnBkOverview button success large capsOn"><span>book overview</span></div>
 	      			</div>
-	      			<div class="previewElem">
-	      				<div class="mainElem place-left">
-							<img src="http://hdwallpaper2013.com/wp-content/uploads/2013/02/Download-Forest-Background-Images-HD-Wallpaper.jpg"/>	      				
-	      				</div>
-	      				<div class="contentElem place-right">
-							asdas ad sadasd sadas dsdsad  asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsad asdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsadasdas ad sadasd sadas dsdsad	      				
-	      				</div>
-	      			</div>
+	      			<div class="btnAthr button success large capsOn"><span>add authoring and licensing details</span></div>
+	      			
 	      		</div>
 	         </div>
 	      </div>
@@ -73,11 +67,62 @@
       </div>
       <div class="popup hidden"></div>
       <div class="dialog-html hidden">
-       	<textarea class="html_input"></textarea>
+       	<div class="toolbarCls">
+       		<div class="btn-toolbar" data-role="editor-toolbar">
+	      <div class="btn-group">
+	        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a>
+	          <ul class="dropdown-menu">
+	          </ul>
+	        </div>
+	      <div class="btn-group">
+	        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="icon-text-height"></i>&nbsp;<b class="caret"></b></a>
+	          <ul class="dropdown-menu">
+	          <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
+	          <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
+	          <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
+	          </ul>
+	      </div>
+	      <div class="btn-group">
+	        <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="icon-bold"></i></a>
+	        <a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="icon-italic"></i></a>
+	        <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="icon-strikethrough"></i></a>
+	        <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="icon-underline"></i></a>
+	      </div>
+	      <div class="btn-group">
+	        <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="icon-list-ul"></i></a>
+	        <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="icon-list-ol"></i></a>
+	        <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="icon-indent-left"></i></a>
+	        <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="icon-indent-right"></i></a>
+	      </div>
+	      <div class="btn-group">
+	        <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="icon-align-left"></i></a>
+	        <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="icon-align-center"></i></a>
+	        <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="icon-align-right"></i></a>
+	        <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="icon-align-justify"></i></a>
+	      </div>
+	      <div class="btn-group">
+			  <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="icon-link"></i></a>
+			    <div class="dropdown-menu input-append">
+				    <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
+				    <button class="btn" type="button">Add</button>
+	        </div>
+	        <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="icon-cut"></i></a>
+	
+	      </div>
+	      
+	      <div class="btn-group">
+	        <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="icon-picture"></i></a>
+	        <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+	      </div>
+	      <div class="btn-group">
+	        <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="icon-undo"></i></a>
+	        <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="icon-repeat"></i></a>
+	      </div>
+	    </div>
+	    </div>
       </div>
-      <div class="contextmenu hidden" unselectable="on">
-		
-	 </div>
+     
+    <div class="contextmenu hidden" unselectable="on"></div>
 	<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
 	<script src="assets/js/jquery.js"></script>
 	<script src="assets/js/chosen.jquery.js"></script>

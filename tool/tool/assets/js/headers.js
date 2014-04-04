@@ -5,6 +5,7 @@ divi.app.book = new divi.pageBase({
 		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield","isRequired": true},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
 		 	    {name:"License", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},
+		 	    {name:"overview", "desc": "overview", "type": "textfield",hidden:true},
 		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true},
 		 	    {name:"bookId", "desc": "Book Version", "type": "numberfield",hidden:true},
 		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true}
@@ -65,15 +66,32 @@ divi.app.videoAlone = new divi.pageBase({
 	}
 });
 
+divi.app.imageAlone = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"src", "desc": "Image File", "type": "imagefield","isRequired": true},
+		         {name:"id", "desc": "Video ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
+		         {name:"title", "desc": "Title", "type": "textfield"},
+		         {name:"url","desc": "URL", "type": "textfield"}];
+	}
+});
+
+
 divi.app.video = new divi.crossPageBase({
 	 tables:["videoAlone","references"],
 	 sections:{"":{name:"", incAll:["videoAlone","references"]}}
 });
 
 
-divi.app.audioHybrid = new divi.crossPageBase({
+divi.app.audio = new divi.crossPageBase({
 	 tables:["audioAlone","references"],
 	 sections:{"":{name:"", incAll:["audioAlone","references"]}}
+});
+
+
+divi.app.image = new divi.crossPageBase({
+	 tables:["imageAlone","references"],
+	 sections:{"":{name:"", incAll:["imageAlone","references"]}}
 });
 
 divi.namespace("divi.tpl");
@@ -81,6 +99,7 @@ divi.namespace("divi.tpl");
 divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Author Name/ID/Organization Name:</span><span class="lblValue">${source}</span></div><div class="formfield larger"><span class="labelStyle">Name:</span><span class="lblValue">${name}</span></div><div class="formfield larger"><span class="labelStyle">Website URL:</span><span class="lblValue">${url}</span></div><div class="formfield larger"><span class="labelStyle">License:</span><span class="lblValue">${license}</span></div>';
 divi.tpl.video = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
+divi.tpl.image = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.eachHeader = '<div class="previewElem"></div>'
 
 
