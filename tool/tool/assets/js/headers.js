@@ -76,6 +76,17 @@ divi.app.imageAlone = new divi.pageBase({
 	}
 });
 
+divi.app.htmlAlone = new divi.pageBase({
+	fieldconfig:function(){
+		return [{name:"boxtype", "desc": "Type", "type": "combofield","isRequired": true,"listener":"boxInfo"},
+		         {name:"boxTitle","desc": "Title", "type": "textfield","isRequired": true}];
+	}
+});
+
+divi.app.html = new divi.crossPageBase({
+	 tables:["htmlAlone","references"],
+	 sections:{"":{name:"", incAll:["htmlAlone","references"]}}
+});
 
 divi.app.video = new divi.crossPageBase({
 	 tables:["videoAlone","references"],

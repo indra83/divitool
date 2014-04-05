@@ -145,7 +145,15 @@ divi.appBase = divi.extend(divi.base, {
 		  	{description:"CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)",id:"CC Attribution - NonCommercial NoDerivs (CC BY-NC-ND)"},
 		  	{description:"Public Domain",id:"Public Domain"},
 		  	{description:"GNU Free License",id:"GNU Free License"}];
-		this.setData({'license':licenseData});
+		this.setData({'license':licenseData},true);
+	}
+     
+	,boxInfoData:function(){
+		var boxInfoData = [{description:"None",id:"none"},
+		  	{description:"Box Info",id:"box_info"},
+		  	{description:"Box Alert",id:"box_alert"},
+		  	{description:"Other",id:"other"}];
+		this.setData({'boxInfo':boxInfoData},true);
 	}
 	
 	,loadinitialCombos:function(){
@@ -169,7 +177,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.setData({});
 			this.setComboMaster({});
 			this.licenseData();
-			
+			this.boxInfoData();
 		}
 	}
 	
@@ -191,8 +199,12 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
-	,setData:function(values){
-		divi.appBase.prototype.data = values;
+	,setData:function(values,apend){
+		if(apend){
+			$.extend(divi.appBase.prototype.data,values);
+		}else{
+			divi.appBase.prototype.data = values;	
+		}
 	}
 	
 	
@@ -459,7 +471,7 @@ divi.appBase = divi.extend(divi.base, {
 			var newButtons = {};
 			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm}},buttons);
 			mydialog.superDialog("option", "buttons", newButtons);
-			popupDiv.empty().superDialog('open');
+			popupDiv.empty().removeClass('hidden').superDialog('open');
 			instance.showContent(popupDiv);
 		}
 	}
@@ -715,6 +727,16 @@ divi.video = divi.extend(divi.element,{
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.video.superclass.constructor.call(this);
+	}
+});
+
+divi.html = divi.extend(divi.element,{
+	table:'html',
+	idCount:1,
+	idPrefix:'html',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.html.superclass.constructor.call(this);
 	}
 });
 
@@ -1343,9 +1365,6 @@ divi.topic = divi.extend(divi.bookBase,{
 	}
 	
 	
-	
-	
-	
 	,prepareSideBar:function(parent,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -1765,7 +1784,8 @@ divi.home =  divi.extend(divi.appBase,{
 	,editBtnListeners:function(scope){
 		 return [{tag:'.addvideo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'video',mapTo:scope},
 		         {tag:'.addimage',listType:'click',parent:divi.book,listenerFn:'addelement',key:'image',mapTo:scope},
-		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope}];
+		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope},
+		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){
