@@ -841,7 +841,7 @@ divi.util = {
 	}
 	
 	,isjQEmpty:function(v){
-		return v === null || v === undefined || v.length > 0;
+		return v === null || v === undefined || v.length == 0;
 	}
 	
 	,isEmpty : function(v){

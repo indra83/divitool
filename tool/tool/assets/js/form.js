@@ -1950,8 +1950,10 @@ divi.form.file = divi.extend(divi.baseField, {
 	
 	,checkValid:function(target,jTarget,value){
 		var isValid = true;
+		target = target ? target : this.doms[this.inputdom].dom;
+		jTarget = jTarget ? jTarget : divi.domBase.fetchJSel(this.doms[this.inputdom].id);
 		if(target){
-			var files = target .files;
+			var files = target.files;
 			if(files && files.length > 0){
 				var baseFile = files[0];
 				if(baseFile && !$.isEmptyObject(this.validTypes)){
@@ -1966,6 +1968,8 @@ divi.form.file = divi.extend(divi.baseField, {
 						alert('File format is not expected.Please select relevent file');
 					}
 				}
+			}else if(this.isRequired){
+				isValid = false
 			}
 			this.isValid = isValid;
 		}

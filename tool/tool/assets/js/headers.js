@@ -79,7 +79,8 @@ divi.app.imageAlone = new divi.pageBase({
 divi.app.htmlAlone = new divi.pageBase({
 	fieldconfig:function(){
 		return [{name:"boxtype", "desc": "Type", "type": "combofield","isRequired": true,"listener":"boxInfo"},
-		         {name:"boxTitle","desc": "Title", "type": "textfield","isRequired": true}];
+		        {name:"boxTitle","desc": "Title", "type": "textfield","isRequired": true},
+		        {name:"data","desc": "data", "type": "textfield",hidden:true}];
 	}
 });
 

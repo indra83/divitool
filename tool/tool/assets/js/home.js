@@ -106,6 +106,7 @@ divi.appBase = divi.extend(divi.base, {
 	htmlKey:'.dialog-html',
 	comboMaster:{},
 	getFileAction:'/getfiles',
+	toolbarCls:'.toolbarCls',
 	getFileActionWoPrefix:'getfiles',
 	savefileAction:'/savefile/',
 	imageLocExact:"./htmlimages/",
@@ -307,14 +308,42 @@ divi.appBase = divi.extend(divi.base, {
 		return this.contents[refKey];
 	}
 	
+	,getFirstEditor:function(editor){
+		var first;
+		if(editor){
+			var sortedKeys = Object.keys(editor.getEditors()).sort();
+			first = editor.getEditors()[sortedKeys[0]];
+		}
+		return first;
+	}
+	
 	,launchEditor:function(instance,homeScope){
 		if(instance){
 			var sel = this.getSelector(this.htmlKey);
 			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
 			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
-			instance.createEditor(sel);
+			var value = instance.getFieldValue(instance.bookoverviewkey);
+			instance.createEditor.call(instance,sel,value);
 		}
 	}
+	
+	,createEditor:function(sel,value){
+		if(sel && !this.editor){
+			sel.find(this.toolbarCls).remove();
+			sel.find('div.editableDiv').remove();
+			
+			sel.append(this.getSelector(this.toolbarCls).clone().removeClass('hidden'));
+			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
+			sel.append(editorDom.dom);
+			var params = {};
+			params['editors'] = {};
+			$(editorDom.dom).attr('ref',editorDom.id);
+			params['editors'][editorDom.id] = {'editor':editorDom.dom,value:value};
+			$.apply(params,{toolbardomCls:'.toolbarCls'});
+			this.editor = new divi.contentEditor(params);
+		}
+	}
+	
 	
 	,closeDailog:function(b,e){
 		var scope = this;
@@ -343,9 +372,10 @@ divi.appBase = divi.extend(divi.base, {
 		var editor = scope.editor;
 		var value = "";
 		if(editor){
-			var sortedKeys = Object.keys(editor.editors).sort();
-			var first = editor.editors[sortedKeys[0]];
-			value = first.value;
+			var first = this.getFirstEditor(editor);
+			if(first){
+				value = first.getValue();
+			}
 		}
 	}
 
@@ -669,6 +699,11 @@ divi.elementbase = divi.extend(divi.appBase,{
 				child.appendChild(key);
 			}
 		}
+		this.addSplValues(dom, childdom, values, parent);
+	}
+	
+	,addSplValues:function(dom,childdom,values,parent){
+		
 	}
 	
 	,prepareParentDom:function(dom,childdom,values,parent){
@@ -705,7 +740,12 @@ divi.elementbase = divi.extend(divi.appBase,{
 		return id;
 	}
 
+	,attachpreContent:function(appendTo,showToggle){
+		
+	}
+	
 	,showContent:function(appendTo,showToggle){
+		this.attachpreContent(appendTo, showToggle);
 		if(!this.formPanel){
 			this.formPanel = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
 		}
@@ -773,38 +813,43 @@ divi.video = divi.extend(divi.element,{
 });
 
 divi.html = divi.extend(divi.element,{
+	ignoreFields:['data','references'],
 	table:'html',
 	idCount:1,
+	editor:undefined,
 	idPrefix:'html',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.html.superclass.constructor.call(this);
 	}
 
+	,attachpreContent:function(appendTo,showToggle){
+		this.createEditor(appendTo,"");
+	}
+	
+	,addSplValues:function(dom,childdom,values,parent){
+		var editor = this.editor;
+	}
+	
 	,persistChild:function(){
-		var scope = this.elements ? this : this.parent;
-		if(scope && scope.fileName){
-			var eachSet;
-			var elemId,eachElem;
-			var elements = scope.elements;
-			elemId =  scope.getFieldValue('id');
-			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="' + elemId+ '"/>');
-			var masterObj = {};
-			for(var index = 0; index  < elements.length;index++){
-				eachElem = elements[index];
-				if(eachElem){
-					eachElem.getPersistValues(dom);
-					var elemFiles = eachElem.formPanel ? eachElem.formPanel.files : [];
-					files = files.concat(elemFiles);
-				}
+		var editor = this.editor;
+		if(editor){
+			var first = this.getFirstEditor(editor);
+			if(first){
+				first.getValue(this,this.htmlCallBack);
 			}
-			
-			var url = this.prepareFilePath(this,url);
-			var file = new Blob([jsxml.toXml(dom)]);
-			file.name = scope.fileName;
-			scope.persist(url,file);
-			scope.persist(url,files,true);
+		}else{
+			this.htmlcallBack();
+		}
+	}
+	
+	,htmlcallBack:function(){
+		var scope = this;
+		divi.appBase.persistChild.call(scope);
+	}
+	
+	,prepareParentDom:function(dom,childdom,values,parent){
+		if(childdom){
 		}
 	}
 });
@@ -1246,20 +1291,6 @@ divi.book = divi.extend(divi.bookBase,{
 		divi.book.superclass.constructor.call(this);
 	}
 	
-	,createEditor:function(sel){
-		if(sel && !this.editor){
-			sel.find('div.editableDiv').remove();
-			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
-			sel.append(editorDom.dom);
-			var value = this.getFieldValue(this.bookoverviewkey);
-			var params = {};
-			params['editors'] = {};
-			$(editorDom.dom).attr('ref',editorDom.id);
-			params['editors'][editorDom.id] = {'editor':editorDom.dom,value:value};
-			$.apply(params,{toolbardomCls:'.toolbarCls'});
-			this.editor = new divi.contentEditor(params);
-		}
-	}
 	
 	,drawonScreen:function(values){
 		var mainKey = "",jMainKey,parse,val;
@@ -1287,11 +1318,12 @@ divi.book = divi.extend(divi.bookBase,{
 		var editor = scope.editor;
 		var value = "";
 		if(editor){
-			var sortedKeys = Object.keys(editor.getEditors()).sort();
-			var first = editor.getEditors()[sortedKeys[0]];
-			first.getValue(this,this.htmlCallBack);
-			scope.home.cancelDailog(uidialog);
+			var first = this.getFirstEditor(editor);
+			if(first){
+				first.getValue(this,this.htmlCallBack);
+			}
 		}
+		scope.home.cancelDailog(uidialog);
 	}
 	
 	,htmlCallBack:function(saveVal){
