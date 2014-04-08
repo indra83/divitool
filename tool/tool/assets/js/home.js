@@ -101,12 +101,15 @@ divi.appBase = divi.extend(divi.base, {
     contentPreview:'.contentPreview',
     contents:{},
     cmKey:'.contextmenu',
-    //fileFields:['videofield','audiofield','imagefield'],
+    // fileFields:['videofield','audiofield','imagefield'],
 	popupKey:'.popup',
 	htmlKey:'.dialog-html',
 	comboMaster:{},
 	getFileAction:'/getfiles',
+	getFileActionWoPrefix:'getfiles',
 	savefileAction:'/savefile/',
+	imageLocExact:"./htmlimages/",
+	imageLoc:"/htmlimages/",
 	data:{},
 	values:{},
 	
@@ -157,14 +160,13 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,loadinitialCombos:function(){
-		this.stringify();//need this initialize combos.(masterObj);
+		this.stringify();// need this initialize combos.(masterObj);
 	}
 	
 	,readFileIntoDataUrl :function (fileInfo) {
-		var loader = $.Deferred(),
-			fReader = new FileReader();
+		var loader = $.Deferred(),fReader = new FileReader();
 		fReader.onload = function (e) {
-			loader.resolve(e.target.result);
+			loader.resolve(e);
 		};
 		fReader.onerror = loader.reject;
 		fReader.onprogress = loader.notify;
@@ -260,6 +262,26 @@ divi.appBase = divi.extend(divi.base, {
 		return this.getSelector(this.popupKey);
 	}
 	
+	,prepareRetrievePath:function (location,val, files,cbScope) {
+	    var dataQuery = $(val);
+	    var matchedElem;
+	    for (var i = 0; i < files.length; i++) {
+	        currData = files[i];
+	        matchedElem = dataQuery.find('img[name="' + currData.name + '"]');
+	        if (matchedElem) {
+	            $(matchedElem).attr('src', location + currData.name);
+	        }
+	    }
+	    return $("<div/>").append($(dataQuery).clone()).html();
+	}
+	
+	,prepareResourcePath:function (val,fromLoc,toLoc) {
+		if(val && fromLoc && toLoc){
+			val = val.replace(new RegExp(fromLoc, 'g'), toLoc);
+		}
+		return val;
+	}
+	
 	,cancelDailog:function(b,e){
 		var jB = $(b);
 		var elem = (jB.hasClass('ui-dialog-content')) ? jB : jB.find("ui-dialog-content");
@@ -288,9 +310,17 @@ divi.appBase = divi.extend(divi.base, {
 	,launchEditor:function(instance,homeScope){
 		if(instance){
 			var sel = this.getSelector(this.htmlKey);
-			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:homeScope.cancelDailog,scope:homeScope}},close: function () {homeScope.cancelDailog();}};
+			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
 			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
 			instance.createEditor(sel);
+		}
+	}
+	
+	,closeDailog:function(b,e){
+		var scope = this;
+		if($.isFunction(scope.cancelDailog)){
+			delete scope.editor;
+			scope.cancelDailog(b,e);
 		}
 	}
 	
@@ -360,6 +390,15 @@ divi.appBase = divi.extend(divi.base, {
 		return url;
 	}
 	
+	,prepareBookPath:function(scope,url,action,addAction){
+		url = url || "";
+		url = action || scope.savefileAction;
+		if(addAction){
+			url += addAction;
+		}
+		return url;
+	}
+	
 	,getCount:function(){
 		return divi[this.table].prototype.idCount;
 	}
@@ -370,6 +409,8 @@ divi.appBase = divi.extend(divi.base, {
 			this.setCount(cnt+1);
 		}
 	}
+	
+	
 	
 	,setCount:function(id){
 		if(id){
@@ -518,9 +559,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 					condition = (this.table == "references") ? this.referenceFields.contains(index) : !this.referenceFields.contains(index);
 					if(condition){
 						eachCfg = fieldConfig[index];
-						/*if(this.fileFields.contains(eachCfg.type)){
-							this.files[eachCfg.name];
-						}*/
+						/*
+						 * if(this.fileFields.contains(eachCfg.type)){
+						 * this.files[eachCfg.name]; }
+						 */
 						this.values[eachCfg.name] = eachCfg.value || '';
 					}
 				}
@@ -738,6 +780,33 @@ divi.html = divi.extend(divi.element,{
 		$.extend(this,cfg);
 		divi.html.superclass.constructor.call(this);
 	}
+
+	,persistChild:function(){
+		var scope = this.elements ? this : this.parent;
+		if(scope && scope.fileName){
+			var eachSet;
+			var elemId,eachElem;
+			var elements = scope.elements;
+			elemId =  scope.getFieldValue('id');
+			var files = [];
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="' + elemId+ '"/>');
+			var masterObj = {};
+			for(var index = 0; index  < elements.length;index++){
+				eachElem = elements[index];
+				if(eachElem){
+					eachElem.getPersistValues(dom);
+					var elemFiles = eachElem.formPanel ? eachElem.formPanel.files : [];
+					files = files.concat(elemFiles);
+				}
+			}
+			
+			var url = this.prepareFilePath(this,url);
+			var file = new Blob([jsxml.toXml(dom)]);
+			file.name = scope.fileName;
+			scope.persist(url,file);
+			scope.persist(url,files,true);
+		}
+	}
 });
 
 
@@ -925,7 +994,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var currKey = this.pluralize(this.table);
 		var children = this.parent.children[currKey];
 		if(children){
-			var currSeq = children.length-1;//already children are updated
+			var currSeq = children.length-1;// already children are updated
 			this.prepareSideBar(parDom,currKey,currSeq);
 			this.isNew = false;
 		}
@@ -938,7 +1007,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,load:function(data){
 		this.read(data);
-		this.loadinitialCombos(this);//need this initialize combos.
+		this.loadinitialCombos(this);// need this initialize combos.
 		this.draw();
 	}
 	
@@ -950,7 +1019,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		return masterObj;
 	}
 
-	,persist:function(url, file,isArray){
+	,persist:function(url, file,isArray,deferred){
 		var formData = new FormData();
 		if(isArray){
 			var eachFile;
@@ -962,9 +1031,20 @@ divi.bookBase = divi.extend(divi.appBase,{
 			formData.append(file.name, file, file.name);
 		}
 	    var xhr = new XMLHttpRequest();
-
+	    if(deferred){
+	    	var scope = this;
+	    	 xhr.onload = function (e) {
+    	        if (this.status == 200) {
+    	            deferred.resolve(scope);
+    	        } else {
+    	            deferred.reject(scope);
+    	        }
+    	    };
+	    }
 	    xhr.open('POST', url, true);
 	    xhr.send(formData);
+	    
+	   
 	}
 	
 	,destinationUrl:function(){
@@ -1024,9 +1104,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var currKey;
 		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
 			currKey = this.childrenKeys[i];
-			/*if(!input.children){
-				input.children = {};
-			}*/
+			/*
+			 * if(!input.children){ input.children = {}; }
+			 */
 			addParams = addParams || [];
 			this.attachEachChild(callback,input,currKey,initialize,addParams,skipChildren);
 		}
@@ -1126,7 +1206,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			var selected = this;
 			var parentCont = this.getSelector(this.contentPreview);
 			parentCont.empty();
-			selected.elements = [];//resetting the elems
+			selected.elements = [];// resetting the elems
 			var eachChild,eachElem,children = topicChild.children;
 			for(var index = 0; index  < children.length;index++){
 				eachChild = children[index];
@@ -1167,7 +1247,8 @@ divi.book = divi.extend(divi.bookBase,{
 	}
 	
 	,createEditor:function(sel){
-		if(sel){
+		if(sel && !this.editor){
+			sel.find('div.editableDiv').remove();
 			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
 			sel.append(editorDom.dom);
 			var value = this.getFieldValue(this.bookoverviewkey);
@@ -1180,19 +1261,22 @@ divi.book = divi.extend(divi.bookBase,{
 		}
 	}
 	
-	
 	,drawonScreen:function(values){
-		var mainKey = "",jMainKey,parse;
+		var mainKey = "",jMainKey,parse,val;
 		for(var key in values){
+			var imglocation  = "../"+this.getFileActionWoPrefix+this.imageLoc;
 			if(values.hasOwnProperty(key)){
 				mainKey = "."+this.prefix+key;
 				jMainKey = $(mainKey);
 				parse = (key !== this.bookoverviewkey || !divi.util.isEmpty(values[key])) ? true : false;
 				if(parse){
-					jMainKey.html(values[key]);
+					val = values[key];
 					if(key == this.bookoverviewkey){
-						$(this.bookheader).removeClass('hidden');
+						$(this.bookheader).removeClass('hidden').attr('contenteditable', false);
+						val = this.prepareResourcePath(val,this.imageLocExact,imglocation);
+						values[key] = val;
 					}
+					jMainKey.html(val);
 				}
 			}
 		}
@@ -1203,15 +1287,18 @@ divi.book = divi.extend(divi.bookBase,{
 		var editor = scope.editor;
 		var value = "";
 		if(editor){
-			var sortedKeys = Object.keys(editor.editors).sort();
-			var first = editor.editors[sortedKeys[0]];
-			var values = this.getValues();
-			values[this.bookoverviewkey] = first.value;
-			this.setValues(values);
-			this.update();
+			var sortedKeys = Object.keys(editor.getEditors()).sort();
+			var first = editor.getEditors()[sortedKeys[0]];
+			first.getValue(this,this.htmlCallBack);
 			scope.home.cancelDailog(uidialog);
-			delete scope.editor;
 		}
+	}
+	
+	,htmlCallBack:function(saveVal){
+		var values = this.getValues();
+		values[this.bookoverviewkey] = saveVal;
+		this.setValues(values);
+		this.update();
 	}
 	
 	,draw:function(){
@@ -1404,11 +1491,14 @@ divi.assessment = divi.extend(divi.bookBase,{
 
 
 divi.contentEditor = divi.extend(divi.appBase,{
+	_editors:{},
 	editors:{},
+	activeKey:undefined,
 	toolbar:undefined,
 	activeEditor:undefined,
 	events:'click',
 	value:'',
+	filesList:{},
 	listeners:{},
 	toolbarBtnSelector:undefined,
 	hotKeys: {
@@ -1437,13 +1527,27 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.initialize();
 	}
 	
+	,getEditors:function(){
+		return this._editors;
+	}
+	
+	,getEditorsForKey:function(ref){
+		var editors = this.getEditors();
+		var currEditor;
+		if(editors && ref){
+			currEditor = editors[ref];
+		}
+		return currEditor;
+	}
+	
 	,setActiveToolbar:function(event,target,jTarget){
 		var scope = event.data.scope;
 		var currEditor = jTarget.hasClass('editableDiv') ? jTarget : jTarget.closest('div.editableDiv');
-		if(!scope.activeEditor || currEditor.get(0) != scope.activeEditor.editor.get(0)){
+		var refKey = currEditor.attr('ref');
+		if(!scope.activeKey || scope.activeKey != refKey){
 			scope.removeActiveToolbar.call(scope);
-			var value = scope.editors[currEditor.attr('ref')].value;
-			scope.activeEditor = new divi.indEditor({editor:currEditor,parent:scope,value:value});
+			scope.activeKey = refKey;
+			scope.activeEditor = scope.getEditorsForKey(refKey);
 		}
 	}
 	
@@ -1452,8 +1556,6 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		document.execCommand(command, 0, args);
 		var par = this.parent ? this.parent : this;
 		par.updateToolbar();
-		var editor = this.parent ? this : this.activeEditor;
-		editor.updateValue();
 	}
 	
 	,updateToolbar:function () {
@@ -1470,17 +1572,9 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,update:function(ref,value){
-		if(ref){
-			this.editors[ref].value = value;
-		}
-	}
-	
 	,removeActiveToolbar:function(){
 		if(this.activeEditor){
 			this.activeEditor.destroy();
-			var ref = this.activeEditor.ref;
-			delete this.activeEditor;
 		}
 	}
 	
@@ -1502,7 +1596,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 								 eachListener.apply(scope,[event,target,jTarget]);
 							 }
 						 }
-					 }
+					 } 
 				}else{
 					event.preventDefault();
 					event.stopPropagation();
@@ -1527,17 +1621,22 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.listeners['click'] = [this.setActiveToolbar];
 	}
 	
+	,setEditors:function(editors){
+		this._editors = editors;
+	}
+	
 	,initiateEditors:function(){
-		var editors = [],eachEdit;
+		var editors = [],eachEdit,mainEditors = {};
 		for(var ind in this.editors){
 			if(this.editors.hasOwnProperty(ind)){
 				eachEdit = this.editors[ind];
 				if(eachEdit){
 					editors.push(eachEdit.editor);
-					$(eachEdit.editor).html(eachEdit.value);
+					mainEditors[ind] = new divi.indEditor({editor:$(eachEdit.editor),parent:this,value:eachEdit.value});
 				}
 			}
 		}
+		this.setEditors(mainEditors);
 		return editors;
 	}
 	
@@ -1546,36 +1645,77 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.bindToolbar();
 	}
 	
+	,getEditorDtls:function(scope,event){
+		var scope = event.data.scope;
+		return scope.parent ? scope : scope.activeEditor;
+	}
+	
 	,onToolBarclick:function(event,target,scope){
 		var scope = event.data.scope;
-		if(scope.activeEditor){
-			var target = event.currentTarget;
-			scope.activeEditor.restoreSelection();
-			scope.activeEditor.activate();
-			scope.execCommand($(target).data(scope.commandRole));
-			scope.activeEditor.saveSelection();
+		var editor = scope.getEditorDtls(scope,event);
+		if(editor){
+			scope.launchCommand($(event.currentTarget).data(scope.commandRole),editor);
 		}
 	}
+	
+	,launchCommand:function(data,activeEditor){
+		if(activeEditor){
+			var scope = activeEditor.parent;
+			activeEditor.restoreSelection();
+			activeEditor.activate();
+			if(data){
+				scope.execCommand(data);
+			}else{
+				this.updateToolbar();
+			}	
+			activeEditor.saveSelection();
+		}
+	}
+
 	
 	,onRestoreSel:function(event,target,scope){
 		var scope = event.data.scope;
-		if(scope.activeEditor){
-			scope.activeEditor.restoreSelection();
+		var editor = scope.getEditorDtls(scope,event);
+		if(editor){
+			editor.restoreSelection();
 		}
 	}
 	
-	,insertFiles:function (files,event) {
-		var scope = event.data.scope;
-		if(scope.activeEditor){
-			scope.activeEditor.activate();
-		}
+	,insertImage:function(fileInfo,event){
+		var file = fileInfo;
+		var scope = this;
+		var editor = scope.getEditorDtls(scope,event);
+		$.when(scope.readFileIntoDataUrl(fileInfo)).done(function (e) {
+			editor.addFile(file);
+			var tpl = '<img src="%s" name= "%y"/>';
+			tpl = tpl.replace('%s', e.target.result);
+			tpl = tpl.replace('%y', file.name);
+			scope.execCommand.call(scope,'insertHTML', tpl);
+		}).fail(function (e) {
+			scope.fileUploadError("file-reader", e);
+		});
+	}
+	
+	,insertImage1:function(fileInfo,event){
+		var file = fileInfo;
+		var scope = this;
+		$.when(scope.readFileIntoDataUrl(fileInfo)).done(function (e) {
+			editor.addFile(file);
+			var tpl = '<img src="%s" name= "%y"/>';
+			tpl = tpl.replace('%s', e.target.result);
+			tpl = tpl.replace('%y', file.name);
+			scope.execCommand.call(scope,'insertHTML', tpl);
+		}).fail(function (e) {
+			scope.fileUploadError("file-reader", e);
+		});
+	}
+	
+	,insertFiles:function (mainEditor,files,event) {
+		var scope = mainEditor;
+		var editor = scope.getEditorDtls(scope,event);
 		$.each(files, function (idx, fileInfo) {
 			if (/^image\//.test(fileInfo.type)) {
-				$.when(scope.readFileIntoDataUrl(fileInfo)).done(function (dataUrl) {
-					scope.execCommand.call(scope,'insertimage', dataUrl);
-				}).fail(function (e) {
-					scope.fileUploadError("file-reader", e);
-				});
+				scope.insertImage(fileInfo,event);
 			} else {
 				scope.fileUploadError("unsupported-file-type", fileInfo.type);
 			}
@@ -1584,14 +1724,18 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	
 	,onFileChange:function(event,target,scope){
 		var scope = event.data.scope;
-		scope.onRestoreSel(event,target,scope);
-		if (this.type === 'file' && this.files && this.files.length > 0) {
-			scope.insertFiles(this.files,event);
+		var editor = scope.getEditorDtls(scope,event);
+		if(editor){
+			editor.onRestoreSel(event,target,scope);
+			if (this.type === 'file' && this.files && this.files.length > 0) {
+				scope.insertFiles(scope,this.files,event);
+			}
+			if(scope){
+				editor.saveSelection();
+				this.value = '';
+			}
 		}
-		if(scope.activeEditor){
-			scope.activeEditor.saveSelection();
-			this.value = '';
-		}
+		
 	}
 	
 	,bindToolbar:function () {
@@ -1608,6 +1752,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	selectedRange:undefined,
 	parent:undefined,
 	value:'',
+	files:{},
 	ref:undefined,
 	events:'mouseup keyup keydown mouseout',
 	editable:false,
@@ -1617,18 +1762,64 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.ref = this.editor.attr('ref');
 	}
 
-	,getValue:function(){
-		var val = this.value;
-		if(this.editor){
-			val = this.editor.html();
-		}
-		return val;
+	,initialize:function(){
+		
 	}
 	
-	,updateValue:function(){
-		this.parent.update(this.ref,this.getValue());
+	,addFile:function(file){
+		if(file){
+			this.files[file.name] = file;	
+		}
 	}
+	
 
+	,getValue:function(rtnScope,callback){
+		var val = "";
+		if(this.editor){
+			this.saveinlineImages(rtnScope,this.editor.html(),callback);
+		}
+	}
+	
+	,saveinlineImages:function(rtnScope,value,callback){
+		var scope = this;
+		var files = scope.files;
+		var cbScope = rtnScope;
+	    if (files) {
+	        var url = scope.prepareBookPath(scope,null,null,cbScope.imageLocExact);
+	        var filesList = [],currFile;
+	        for (var key in files) {
+	            if (files.hasOwnProperty(key)) {
+	                filesList.push(files[key]);
+	            }
+	        }
+	        if (filesList.length > 0) {
+	            var deferred = new $.Deferred();
+	            var deferredArray = [];
+	            deferredArray.push(deferred);
+	            rtnScope.persist.call(scope, url, filesList,false,deferred);
+	            $.when.apply($, deferredArray).then(function (e) {
+	            	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+	            });
+	        }else{
+	        	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+	        }
+	    }
+	}
+	
+	,saveInlineSucess:function (val, files,callback,cbScope) {
+		var saveVal = val;
+		if(files && files.length > 0){
+			var location = cbScope.imageLocExact;
+			saveVal = this.prepareRetrievePath(location, val, files, cbScope);
+			this.files = {};
+		}
+		saveVal = this.prepareResourcePath(val,"../"+cbScope.getFileActionWoPrefix+cbScope.imageLoc,cbScope.imageLocExact);
+		if(callback){
+	    	callback.apply(cbScope,[saveVal]);
+	    }
+		
+	}
+	
 	,restoreSelection:function () {
 		var scope = this;
 		var selection = window.getSelection();
@@ -1646,7 +1837,8 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 			}
 		}
 	}
-
+	
+	
 	,activate:function(){
 		if(this.editor){
 			this.editor.attr('contenteditable', true);
@@ -1657,8 +1849,6 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	,destroy:function(){
 		if(this.editor){
 			this.editor.attr('contenteditable', false);
-			this.removeListeners();
-			this.editor = undefined;
 		}
 	}
 
@@ -1666,12 +1856,16 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		if(this.value){
 			this.editor.empty().append(this.value);
 		}
-		this.activate();
+		var parent = this.parent;
 		this.listeners['keydown'] = [this.triggerCommand];
 		this.listeners['keyup'] = [this.triggerCommand,this.editorListener];
 		this.listeners['mouseup'] = [this.editorListener];
 		this.listeners['mouseout'] = [this.editorListener];
 		this.attachListeners([this.editor]);
+		this.activate();
+		/*if(parent){
+			parent.launchCommand.call(parent,null,this);
+		}*/
 	}
 
 	,getCurrentRange:function () {
@@ -1701,11 +1895,12 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 		
 		if(this.hotKeys[hotKey]){
+			var parent = scope.parent;
 			event.preventDefault();
 			event.stopPropagation();
-			scope.restoreSelection();
-			scope.execCommand(scope.hotKeys[hotKey]);
-			scope.saveSelection();
+			if(parent){
+				parent.launchCommand.call(parent,scope.hotKeys[hotKey],scope);
+			}
 		}
 	}
 	
@@ -1870,18 +2065,7 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,initiliazeEditor:function(){
 		if (this.selector) {
-			tinymce.init({
-					selector : this.selector,
-					paste_as_text : true,
-					paste_text_sticky : true,
-					paste_text_sticky_default : true,
-					plugins : 'imageupload paste formulaupload',
-					valid_elements : '*[*]',
-					toolbar1 : 'undo redo | styleselect | bold italic underline superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link imageupload | link formulaupload',
-					height : 300,
-					init_instance_callback : "formulaOnclick"
-				});
-			tinymce.ScriptLoader.load('assets/js/jquery.iframe-post-form.js');
+			
 		}
 	}
 	
