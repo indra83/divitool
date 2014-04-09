@@ -2,6 +2,9 @@
 //save the book into master.json
 //handle all pop-ups ( chapters/topics/assessments)
 
+$(document).ready(function() {
+  $.ajaxSetup({ cache: false });
+});
 
 $.widget( "custom.superDialog", $.ui.dialog, {
 	_createButtons: function() {
@@ -440,8 +443,6 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
-	
-	
 	,setCount:function(id){
 		if(id){
 			divi[this.table].prototype.idCount = id;
@@ -699,10 +700,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 				child.appendChild(key);
 			}
 		}
-		this.addSplValues(dom, childdom, values, parent);
+		this.addSplValues(dom, child, values, parent);
 	}
 	
-	,addSplValues:function(dom,childdom,values,parent){
+	,addSplValues:function(dom,child,values,parent){
 		
 	}
 	
@@ -815,6 +816,7 @@ divi.video = divi.extend(divi.element,{
 divi.html = divi.extend(divi.element,{
 	ignoreFields:['data','references'],
 	table:'html',
+	dataField:'data',
 	idCount:1,
 	editor:undefined,
 	idPrefix:'html',
@@ -823,12 +825,39 @@ divi.html = divi.extend(divi.element,{
 		divi.html.superclass.constructor.call(this);
 	}
 
+	,getSaveHtmlLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.savefileAction);
+		return url+"/"+this.imageLoc;
+	}
+	
+	,getHtmlLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
+		return url+"/"+this.imageLoc;
+	}
+
+	,previewElement:function(values,appendSel){
+		var val = values['data'];
+		if(val){
+			var tag = document.createElement('div');
+			val = this.prepareResourcePath(val,this.imageLocExact,this.getHtmlLoc());
+			$(tag).html(val);
+		}
+		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
+	}
+
 	,attachpreContent:function(appendTo,showToggle){
 		this.createEditor(appendTo,"");
 	}
 	
-	,addSplValues:function(dom,childdom,values,parent){
-		var editor = this.editor;
+	,addSplValues:function(dom,child,values,parent){
+		var dataF = values[this.dataField];
+		var data;
+		if(dataF){
+			data = dom.createElement('data');
+            cdata = dom.createCDATASection(unescape(dataF));
+            data.appendChild(cdata);
+            child.appendChild(data);
+		}
 	}
 	
 	,persistChild:function(){
@@ -836,16 +865,19 @@ divi.html = divi.extend(divi.element,{
 		if(editor){
 			var first = this.getFirstEditor(editor);
 			if(first){
-				first.getValue(this,this.htmlCallBack);
+				first.getValue(this,this.htmlcallBack);
 			}
 		}else{
 			this.htmlcallBack();
 		}
 	}
 	
-	,htmlcallBack:function(){
+	,htmlcallBack:function(val){
 		var scope = this;
-		divi.appBase.persistChild.call(scope);
+		var values = this.getValues();
+		values[this.dataField] = val;
+		this.setValues(values);
+		divi.appBase.prototype.persistChild.call(scope);
 	}
 	
 	,prepareParentDom:function(dom,childdom,values,parent){
@@ -1291,11 +1323,16 @@ divi.book = divi.extend(divi.bookBase,{
 		divi.book.superclass.constructor.call(this);
 	}
 	
+	,getSaveHtmlLoc:function(){
+		return this.prepareBookPath(this,null,null,this.imageLoc);
+	}
 	
+	,getHtmlLoc:function(){
+		return this.prepareBookPath(this,null,this.getFileAction,this.imageLoc);
+	}
 	,drawonScreen:function(values){
 		var mainKey = "",jMainKey,parse,val;
 		for(var key in values){
-			var imglocation  = "../"+this.getFileActionWoPrefix+this.imageLoc;
 			if(values.hasOwnProperty(key)){
 				mainKey = "."+this.prefix+key;
 				jMainKey = $(mainKey);
@@ -1304,8 +1341,8 @@ divi.book = divi.extend(divi.bookBase,{
 					val = values[key];
 					if(key == this.bookoverviewkey){
 						$(this.bookheader).removeClass('hidden').attr('contenteditable', false);
-						val = this.prepareResourcePath(val,this.imageLocExact,imglocation);
-						values[key] = val;
+						val = this.prepareResourcePath(val,this.imageLocExact,this.getHtmlLoc());
+						values[this.bookoverviewkey] = val;
 					}
 					jMainKey.html(val);
 				}
@@ -1728,20 +1765,6 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		});
 	}
 	
-	,insertImage1:function(fileInfo,event){
-		var file = fileInfo;
-		var scope = this;
-		$.when(scope.readFileIntoDataUrl(fileInfo)).done(function (e) {
-			editor.addFile(file);
-			var tpl = '<img src="%s" name= "%y"/>';
-			tpl = tpl.replace('%s', e.target.result);
-			tpl = tpl.replace('%y', file.name);
-			scope.execCommand.call(scope,'insertHTML', tpl);
-		}).fail(function (e) {
-			scope.fileUploadError("file-reader", e);
-		});
-	}
-	
 	,insertFiles:function (mainEditor,files,event) {
 		var scope = mainEditor;
 		var editor = scope.getEditorDtls(scope,event);
@@ -1817,7 +1840,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		var files = scope.files;
 		var cbScope = rtnScope;
 	    if (files) {
-	        var url = scope.prepareBookPath(scope,null,null,cbScope.imageLocExact);
+	        var url = rtnScope.getSaveHtmlLoc();
 	        var filesList = [],currFile;
 	        for (var key in files) {
 	            if (files.hasOwnProperty(key)) {
@@ -1828,7 +1851,11 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	            var deferred = new $.Deferred();
 	            var deferredArray = [];
 	            deferredArray.push(deferred);
-	            rtnScope.persist.call(scope, url, filesList,false,deferred);
+	            var method = rtnScope.persist;
+	            if(!method){
+	            	method = rtnScope.parent.persist;
+	            }
+	            method.call(scope, url, filesList,true,deferred);
 	            $.when.apply($, deferredArray).then(function (e) {
 	            	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
 	            });
@@ -1841,11 +1868,10 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	,saveInlineSucess:function (val, files,callback,cbScope) {
 		var saveVal = val;
 		if(files && files.length > 0){
-			var location = cbScope.imageLocExact;
-			saveVal = this.prepareRetrievePath(location, val, files, cbScope);
+			saveVal = this.prepareRetrievePath(cbScope.imageLocExact, val, files, cbScope);
 			this.files = {};
 		}
-		saveVal = this.prepareResourcePath(val,"../"+cbScope.getFileActionWoPrefix+cbScope.imageLoc,cbScope.imageLocExact);
+		saveVal = this.prepareResourcePath(saveVal,cbScope.getHtmlLoc(),cbScope.imageLocExact);
 		if(callback){
 	    	callback.apply(cbScope,[saveVal]);
 	    }

@@ -51,6 +51,7 @@ divi.app.audioAlone = new divi.pageBase({
 		 return [{name:"src", "desc": "Audio File", "type": "audiofield","isRequired": true},
 		         {name:"id", "desc": "Audio ID", "type": "textfield","isRequired": true,isReadOnly:true},
 		         {name:"title", "desc": "Title", "type": "textfield"},
+		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
 		         {name:"url","desc": "URL", "type": "textfield"}];
 	}
 });
@@ -112,6 +113,7 @@ divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Au
 divi.tpl.video = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.image = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
+divi.tpl.html = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.eachHeader = '<div class="previewElem"></div>'
 
 
