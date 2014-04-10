@@ -115,6 +115,7 @@ divi.appBase = divi.extend(divi.base, {
 	savefileAction:'/savefile/',
 	saveformulaAction:'/saveformula/',
 	imageLocExact:"./htmlimages/",
+	equationLocExact:"./equations/",
 	imageLoc:"/htmlimages/",
 	data:{},
 	values:{},
@@ -297,6 +298,19 @@ divi.appBase = divi.extend(divi.base, {
 	    for (var i = 0; i < files.length; i++) {
 	        currData = files[i];
 	        matchedElem = dataQuery.find('img[name="' + currData.name + '"]');
+	        if (!divi.util.isjQEmpty(matchedElem)) {
+	            $(matchedElem).attr('src', location + currData.name);
+	        }
+	    }
+	    return dataQuery.clone().html();
+	}
+	
+	,prepareEquationPath:function (location,val, files,cbScope) {
+	    var dataQuery = $("<div/>").append($(val));
+	    var matchedElem;
+	    for (var i = 0; i < files.length; i++) {
+	        currData = files[i];
+	        matchedElem = dataQuery.find(currData.src);
 	        if (!divi.util.isjQEmpty(matchedElem)) {
 	            $(matchedElem).attr('src', location + currData.name);
 	        }
@@ -851,7 +865,12 @@ divi.html = divi.extend(divi.element,{
 		return url+"/"+this.imageLoc;
 	}
 	
-	,getEquationsHtmlLoc:function(){
+	,getEquationsLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
+		return url+"/"+this.equationLocExact;
+	}
+	
+	,getSaveEquationsHtmlLoc:function(){
 		return this.prepareFilePath(this.parent,"",this.saveformulaAction);
 	}
 	
@@ -865,6 +884,7 @@ divi.html = divi.extend(divi.element,{
 		if(val){
 			var tag = document.createElement('div');
 			val = this.prepareResourcePath(val,this.imageLocExact,this.getHtmlLoc());
+			val = this.prepareResourcePath(val,this.equationLocExact,this.getEquationsLoc());
 			$(tag).html(val);
 		}
 		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
@@ -1340,7 +1360,11 @@ divi.book = divi.extend(divi.bookBase,{
 		return this.prepareBookPath(this,null,null,this.imageLoc);
 	}
 	
-	,getEquationsHtmlLoc:function(){
+	,getSaveEquationsHtmlLoc:function(){
+		return "";
+	}
+	
+	,getEquationsLoc:function(){
 		return "";
 	}
 	
@@ -1359,6 +1383,7 @@ divi.book = divi.extend(divi.bookBase,{
 					if(key == this.bookoverviewkey){
 						$(this.bookheader).removeClass('hidden').attr('contenteditable', false);
 						val = this.prepareResourcePath(val,this.imageLocExact,this.getHtmlLoc());
+						val = this.prepareResourcePath(val,this.equationLocExact,this.getEquationsLoc());
 						values[this.bookoverviewkey] = val;
 					}
 					jMainKey.html(val);
@@ -1914,16 +1939,16 @@ divi.indEditor = divi.extend(divi.contentEditor,{
         }
         
         var imageFiles = this.fetchFormulas(value);
-        var imageUrl = rtnScope.getEquationsHtmlLoc();
+        var imageUrl = rtnScope.getSaveEquationsHtmlLoc();
         if(imageFiles && imageFiles.length > 0 && imageUrl){
         	 deferredArr.push(method.call(scope, imageUrl, imageFiles,true));
         }
         if(deferredArr.length > 0){
         	$.when.apply(this,deferredArr).then(function(){
-            	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+            	scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope);
         	});
         }else{
-        	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+        	scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope);
         }
 	}
 	
@@ -1943,13 +1968,18 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		return files;
 	}
 	
-	,saveInlineSucess:function (val, files,callback,cbScope) {
+	,saveInlineSucess:function (val, files,imageFiles,callback,cbScope) {
 		var saveVal = val;
 		if(files && files.length > 0){
 			saveVal = this.prepareRetrievePath(cbScope.imageLocExact, val, files, cbScope);
 			this.files = {};
 		}
+		if(imageFiles && imageFiles.length > 0){
+			saveVal = this.prepareEquationPath(cbScope.equationLocExact, val, files, cbScope);
+			this.files = {};
+		}
 		saveVal = this.prepareResourcePath(saveVal,cbScope.getHtmlLoc(),cbScope.imageLocExact);
+		saveVal = this.prepareResourcePath(saveVal,cbScope.getEquationsLoc(),cbScope.equationLocExact);
 		if(callback){
 	    	callback.apply(cbScope,[saveVal]);
 	    }
