@@ -77,7 +77,6 @@ function formulaOnclick(inst, e, d) {
 	});
 }
 
-
 (function() {
 	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
@@ -86,7 +85,8 @@ function formulaOnclick(inst, e, d) {
 	EDITOR_SRC = http + 'latex.codecogs.com';
 	EMBED_ENGINE = 'formulaEditor.html';
 	EDIT_ENGINE = http + 'www.codecogs.com/eqnedit.php';
-	EDITOR_SW_FLASH = http+ 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
+	EDITOR_SW_FLASH = http
+			+ 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
 	EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
 })();
 
@@ -104,9 +104,9 @@ divi.appBase = divi.extend(divi.base, {
     contentPreview:'.contentPreview',
     contents:{},
     cmKey:'.contextmenu',
-    // fileFields:['videofield','audiofield','imagefield'],
 	popupKey:'.popup',
 	htmlKey:'.dialog-html',
+	equations:'./equations',
 	comboMaster:{},
 	getFileAction:'/getfiles',
 	toolbarCls:'.toolbarCls',
@@ -127,6 +127,21 @@ divi.appBase = divi.extend(divi.base, {
 
 	,startup:function(){
 		this.initializeValues();
+	}
+	
+	,initiliazeEditor:function(){
+		var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier', 
+		             'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
+		             'Times New Roman', 'Verdana'],
+         fontTarget = $('[title=Font]').siblings('.dropdown-menu');
+       $.each(fonts, function (idx, fontName) {
+           fontTarget.append($('<li><a data-edit="fontName ' + fontName +'" style="font-family:\''+ fontName +'\'">'+fontName + '</a></li>'));
+       });
+        //$('a[title]').tooltip({container:'body'});
+     	$('.dropdown-menu input').click(function() {return false;})
+ 		    .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
+         .keydown('esc', function () {this.value='';$(this).change();});
+     	
 	}
 	
 	,initializeValues:function(){
@@ -272,7 +287,7 @@ divi.appBase = divi.extend(divi.base, {
 	    for (var i = 0; i < files.length; i++) {
 	        currData = files[i];
 	        matchedElem = dataQuery.find('img[name="' + currData.name + '"]');
-	        if (matchedElem) {
+	        if (!divi.util.isjQEmpty(matchedElem)) {
 	            $(matchedElem).attr('src', location + currData.name);
 	        }
 	    }
@@ -323,7 +338,7 @@ divi.appBase = divi.extend(divi.base, {
 	,launchEditor:function(instance,homeScope){
 		if(instance){
 			var sel = this.getSelector(this.htmlKey);
-			var dlgConfig  = {autoOpen: false,modal: true,width: '50%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
+			var dlgConfig  = {position: "top",autoOpen: false,modal: true,top:'1%',width: '80%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
 			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
 			var value = instance.getFieldValue(instance.bookoverviewkey);
 			instance.createEditor.call(instance,sel,value);
@@ -334,8 +349,8 @@ divi.appBase = divi.extend(divi.base, {
 		if(sel && !this.editor){
 			sel.find(this.toolbarCls).remove();
 			sel.find('div.editableDiv').remove();
-			
 			sel.append(this.getSelector(this.toolbarCls).clone().removeClass('hidden'));
+			this.initiliazeEditor();
 			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
 			sel.append(editorDom.dom);
 			var params = {};
@@ -590,10 +605,6 @@ divi.elementbase = divi.extend(divi.appBase,{
 					condition = (this.table == "references") ? this.referenceFields.contains(index) : !this.referenceFields.contains(index);
 					if(condition){
 						eachCfg = fieldConfig[index];
-						/*
-						 * if(this.fileFields.contains(eachCfg.type)){
-						 * this.files[eachCfg.name]; }
-						 */
 						this.values[eachCfg.name] = eachCfg.value || '';
 					}
 				}
@@ -1569,6 +1580,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	value:'',
 	filesList:{},
 	listeners:{},
+	formuleImages:undefined,
 	toolbarBtnSelector:undefined,
 	hotKeys: {
 		'ctrl+b': 'bold',
@@ -1583,7 +1595,9 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		'shift+tab': 'outdent',
 		'tab': 'indent'
 	},
+	formula:'formula',
 	toolbarSelector: '[data-role=editor-toolbar]',
+	dailogKey:'.dialog-html',
 	commandRole: 'edit',
 	activeToolbarClass: 'btn-info',
 	selectionMarker: 'edit-focus-marker',
@@ -1593,6 +1607,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.contentEditor.superclass.constructor.call(this);
+		this.formuleImages = 'img[src*="' + EQUATION_ENGINE + '"],img[src*="' + this.equations + '"]';
 		this.initialize();
 	}
 	
@@ -1690,6 +1705,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.listeners['click'] = [this.setActiveToolbar];
 	}
 	
+	
 	,setEditors:function(editors){
 		this._editors = editors;
 	}
@@ -1719,11 +1735,38 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		return scope.parent ? scope : scope.activeEditor;
 	}
 	
-	,onToolBarclick:function(event,target,scope){
+	,onToolBarclick:function(event){
 		var scope = event.data.scope;
+		var target = divi.util.getTarget(event);
+		var jTarget = $(target);
+		var editText = jTarget.parent().attr('data-edit');
+		if(!editText){
+			editText = jTarget.attr('data-edit');
+		}
 		var editor = scope.getEditorDtls(scope,event);
 		if(editor){
-			scope.launchCommand($(event.currentTarget).data(scope.commandRole),editor);
+			editor.restoreSelection();
+			if(editText == scope.formula){
+				scope.launchFormula(scope,editor);
+			}else if(editText == 'Cancel'){
+				scope.launchCommand($(event.currentTarget).data(scope.commandRole),editor);
+			}else{
+				
+				var checkforImg = jTarget.find(scope.formuleImages);
+				if(divi.util.isjQEmpty(checkforImg)){
+					checkforImg = jTarget.parent().find(scope.formuleImages);
+				}
+				if(!divi.util.isjQEmpty(checkforImg)){
+					scope.launchFormula(scope,editor,target);
+				}
+			}
+		}
+	}
+	
+	,launchFormula:function(mainEditor,editor,editTarget){
+		var range = editor.getCurrentRange();
+		if(editor || range){
+			editor.formula = new divi.formula({mainEditor:mainEditor,parent:editor,value:editTarget,currSel:range});
 		}
 	}
 	
@@ -1740,7 +1783,6 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			activeEditor.saveSelection();
 		}
 	}
-
 	
 	,onRestoreSel:function(event,target,scope){
 		var scope = event.data.scope;
@@ -1790,7 +1832,10 @@ divi.contentEditor = divi.extend(divi.appBase,{
 				this.value = '';
 			}
 		}
-		
+	}
+	
+	,attachEquationsListeners:function(){
+		$(this.dailogKey).find(this.formuleImages).on('click',null,{scope:this},this.onToolBarclick);
 	}
 	
 	,bindToolbar:function () {
@@ -1798,6 +1843,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		toolbar.find(this.toolbarBtnSelector).on('click',null,{scope:this},this.onToolBarclick);
 		toolbar.find('[data-toggle=dropdown]').on('click',null,{scope:this},this.onRestoreSel);
 		toolbar.find('input[type=file][data-' + this.commandRole + ']').on('change',null,{scope:this},this.onFileChange);
+		this.attachEquationsListeners();
 	}
 });
 
@@ -1807,17 +1853,17 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	selectedRange:undefined,
 	parent:undefined,
 	value:'',
+	listeners:{},
 	files:{},
 	ref:undefined,
 	events:'mouseup keyup keydown mouseout',
-	editable:false,
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.indEditor.superclass.constructor.call(this);
 		this.ref = this.editor.attr('ref');
 	}
 
-	,initialize:function(){
+	,initialize:function(){//overriding the base initialize
 		
 	}
 	
@@ -1921,9 +1967,6 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.listeners['mouseout'] = [this.editorListener];
 		this.attachListeners([this.editor]);
 		this.activate();
-		/*if(parent){
-			parent.launchCommand.call(parent,null,this);
-		}*/
 	}
 
 	,getCurrentRange:function () {
@@ -1973,11 +2016,170 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 	}
 	
+	,destroyFormula:function(){
+		this.formula.destroy();
+		delete this.formula;
+	}
+	
+	,updateFormula:function(html,range,oldDom){
+		if(html){
+			this.destroyFormula();
+			var node;
+			if(){
+				$(oldDom).replaceWith(html);
+			}else if(range) {
+	            range.deleteContents();
+	            if (range.createContextualFragment) {
+	                node = range.createContextualFragment(html);
+	            } else {
+	                var div = document.createElement("div"), child;
+	                div.innerHTML = html;
+	                node = document.createDocumentFragment();
+	                while ( (child = div.firstChild) ) {
+	                    node.appendChild(child);
+	                }
+	            }
+	            range.insertNode(node);
+		    }
+		}
+		this.attachEquationsListeners();
+	}
+	
 	,saveSelection:function () {
 		this.selectedRange = this.getCurrentRange();
 	}
 	
 });
+
+
+divi.formula = divi.extend(divi.contentEditor,{
+	mainEditor:undefined,
+	parent:undefined,
+	events:'click',
+	listeners:{},
+	ref:undefined,
+	formulaText:undefined,
+	formulaImg:undefined,
+	currSel:undefined,
+	value:undefined,
+	elems:['.insertWin','.cancelWin'],
+	tpl:undefined,
+	toolbar:'#toolbar',
+	value:undefined,
+	table:'formula',
+	dlgDflts:{ shadow: true,overlay: true,title: '<h3>Formula Upload</h3>',width: '100%',height:'100%',padding: 10,content: '',draggable: true,sysButtons: {btnClose: true}}
+
+	,constructor : function (cfg) {
+		$.extend(this,cfg);
+		divi.formula.superclass.constructor.call(this);
+	}
+	
+	,setValue:function(val){
+		if(val){
+			var jVal = $(val);
+			this.formulaText = jVal.attr('text');
+			$('#formulaText').val(unescape(this.formulaText));
+			this.formulaImg = jVal.attr('src');
+			$('#prFormula').attr('src',this.formulaImg);
+		}
+	}
+
+	,initialize:function(){//overriding the base initialize
+		this.tpl = divi.tpl[this.table];
+		this.show();
+	}
+	
+	,activate:function(){
+		$(this.toolbar).focus().removeAttr('readOnly');
+	}
+	
+	,show:function(){
+		var scope = this;
+		var dflts = scope.dlgDflts;
+		$.extend(dflts,{onShow:function(){scope.onShow();}});
+		$.Dialog(dflts);
+	}
+
+	,onShow:function(){
+		var formula = this.tpl;
+		$.Dialog.content(formula);
+		$(this.toolbar).html(divi.tpl.formToolBar);
+		EqEditor.init('',undefined,undefined,'toolbar');
+ 		EqEditor.add(new EqTextArea('prFormula', 'formulaText'),false);
+ 		this.handleListeners();
+		this.setValue(this.value);
+	}
+	
+	,handleListeners:function(){
+		this.listeners['click'] = [this.buttonClick];
+		this.attachListeners(this.elems);
+	}
+	
+	,destroy:function(){
+		this.removeListeners();
+		$('.window-overlay').remove();
+	}
+	
+	,buttonClick:function(event){
+		var scope = this;
+		var target = divi.util.getTarget(event);
+		var text = target.innerHTML;
+		if(text == "Insert"){
+			this.submitClick();
+		}else{
+			this.closeClick();
+		}
+	}
+	
+	,closeClick:function(){
+		$.Dialog.close();
+	}
+	
+	,submitClick:function(){
+		var textVal = $('#formulaText').val();
+		var val = $('#prFormula').attr('src');
+		var content,toProcess = false;
+		if (textVal) {
+			textVal  = escape(textVal);
+			if(this.formulaText){
+				var oldVal = this.formulaImg;
+				if(oldVal != val){
+					toProcess = true;
+				}
+			}else{
+				toProcess = true;
+			}
+		}
+		if(toProcess){
+			var content = '<img src="%s"  text="%y""/>';
+			content = content.replace('%s', val);
+			content = content.replace('%y', textVal);
+		}
+		this.closeClick();
+		this.parent.updateFormula(content,this.currSel,this.value);
+	}
+
+	,startup:function(){
+		if(this.value){
+			//this.editor.empty().append(this.value);
+		}
+		this.activate();
+	}
+	
+
+	,removeListeners:function(){
+		var elems = this.elems,elem;
+		if(this.elems){
+			for(var i=0;i < elems.length;i++){
+				if(elems.hasOwnProperty(i)){
+					elem = elems[i];
+					$(elem).off(this.events,null);
+				}
+			}
+		}
+	}
+});
+
 
 divi.home =  divi.extend(divi.appBase,{
 	parent:undefined,
@@ -2054,13 +2256,14 @@ divi.home =  divi.extend(divi.appBase,{
 	,startup:function(){
 		this.book = new divi.book({home:this});
 		this.loadBook();
-		this.initiliazeEditor();
 		this.attachListeners(this.defaultListeners());
 	}
 	
+	
+	
 	,preparepopUp:function(lstnCfg){
 		var popupDiv = this.retrievePopUpDiv();
-		var dlgConfig  = {autoOpen: false,modal: true,top:'2%',width: '50%', buttons: {Cancel:{scope:this,fn:this.cancelDailog}},close:{scope:this,fn:'cancelDailog'}};
+		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: '60%', buttons: {Cancel:{scope:this,fn:this.cancelDailog}},close:{scope:this,fn:'cancelDailog'}};
 		popupDiv.empty().superDialog(dlgConfig);
 	}
 	
@@ -2118,12 +2321,6 @@ divi.home =  divi.extend(divi.appBase,{
 	,showEditor:function(lstnCfg){
 		if(lstnCfg && lstnCfg.mapTo){
 			this.launchEditor(lstnCfg.mapTo,lstnCfg.scope);
-		}
-	}
-	
-	,initiliazeEditor:function(){
-		if (this.selector) {
-			
 		}
 	}
 	
