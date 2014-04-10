@@ -103,6 +103,7 @@ divi.appBase = divi.extend(divi.base, {
     padMax:3,
     contentPreview:'.contentPreview',
     contents:{},
+    defaultImgExtension:'.png',
     cmKey:'.contextmenu',
 	popupKey:'.popup',
 	htmlKey:'.dialog-html',
@@ -112,6 +113,7 @@ divi.appBase = divi.extend(divi.base, {
 	toolbarCls:'.toolbarCls',
 	getFileActionWoPrefix:'getfiles',
 	savefileAction:'/savefile/',
+	saveformulaAction:'/saveformula/',
 	imageLocExact:"./htmlimages/",
 	imageLoc:"/htmlimages/",
 	data:{},
@@ -142,6 +144,14 @@ divi.appBase = divi.extend(divi.base, {
  		    .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
          .keydown('esc', function () {this.value='';$(this).change();});
      	
+	}
+	
+	,S4:function() {
+		return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	}
+
+	,guid:function() {
+		return (this.S4() + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4()+ this.S4() + this.S4());
 	}
 	
 	,initializeValues:function(){
@@ -282,7 +292,7 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,prepareRetrievePath:function (location,val, files,cbScope) {
-	    var dataQuery = $(val);
+	    var dataQuery = $("<div/>").append($(val));
 	    var matchedElem;
 	    for (var i = 0; i < files.length; i++) {
 	        currData = files[i];
@@ -291,7 +301,7 @@ divi.appBase = divi.extend(divi.base, {
 	            $(matchedElem).attr('src', location + currData.name);
 	        }
 	    }
-	    return $("<div/>").append($(dataQuery).clone()).html();
+	    return dataQuery.clone().html();
 	}
 	
 	,prepareResourcePath:function (val,fromLoc,toLoc) {
@@ -841,6 +851,10 @@ divi.html = divi.extend(divi.element,{
 		return url+"/"+this.imageLoc;
 	}
 	
+	,getEquationsHtmlLoc:function(){
+		return this.prepareFilePath(this.parent,"",this.saveformulaAction);
+	}
+	
 	,getHtmlLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
 		return url+"/"+this.imageLoc;
@@ -1107,7 +1121,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		return masterObj;
 	}
 
-	,persist:function(url, file,isArray,deferred){
+	,persist:function(url, file,isArray){
 		var formData = new FormData();
 		if(isArray){
 			var eachFile;
@@ -1118,21 +1132,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}else{
 			formData.append(file.name, file, file.name);
 		}
-	    var xhr = new XMLHttpRequest();
-	    if(deferred){
-	    	var scope = this;
-	    	 xhr.onload = function (e) {
-    	        if (this.status == 200) {
-    	            deferred.resolve(scope);
-    	        } else {
-    	            deferred.reject(scope);
-    	        }
-    	    };
-	    }
-	    xhr.open('POST', url, true);
-	    xhr.send(formData);
-	    
-	   
+		 var xhr = new XMLHttpRequest();
+	     xhr.open('POST', url, true);
+	     xhr.send(formData);
 	}
 	
 	,destinationUrl:function(){
@@ -1336,6 +1338,10 @@ divi.book = divi.extend(divi.bookBase,{
 	
 	,getSaveHtmlLoc:function(){
 		return this.prepareBookPath(this,null,null,this.imageLoc);
+	}
+	
+	,getEquationsHtmlLoc:function(){
+		return "";
 	}
 	
 	,getHtmlLoc:function(){
@@ -1748,7 +1754,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			editor.restoreSelection();
 			if(editText == scope.formula){
 				scope.launchFormula(scope,editor);
-			}else if(editText == 'Cancel'){
+			}else if(editText){
 				scope.launchCommand($(event.currentTarget).data(scope.commandRole),editor);
 			}else{
 				
@@ -1855,6 +1861,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	value:'',
 	listeners:{},
 	files:{},
+	imgFiles:{},
 	ref:undefined,
 	events:'mouseup keyup keydown mouseout',
 	constructor : function (cfg) {
@@ -1867,12 +1874,17 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		
 	}
 	
+	,addImgFile:function(file){
+		if(file){
+			this.imgFiles[file.name] = file;	
+		}
+	}
+	
 	,addFile:function(file){
 		if(file){
 			this.files[file.name] = file;	
 		}
 	}
-	
 
 	,getValue:function(rtnScope,callback){
 		var val = "";
@@ -1885,30 +1897,50 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		var scope = this;
 		var files = scope.files;
 		var cbScope = rtnScope;
-	    if (files) {
-	        var url = rtnScope.getSaveHtmlLoc();
-	        var filesList = [],currFile;
-	        for (var key in files) {
+        var filesList = [],currFile;
+        var deferredArr = [];
+        var method = rtnScope.persist;
+        if(!method){
+        	method = rtnScope.parent.persist;
+        }
+        var url = rtnScope.getSaveHtmlLoc();
+        if (files && url) {
+        	for (var key in files) {
 	            if (files.hasOwnProperty(key)) {
 	                filesList.push(files[key]);
 	            }
 	        }
-	        if (filesList.length > 0) {
-	            var deferred = new $.Deferred();
-	            var deferredArray = [];
-	            deferredArray.push(deferred);
-	            var method = rtnScope.persist;
-	            if(!method){
-	            	method = rtnScope.parent.persist;
+        	deferredArr.push(method.call(scope, url, filesList,true));
+        }
+        
+        var imageFiles = this.fetchFormulas(value);
+        var imageUrl = rtnScope.getEquationsHtmlLoc();
+        if(imageFiles && imageFiles.length > 0 && imageUrl){
+        	 deferredArr.push(method.call(scope, imageUrl, imageFiles,true));
+        }
+        if(deferredArr.length > 0){
+        	$.when.apply(this,deferredArr).then(function(){
+            	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+        	});
+        }else{
+        	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
+        }
+	}
+	
+	,fetchFormulas:function(val){
+		var files = [];
+		if (val) {
+	        var elements = $(val).find('img[src^="' + EQUATION_ENGINE + '"]');
+	        if (elements && elements.length > 0) {
+	            var currData;
+	            for (var i = 0; i < elements.length; i++) {
+	                currData = elements[i];
+	                id = this.guid();
+	                files.push({name: id + this.defaultImgExtension,src: currData.src,text: currData.text});
 	            }
-	            method.call(scope, url, filesList,true,deferred);
-	            $.when.apply($, deferredArray).then(function (e) {
-	            	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
-	            });
-	        }else{
-	        	scope.saveInlineSucess.call(scope,value, filesList,callback,cbScope);
 	        }
 	    }
+		return files;
 	}
 	
 	,saveInlineSucess:function (val, files,callback,cbScope) {
@@ -2025,7 +2057,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		if(html){
 			this.destroyFormula();
 			var node;
-			if(){
+			if(oldDom){
 				$(oldDom).replaceWith(html);
 			}else if(range) {
 	            range.deleteContents();
@@ -2040,6 +2072,9 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	                }
 	            }
 	            range.insertNode(node);
+		    }else if (document.selection && document.selection.type != "Control") {
+		        range = document.selection.createRange();
+		        range.pasteHTML(html);
 		    }
 		}
 		this.attachEquationsListeners();
