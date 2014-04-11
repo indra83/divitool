@@ -390,7 +390,7 @@ divi.appBase = divi.extend(divi.base, {
 		if(sel && !this.editor){
 			sel.find(this.toolbarCls).remove();
 			sel.find('div.editableDiv').remove();
-			sel.append(this.getSelector(this.toolbarCls).clone().removeClass('hidden'));
+			sel.append(divi.tpl.richtoolbar);
 			this.initiliazeEditor();
 			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
 			sel.append(editorDom.dom);
