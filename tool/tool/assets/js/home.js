@@ -118,6 +118,7 @@ function guid() {
 divi.appBase = divi.extend(divi.base, {
     title: '',
     padMax:3,
+    editableDiv:'editableDiv',
     contentPreview:'.contentPreview',
     contents:{},
     defaultImgExtension:'.png',
@@ -401,10 +402,10 @@ divi.appBase = divi.extend(divi.base, {
 	,createEditor:function(sel,value){
 		if(sel && !this.editor){
 			sel.find(this.toolbarCls).remove();
-			sel.find('div.editableDiv').remove();
+			sel.find("div."+this.editableDiv).remove();
 			sel.append(divi.tpl.richtoolbar);
 			this.initiliazeEditor();
-			var editorDom = divi.domBase.create({tag:'div','class':'editableDiv'});
+			var editorDom = divi.domBase.create({tag:'div','class':this.editableDiv});
 			sel.append(editorDom.dom);
 			var params = {};
 			params['editors'] = {};
@@ -1696,7 +1697,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	
 	,setActiveToolbar:function(event,target,jTarget){
 		var scope = event.data.scope;
-		var currEditor = jTarget.hasClass('editableDiv') ? jTarget : jTarget.closest('div.editableDiv');
+		var currEditor = jTarget.hasClass("."+this.editableDiv) ? jTarget : jTarget.closest("div."+this.editableDiv);
 		scope.activateToolBar(scope,currEditor.attr('ref'));
 		
 	}
@@ -1840,6 +1841,9 @@ divi.contentEditor = divi.extend(divi.appBase,{
 				if(divi.util.isjQEmpty(checkforImg)){
 					checkforImg = jTarget.parent().find(scope.formuleImages);
 				}
+				if(scope instanceof divi.indEditor){
+					scope = scope.parent;
+				}
 				if(!divi.util.isjQEmpty(checkforImg)){
 					scope.launchFormula(scope,editor,target);
 				}
@@ -1849,7 +1853,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	
 	,launchFormula:function(mainEditor,editor,editTarget){
 		var range = editor.getCurrentRange();
-		if(editor || range){
+		if(editTarget || range){
 			$(mainEditor.sel).closest(".ui-dialog").css('display','none');
 			editor.formula = new divi.formula({mainEditor:mainEditor,parent:editor,value:editTarget,currSel:range});
 		}
@@ -1920,7 +1924,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	}
 	
 	,attachEquationsListeners:function(){
-		$(this.dailogKey).find(this.formuleImages).on('click',null,{scope:this},this.onToolBarclick);
+		$("div."+this.editableDiv).find(this.formuleImages).on('click',null,{scope:this},this.onToolBarclick);
 	}
 	
 	,bindToolbar:function () {
