@@ -126,6 +126,7 @@ divi.appBase = divi.extend(divi.base, {
 	htmlKey:'.dialog-html',
 	equations:'./equations',
 	comboMaster:{},
+	htmlValKey:undefined,
 	getFileAction:'/getfiles',
 	toolbarCls:'.toolbarCls',
 	getFileActionWoPrefix:'getfiles',
@@ -228,6 +229,17 @@ divi.appBase = divi.extend(divi.base, {
 			this.licenseData();
 			this.boxInfoData();
 		}
+	}
+	
+	,cleanValues:function(values,key){
+		var key = this.htmlValKey;
+		if(key){
+			value = values[key];
+			value = this.prepareResourcePath(value,this.getHtmlLoc(),this.imageLocExact);
+			value = this.prepareResourcePath(value,this.getEquationsLoc(),this.equationLocExact);
+			values[this.htmlValKey] = value;
+		}
+		return values;
 	}
 	
 	,getValues:function(){
@@ -381,7 +393,7 @@ divi.appBase = divi.extend(divi.base, {
 			var sel = this.getSelector(this.htmlKey);
 			var dlgConfig  = {position: "top",autoOpen: false,modal: true,top:'1%',width: '80%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
 			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
-			var value = instance.getFieldValue(instance.bookoverviewkey);
+			var value = instance.getFieldValue(instance.htmlValKey);
 			instance.createEditor.call(instance,sel,value);
 		}
 	}
@@ -417,7 +429,7 @@ divi.appBase = divi.extend(divi.base, {
 		 if(book){
 			 window.URL = window.webkitURL || window.URL;
 	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-	         var file = new Blob([JSON.stringify(this.stringify(), undefined, 2)]);
+	         var file = new Blob([JSON.stringify(this.stringify(true), undefined, 2)]);
 	         file.name = this.masterFile;
 	         book.persist(this.savefileAction,file);
 	         this.persistChild();
@@ -529,6 +541,7 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,setValues:function(updated){
 		if(updated){
+			var updated = this.modifyValues(updated);
 			$.extend(this.values,updated);
 		}
 	}
@@ -538,6 +551,17 @@ divi.appBase = divi.extend(divi.base, {
 		var parent = this.getComboMasterValue(this.parent.comboKey,values[this.parent.comboKey]);
 		if(!parent){ parent = this.parent;}
 		scope.parent = parent;
+	}
+	
+	,modifyValues:function(values){
+		var key = this.htmlValKey;
+		if(key){
+			value = values[key];
+			value = this.prepareResourcePath(value,this.imageLocExact,this.getHtmlLoc());
+			value = this.prepareResourcePath(value,this.equationLocExact,this.getEquationsLoc());
+			values[this.htmlValKey] = value;
+		}
+		return values;
 	}
 	
 	,update:function(form){
@@ -732,6 +756,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 					}
 				}
 			}
+			var values = this.modifyValues(values);
 			$.extend(this.values,values);
 		}
 		if(this.reference){
@@ -868,7 +893,7 @@ divi.video = divi.extend(divi.element,{
 divi.html = divi.extend(divi.element,{
 	ignoreFields:['data','references'],
 	table:'html',
-	dataField:'data',
+	htmlValKey:'data',
 	idCount:1,
 	editor:undefined,
 	idPrefix:'html',
@@ -912,7 +937,8 @@ divi.html = divi.extend(divi.element,{
 	}
 	
 	,addSplValues:function(dom,child,values,parent){
-		var dataF = values[this.dataField];
+		var values = this.cleanValues(values);
+		var dataF = values[this.htmlValKey];
 		var data;
 		if(dataF){
 			data = dom.createElement('data');
@@ -937,7 +963,7 @@ divi.html = divi.extend(divi.element,{
 	,htmlcallBack:function(val){
 		var scope = this;
 		var values = this.getValues();
-		values[this.dataField] = val;
+		values[this.htmlValKey] = val;
 		this.setValues(values);
 		divi.appBase.prototype.persistChild.call(scope);
 	}
@@ -1150,11 +1176,11 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.draw();
 	}
 	
-	,stringify:function(input){
+	,stringify:function(toClean){
 		var masterObj =  {};
 		var book = this.retrieveBook() 
 		this.loadCombos(book);
-		book.prepareData(masterObj);
+		book.prepareData(masterObj,toClean);
 		return masterObj;
 	}
 
@@ -1227,19 +1253,16 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,attachChildren:function(input,callback,initialize,addParams,skipChildren){
+	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
 		var currKey;
 		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
 			currKey = this.childrenKeys[i];
-			/*
-			 * if(!input.children){ input.children = {}; }
-			 */
 			addParams = addParams || [];
-			this.attachEachChild(callback,input,currKey,initialize,addParams,skipChildren);
+			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
 		}
 	}
 	
-	,attachEachChild:function(callback,input,currKey,initialize,addParams,skipChildren){
+	,attachEachChild:function(callback,toClean,input,currKey,initialize,addParams,skipChildren){
 		var eachChild;
 		if(initialize){
 			this.initilizeChild(input,currKey,skipChildren)
@@ -1247,13 +1270,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var currChildren = this.children[currKey];
 		for(var i=0;currChildren && i < currChildren.length;i++){
 			eachChild = currChildren[i];
-			var params = [input,currKey,i].concat(addParams).concat([skipChildren]);
+			var params = [input,toClean,currKey,i].concat(addParams).concat([skipChildren]);
 			eachChild[callback].apply(eachChild,params);
 		}
 	}
 	
-	
-	,prepareData:function(input,currKey,index,isArray,skipChildren){
+	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
 		if(input){
 			if(isArray){
 				if(skipChildren){
@@ -1264,10 +1286,13 @@ divi.bookBase = divi.extend(divi.appBase,{
 			}
 			var newObj = {};
 			var values = this.getValues();
+			if(toClean){
+				values = this.cleanValues(values);
+			}
 			$.extend(newObj,values);
 			this.setComboMasterData(values);
 			this.setComboData(values);
-			this.attachChildren(newObj,'prepareData',true,[true],true);
+			this.attachChildren(newObj,toClean,'prepareData',true,[true],true);
 			if(isArray){
 				input.push(newObj);
 			}else{
@@ -1300,7 +1325,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,deletefn:function(event,val,jTarget){
 		this.beforeDelete(event,val,jTarget);
-		this.persistData();
+		this.update();
 	}
 	,beforeDelete:function(event,val,jTarget){
 		
@@ -1360,7 +1385,7 @@ divi.book = divi.extend(divi.bookBase,{
 	prviwForm:'.btnAthr',
 	isBook:true,
 	bookoverview:'.bookoverview',
-	bookoverviewkey:'overview',
+	htmlValKey:'overview',
 	bookheader:'.bookheader',
 	prefix:'book',
 	table:'book',
@@ -1394,14 +1419,11 @@ divi.book = divi.extend(divi.bookBase,{
 			if(values.hasOwnProperty(key)){
 				mainKey = "."+this.prefix+key;
 				jMainKey = $(mainKey);
-				parse = (key !== this.bookoverviewkey || !divi.util.isEmpty(values[key])) ? true : false;
+				parse = (key !== this.htmlValKey || !divi.util.isEmpty(values[key])) ? true : false;
 				if(parse){
 					val = values[key];
-					if(key == this.bookoverviewkey){
+					if(key == this.htmlValKey){
 						$(this.bookheader).removeClass('hidden').attr('contenteditable', false);
-						val = this.prepareResourcePath(val,this.imageLocExact,this.getHtmlLoc());
-						val = this.prepareResourcePath(val,this.equationLocExact,this.getEquationsLoc());
-						values[this.bookoverviewkey] = val;
 					}
 					jMainKey.html(val);
 				}
@@ -1424,7 +1446,7 @@ divi.book = divi.extend(divi.bookBase,{
 	
 	,htmlCallBack:function(saveVal){
 		var values = this.getValues();
-		values[this.bookoverviewkey] = saveVal;
+		values[this.htmlValKey] = saveVal;
 		this.setValues(values);
 		this.update();
 	}
@@ -1436,14 +1458,13 @@ divi.book = divi.extend(divi.bookBase,{
 			$(this.prviwForm).removeClass('button').empty().off('click');
 			this.showContent(this.prviwForm,true);
 		}
-		
 	}
 	
 	,prepareSideBar:function(parent){
 		var navDiv,ulDiv;
 		navDiv = this.doms[this.divs['navDiv']] = divi.domBase.create(this.navDflts,parent);
 		ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create(this.ulDflts,navDiv.dom);
-		this.attachChildren(ulDiv.dom,'prepareSideBar',false,false);
+		this.attachChildren(ulDiv.dom,true,'prepareSideBar',false,false);
 	}
 });
 
@@ -1537,7 +1558,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 	}
 	
 
-	,prepareSideBar:function(parent,currKey,index){
+	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,ulDiv;
 		livDiv = this.doms[this.divs['liDiv']] = divi.domBase.create($.extend(this.lidDefaults,{scope:this}),parent);
 		values = this.getValues();
@@ -1547,7 +1568,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 		aDiv.dom.setAttribute('id',aDiv.id);
 		ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create($.extend(this.ulDefaults,{scope:this}),livDiv.dom);
 		if(this.hasChildren){
-			this.attachChildren(ulDiv.dom,'prepareSideBar',false,false);
+			this.attachChildren(ulDiv.dom,toClean,'prepareSideBar',false,false);
 		}
 	}
 });
@@ -1580,7 +1601,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	}
 	
 	
-	,prepareSideBar:function(parent,currKey,index){
+	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
 		livDiv = this.doms[this.divs['liDiv']] = divi.domBase.create($.extend(this.lidDefaults,{scope:this}),parent);
@@ -1612,7 +1633,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		return values;
 	}
 
-	,prepareSideBar:function(parent,currKey,index){
+	,prepareSideBar:function(parent,toClean,currKey,index){
 		this.sequence = this.index;
 	}
 });
@@ -2009,10 +2030,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 		if(imageFiles && imageFiles.length > 0){
 			saveVal = this.prepareEquationPath(cbScope.equationLocExact, val, files, cbScope);
-			this.files = {};
 		}
-		saveVal = this.prepareResourcePath(saveVal,cbScope.getHtmlLoc(),cbScope.imageLocExact);
-		saveVal = this.prepareResourcePath(saveVal,cbScope.getEquationsLoc(),cbScope.equationLocExact);
 		if(callback){
 	    	callback.apply(cbScope,[saveVal]);
 	    }
