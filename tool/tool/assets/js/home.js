@@ -48,6 +48,23 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 		this.uiDialogButtonPane.appendTo( this.uiDialog );
 	}
 
+	,_createOverlay: function () {
+		var t = $;
+	    if (this.options.modal) {
+	        var e = this,
+	            i = this.widgetFullName;
+	        t.ui.dialog.overlayInstances || this._delay(function () {
+	            t.ui.dialog.overlayInstances && this.document.bind("focusin.dialog", function (s) {
+	            	if(t(".ui-dialog:visible:last .ui-dialog-content").data(i)){
+	            		 e._allowInteraction(s) || (s.preventDefault(), t(".ui-dialog:visible:last .ui-dialog-content").data(i)._focusTabbable())
+	            	}
+	            })
+	        }), this.overlay = t("<div>").addClass("ui-widget-overlay ui-front").appendTo(this._appendTo()), this._on(this.overlay, {
+	            mousedown: "_keepFocus"
+	        }), t.ui.dialog.overlayInstances++
+	    }
+	}
+
 	,close: function (e) {
 	    var i, s = this;
 	    if (this._isOpen && this._trigger("beforeClose", e) !== !1) {
@@ -381,7 +398,7 @@ divi.appBase = divi.extend(divi.base, {
 			params['editors'] = {};
 			$(editorDom.dom).attr('ref',editorDom.id);
 			params['editors'][editorDom.id] = {'editor':editorDom.dom,value:value};
-			$.apply(params,{toolbardomCls:'.toolbarCls'});
+			$.extend(params,{toolbardomCls:'.toolbarCls',sel:sel});
 			this.editor = new divi.contentEditor(params);
 		}
 	}
@@ -1610,6 +1627,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	events:'click',
 	value:'',
 	filesList:{},
+	sel:undefined,
 	listeners:{},
 	formuleImages:undefined,
 	toolbarBtnSelector:undefined,
@@ -1658,7 +1676,11 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,setActiveToolbar:function(event,target,jTarget){
 		var scope = event.data.scope;
 		var currEditor = jTarget.hasClass('editableDiv') ? jTarget : jTarget.closest('div.editableDiv');
-		var refKey = currEditor.attr('ref');
+		scope.activateToolBar(scope,currEditor.attr('ref'));
+		
+	}
+	
+	,activateToolBar:function(scope,refKey){
 		if(!scope.activeKey || scope.activeKey != refKey){
 			scope.removeActiveToolbar.call(scope);
 			scope.activeKey = refKey;
@@ -1759,6 +1781,16 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,initialize:function(){
 		this.attachListeners(this.initiateEditors());
 		this.bindToolbar();
+		//this.setDefaultEditor();
+	}
+	
+	,setDefaultEditor:function(){
+		var editors = this.editors;
+		var sortedKeys = Object.keys(editors).sort();
+		if(sortedKeys && sortedKeys.length == 1){
+			var first = editors[sortedKeys[0]];
+			this.activateToolBar(this, $(first).attr('ref'));
+		}
 	}
 	
 	,getEditorDtls:function(scope,event){
@@ -1797,6 +1829,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,launchFormula:function(mainEditor,editor,editTarget){
 		var range = editor.getCurrentRange();
 		if(editor || range){
+			$(mainEditor.sel).closest(".ui-dialog").css('display','none');
 			editor.formula = new divi.formula({mainEditor:mainEditor,parent:editor,value:editTarget,currSel:range});
 		}
 	}
@@ -2108,6 +2141,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		    }
 		}
 		this.attachEquationsListeners();
+		$(this.parent.sel).closest(".ui-dialog").css('display','block');
 	}
 	
 	,saveSelection:function () {
