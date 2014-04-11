@@ -2255,6 +2255,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 	}
 	
 	,closeClick:function(){
+		$(this.parent.parent.sel).closest(".ui-dialog").css('display','block');
 		$.Dialog.close();
 	}
 	
@@ -2310,6 +2311,9 @@ divi.home =  divi.extend(divi.appBase,{
 	book:undefined,
 	editors:1,
 	callback:undefined,
+	editContent:'.titleHolder',
+	topicTit:'.topicTit',
+	chapTit:'.chapTit',
 	selector:'textarea.html_input',
 	previewSel:'.treepreview',
 	constructor : function (cfg) {
@@ -2338,8 +2342,20 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,previewContent:function(selected){
+		this.updateBcrumb(selected);
 		if(selected && this.isTopic(selected)){
 			selected.loadFile();
+		}
+	}
+	
+	,updateBcrumb:function(selected){
+		if(this.isTopic(selected)){
+			var chapter = this.retrieveChapter(selected);
+			this.getSelector(this.editContent).removeClass('hidden');
+			this.getSelector(this.chapTit).html(chapter.getFieldValue('name'));
+			this.getSelector(this.topicTit).html(selected.getFieldValue('name'));
+		}else{
+			this.getSelector(this.editContent).addClass('hidden');
 		}
 	}
 	
