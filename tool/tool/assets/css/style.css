@@ -108,7 +108,7 @@ span{
 .previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video{
 	width:55%;
 	position:relative;
-	height:auto;
+	height:100%;
 }
 
 .previewElem .contentElem{

@@ -1537,9 +1537,10 @@ divi.chapter = divi.extend(divi.bookBase,{
 	
 	,prepareValue:function(val){
 		var rtn = "";
-		if(!divi.util.isEmptyId(this.sequence)){
-			rtn += (this.sequence +1) +'.  ';
+		if(divi.util.isEmptyId(this.sequence)){
+			this.sequence = 0;
 		}
+		rtn += (this.sequence +1) +'.  ';
 		rtn += val;
 		return rtn;
 	}
@@ -2013,7 +2014,8 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	,fetchFormulas:function(val){
 		var files = [];
 		if (val) {
-	        var elements = $(val).find('img[src^="' + EQUATION_ENGINE + '"]');
+			var dataQuery = $("<div/>").append(val);
+	        var elements = dataQuery.find('img[src^="' + EQUATION_ENGINE + '"]');
 	        if (elements && elements.length > 0) {
 	            var currData;
 	            for (var i = 0; i < elements.length; i++) {

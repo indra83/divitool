@@ -809,7 +809,7 @@ $.extend(divi.cache, {
 
 divi.util = {
 	isEmptyId:function(id){
-		return (!id && id < 0);
+		return (!id || id < 0);
 	}
 
 	,pad:function(str, max) {
