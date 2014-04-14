@@ -1,7 +1,6 @@
 //read the book into structure
 //save the book into master.json
 //handle all pop-ups ( chapters/topics/assessments)
-
 $(document).ready(function() {
   $.ajaxSetup({ cache: false });
 });
@@ -81,19 +80,6 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 	}
 });
 
-function formulaOnclick(inst, e, d) {
-	inst.on("click", function(curr, e) {
-		var target = curr.srcElement ? curr.srcElement : curr.target;
-		if (target.localName == "img") {
-			var targetJ = $(target);
-			var text = targetJ.attr("text");
-			if (text) {
-				this.execCommand('mceFormulaUpload', null, target.outerHTML);
-			}
-		}
-	});
-}
-
 (function() {
 	var http = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
@@ -106,14 +92,6 @@ function formulaOnclick(inst, e, d) {
 			+ 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
 	EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
 })();
-
-function S4() {
-	return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-}
-
-function guid() {
-	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4()+ S4() + S4());
-}
 
 divi.appBase = divi.extend(divi.base, {
     title: '',
@@ -520,12 +498,16 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,submitForm:function(b,e){
 		var scope = this;
+		var values;
 		var form = scope.formPanel;
 		if(form){
 			var isValidForm = form.validateForm();
 	    	if(isValidForm){
 	    		if(scope.isNew){
-					var values = form.getValues({});
+					values = form.getValues({});
+					if(scope.reference){
+						$.extend(values,scope.reference.formPanel.getValues({}));
+					}
 					this.setParent(scope,values);
 					var key = scope.table;
 					var lookupKey = this.pluralize(key);
@@ -533,7 +515,7 @@ divi.appBase = divi.extend(divi.base, {
 					this.addChild(scope.parent,lookupKey,scope);
 				}
 	    		if(form){
-	    			scope.update(form);
+	    			scope.update(null,values);
 	    		}
 	    		divi.home.prototype.cancelDailog(b,e);
 	    	}
@@ -565,8 +547,9 @@ divi.appBase = divi.extend(divi.base, {
 		return values;
 	}
 	
-	,update:function(form){
-		var values = form ? form.getValues({}) : this.getValues();
+	,update:function(form,values){
+		form = form || this;
+		values = values || form.values();
 		if(!$.isEmptyObject(values)){
 			this.updated = true;
 			this.setValues(values);
@@ -628,7 +611,6 @@ divi.appBase = divi.extend(divi.base, {
 			instance.showContent(popupDiv);
 		}
 	}
-	
     
 });
 
@@ -825,16 +807,26 @@ divi.elementbase = divi.extend(divi.appBase,{
 	
 	,showContent:function(appendTo,showToggle){
 		this.attachpreContent(appendTo, showToggle);
-		if(!this.formPanel){
-			this.formPanel = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
-		}
-		if(!this.formPanel.toggle && showToggle){
-			$.extend(this.formPanel,{toggle:true});
-			this.formPanel.createToggle();
-		}
-		this.formPanel.draw(appendTo);
-		this.formPanel.setValues(this.getValues());
+		$(appendTo).append(divi.tpl.tabs);
+		this.prepareForm($(appendTo).find('#_page_1'),showToggle);
 		this.formPanel.setValue('id', this.prepareId());
+		if(this.reference){
+			this.prepareForm.call(this.reference,$(appendTo).find('#_page_2'),showToggle);
+		}
+		$('.tab-control').tabcontrol();
+	}
+	
+	,prepareForm:function(appendElem,showToggle,ref){
+		ref = ref || 'formPanel';
+		if(!this[ref]){
+			this[ref] = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
+		}
+		if(this[ref] && !this[ref].toggle && showToggle){
+			$.extend(this[ref],{toggle:true});
+			this[ref].createToggle();
+		}
+		this[ref].draw(appendElem);
+		this[ref].setValues(this.getValues());
 	}
 	
 	,initilizeChild:function(input){
