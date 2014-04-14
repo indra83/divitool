@@ -1318,7 +1318,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,deletefn:function(event,val,jTarget){
 		this.beforeDelete(event,val,jTarget);
-		this.update();
+		this.update.call(this.parent,null,this.parent.getValues());
 	}
 	,beforeDelete:function(event,val,jTarget){
 		
