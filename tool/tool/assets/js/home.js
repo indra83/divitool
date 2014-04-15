@@ -93,6 +93,44 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 	EDITOR_SW_PLAYER = http + 'www.macromedia.com/go/getflashplayer';
 })();
 
+divi.listeners = function(){
+	
+};
+
+$.extend(divi.listeners,{
+	attachElementListeners:function(elements){
+		var avlListeners = this.events;
+		if(avlListeners && elements){
+			 for(var eachEditor in elements){
+				 if(elements.hasOwnProperty(eachEditor)){
+					 $(elements[eachEditor]).on(avlListeners,null,{scope:this},this.contentStdListener);
+				 }
+			 }
+		}
+	}
+
+	,attachListenersWS:function(listeners,scope){
+		if (listeners != null) {
+			$.each(listeners, function(k, v) {
+				v.scope = v.scope || scope;
+				var callback = v.scope[v.listenerFn];
+				$(v.tag).unbind(v.listType).bind(v.listType,$.proxy(function (d,e,f,g) {if(callback){callback.apply(this,[v,d])};},v.scope)).removeClass('disabled');
+			});
+		}
+	}
+	,unbindListeners:function(listeners){
+		if (listeners != null) {
+			var scope = this;
+			$.each(listeners, function(k, v) {
+				v.scope = v.scope || scope;
+				var callback = v.scope[v.listenerFn];
+				$(v.tag).unbind(v.listType).addClass('disabled');
+			});
+		}
+	}
+	
+});
+
 divi.appBase = divi.extend(divi.base, {
     title: '',
     padMax:3,
@@ -137,7 +175,6 @@ divi.appBase = divi.extend(divi.base, {
        $.each(fonts, function (idx, fontName) {
            fontTarget.append($('<li><a data-edit="fontName ' + fontName +'" style="font-family:\''+ fontName +'\'">'+fontName + '</a></li>'));
        });
-        //$('a[title]').tooltip({container:'body'});
      	$('.dropdown-menu input').click(function() {return false;})
  		    .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
          .keydown('esc', function () {this.value='';$(this).change();});
@@ -393,8 +430,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.editor = new divi.contentEditor(params);
 		}
 	}
-	
-	
+
 	,closeDailog:function(b,e){
 		var scope = this;
 		if($.isFunction(scope.cancelDailog)){
@@ -1317,6 +1353,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 	,deletefn:function(event,val,jTarget){
+		var dlgDflts = {shadow: true,overlay: false,icon: '',title: 'Title',width: 500,padding: 10,content: 'Delete Confirmation',sysButtons: {btnClose: true}};
+		$.Dialog(dlgDflts,{sysBtnCloseClick: function(e){;}});
+
+	}
+	
+	,deletefn:function(event,val,jTarget){
 		this.beforeDelete(event,val,jTarget);
 		this.update.call(this.parent,null,this.parent.getValues());
 	}
@@ -1371,6 +1413,32 @@ divi.bookBase = divi.extend(divi.appBase,{
 		
 	}
 	
+	,createContextMenu:function(items){
+		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
+		if(items){
+			for(var ech in items){
+				if(items.hasOwnProperty(ech)){
+					childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.cmListeners}),parDom.dom);
+					childDom.dom.setAttribute('id',childDom.id);
+				}
+			}
+		}
+		this.cmDom = parDom;
+	}
+	
+	,destroydoms:function(){
+		var crr,crref,doms = this.divs;
+		for(var ech in doms){
+			if(doms.hasOwnProperty(ech)){
+				crr = this.doms[doms[ech]];
+				if(crr && crr.id){
+					crref =  crr.id;
+					divi.domBase.destroy(crref);
+				}
+			}
+		}
+	}
+		
 });
 
 divi.book = divi.extend(divi.bookBase,{
@@ -1444,6 +1512,8 @@ divi.book = divi.extend(divi.bookBase,{
 		this.update();
 	}
 	
+	
+	
 	,draw:function(){
 		var values = this.getValues();
 		this.drawonScreen(values);
@@ -1497,19 +1567,6 @@ divi.chapter = divi.extend(divi.bookBase,{
 		this.updateSequence(this.parent.children[lookupKey]);
 	}
 	
-	,destroydoms:function(){
-		var crr,crref,doms = this.divs;
-		for(var ech in doms){
-			if(doms.hasOwnProperty(ech)){
-				crr = this.doms[doms[ech]];
-				if(crr && crr.id){
-					crref =  crr.id;
-					divi.domBase.destroy(crref);
-				}
-			}
-		}
-	}
-
 	,updateSequence:function(children){
 		var currChild;
 		for(var i=0;i< children.length;i++){
@@ -1536,21 +1593,6 @@ divi.chapter = divi.extend(divi.bookBase,{
 		rtn += val;
 		return rtn;
 	}
-	
-	
-	,createContextMenu:function(items){
-		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
-		if(items){
-			for(var ech in items){
-				if(items.hasOwnProperty(ech)){
-					childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.cmListeners}),parDom.dom);
-					childDom.dom.setAttribute('id',childDom.id);
-				}
-			}
-		}
-		this.cmDom = parDom;
-	}
-	
 
 	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,ulDiv;
@@ -1584,7 +1626,23 @@ divi.topic = divi.extend(divi.bookBase,{
 	
 	constructor : function (cfg) {
 		$.extend(this,cfg);
+		this.cmListeners = {'click':[this.onCmClick]};
 		divi.topic.superclass.constructor.call(this);
+		var parent = $('.contextmenu');
+		this.cmItems = {'Delete':{fn:this.deletefn}};
+		this.createContextMenu(this.cmItems);
+	}
+	
+	,beforeDelete:function(event,val,jTarget){
+		var lookupKey = this.pluralize(this.table);
+		var children = this.parent.children[lookupKey];
+		if(children){
+			children.remove(this);
+		}
+		var doms = this.doms[this.divs['liDiv']];
+		var currDom = $(doms.dom);
+		currDom.remove();
+		this.destroydoms();
 	}
 	
 	,getValues:function(){
@@ -1757,16 +1815,6 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		}
 	 }
 	
-	,attachListeners:function(elements){
-		var avlListeners = this.events;
-		if(avlListeners && elements){
-			 for(var eachEditor in elements){
-				 if(elements.hasOwnProperty(eachEditor)){
-					 $(elements[eachEditor]).on(avlListeners,null,{scope:this},this.contentStdListener);
-				 }
-			 }
-		}
-	}
 	
 	,startup:function(){
 		this.toolbarBtnSelector = 'a[data-' + this.commandRole + '],button[data-' + this.commandRole + '],input[type=button][data-' + this.commandRole + ']';
@@ -1794,7 +1842,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	}
 	
 	,initialize:function(){
-		this.attachListeners(this.initiateEditors());
+		this.divi.listeners.attachElementListeners(this.initiateEditors());
 		this.bindToolbar();
 		//this.setDefaultEditor();
 	}
@@ -2076,7 +2124,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.listeners['keyup'] = [this.triggerCommand,this.editorListener];
 		this.listeners['mouseup'] = [this.editorListener];
 		this.listeners['mouseout'] = [this.editorListener];
-		this.attachListeners([this.editor]);
+		this.divi.listeners.attachElementListeners([this.editor]);
 		this.activate();
 	}
 
@@ -2227,7 +2275,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 	
 	,handleListeners:function(){
 		this.listeners['click'] = [this.buttonClick];
-		this.attachListeners(this.elems);
+		this.divi.listeners.attachElementListeners(this.elems);
 	}
 	
 	,destroy:function(){
@@ -2327,9 +2375,9 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,enableTopEditBtns:function(selected){
 		if(selected && selected.table == 'topic'){
-			this.attachListeners(this.editBtnListeners(selected));
+			divi.listeners.attachListenersWS(this.editBtnListeners(selected),this);
 		}else{
-			this.unbindListeners(this.editBtnListeners(selected));
+			divi.listeners.unbindListeners(this.editBtnListeners(selected),this);
 		}
 	}
 	
@@ -2351,17 +2399,6 @@ divi.home =  divi.extend(divi.appBase,{
 		}
 	}
 	
-	,unbindListeners:function(listeners){
-		if (listeners != null) {
-			var scope = this;
-			$.each(listeners, function(k, v) {
-				v.scope = v.scope || scope;
-				var callback = v.scope[v.listenerFn];
-				$(v.tag).unbind(v.listType).addClass('disabled');
-			});
-		}
-	}
-	
 	,btnListeners:function(scope){
 		 return [{tag:'.addtopic',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'topic',mapTo:scope},
 	        {tag:'.addassessment',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'assessment',mapTo:scope}];
@@ -2379,7 +2416,7 @@ divi.home =  divi.extend(divi.appBase,{
 		if(selected){
 			chapter = this.retrieveChapter(selected);
 			if(chapter){
-				this.attachListeners(this.btnListeners(chapter));
+				divi.listeners.attachListenersWS(this.btnListeners(chapter),this);
 			}
 		}
 	}
@@ -2387,7 +2424,7 @@ divi.home =  divi.extend(divi.appBase,{
 	,startup:function(){
 		this.book = new divi.book({home:this});
 		this.loadBook();
-		this.attachListeners(this.defaultListeners());
+		divi.listeners.attachListenersWS(this.defaultListeners(),this);
 	}
 	
 	
@@ -2454,22 +2491,6 @@ divi.home =  divi.extend(divi.appBase,{
 			this.launchEditor(lstnCfg.mapTo,lstnCfg.scope);
 		}
 	}
-	
-	,attachListeners:function(listeners){
-		if (listeners != null) {
-			var scope = this;
-			$.each(listeners, function(k, v) {
-				v.scope = v.scope || scope;
-				var callback = v.scope[v.listenerFn];
-				$(v.tag).unbind(v.listType).bind(v.listType,$.proxy(function (d,e,f,g) {
-					if(callback){
-						callback.apply(this,[v,d])};
-					}
-				,v.scope)).removeClass('disabled');
-			});
-		}
-	}
-
 	,insertContent:function(){
 		
 	}
