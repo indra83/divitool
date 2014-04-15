@@ -920,56 +920,23 @@ divi.core = {
 	ajax : function(dataObj) {
 		var url = dataObj.url ;
 		var params = dataObj.data;
-		var isArray = $.isArray(params);
-		if (params == null) {
-			params = {};
-		}
+		var isArray = dataObj.isArray || false;
 		var resultData = dataObj.resultData || {}
-		var localCache = divi.cache;
-		var cache = dataObj.hasOwnProperty('cache') ? dataObj.cache : false; //leave the behaviour to jquery
 		var requestType = dataObj.requestType ? dataObj.requestType : "POST";
 		var dataType = dataObj.dataType ? dataObj.dataType : "json";
 		var context = dataObj.context ? dataObj.context : this;
 		var async = dataObj.async ? dataObj.async : false;
 		var crossDomain = dataObj.domain ? dataObj.domain : false;
-		var successCallBack = dataObj.succCall;
-		var failureCallBack = dataObj.failCall;
 		if(isArray){
-			params = {data:$.toJSON(params)};
+			params = {data:JSON.stringify(params)};
 		}
-		$.ajax({
+		return $.ajax({
 			type : requestType,
 			async : async,
 			data : params,
 			context: context,
 			url : url,
-			dataType : dataType,
-			beforeSend: function () {
-                if (cache && localCache.exist(url)) {
-                	var content = localCache.get(url);
-                	if(content){
-                		divi.core.ajaxCallback.call(this,content,resultData,successCallBack,dataType);
-                		return false;
-                	}else{
-                		return true;
-                	}
-                }
-                return true;
-            },
-            complete: function (r,textStatus) {
-            	var responseText = r.responseText;
-            	if (cache && !localCache.exist(url)) {
-            		var content = divi.core.removeScripts(responseText,dataType);
-            		localCache.set(url,content);
-                }
-            	if(textStatus == 'error' || textStatus == 'abort' || textStatus == 'parsererror'){
-            		if(failureCallBack){
-            			failureCallBack.call(this,r);
-            		}
-            	}else{
-            		divi.core.ajaxCallback.call(this,r.responseText,resultData,successCallBack,dataType);
-            	}
-            }
+			dataType : dataType
 		});
 	}
 	

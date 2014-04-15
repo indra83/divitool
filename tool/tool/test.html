@@ -1,91 +1,23 @@
 <html>
-   <head>
-      <title>Divi Editor</title>
-	  <link rel="stylesheet" href="assets/css/Normalize.css">
-      <link rel="stylesheet" href="assets/css/style.css">
-      <link rel="stylesheet" href="assets/css/metro-bootstrap.css" media="screen">
-      <link href="assets/css/equation-embed.css" rel="stylesheet" media="screen">
-      <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
-   </head>
-   <body class="metro">
-     <div class="container">
-       <div class="bookcontent">
-	      	<div class="bookPreview inline1">
-	      		<div class="maintitle titlePreview imageSection large txBold capsOn bg-white"><span>Book Progress</span></div>
-	      		<div class="maintitle titlePreview imageSection button success large txBold capsOn"><span>Book Cover</span></div>
-	      		<div class="maintitle titlePreview imageSection button success large capsOn"><span>chapters Progress</span></div>
-	      		<div> <ul class="treeview" data-role="treeview">
-                                    <li class="node">
-
-                                        <a href="#"><span class="node-toggle"></span>sergey@pimenov.com.ua</a>
-                                        <ul>
-                                            <li><a href="#">Inbox</a></li>
-                                            <li><a href="#">Outbox</a></li>
-                                            <li><a href="#">Drafts</a></li>
-                                            <li><a href="#">Rss-channels</a></li>
-                                            <li><a href="#">Trash <span class="value">[5]</span></a></li>
-                                            <li class="node">
-
-                                                <a href="#"><span class="node-toggle"></span>subnode</a>
-                                                <ul>
-                                                    <li><a href="#">Inbox</a></li>
-                                                    <li><a href="#">Outbox</a></li>
-                                                    <li><a href="#">Drafts</a></li>
-                                                    <li><a href="#">Rss-channels</a></li>
-                                                    <li><a href="#">Trash</a></li>
-                                                    <li class="node">
-
-                                                        <a href="#"><span class="node-toggle"></span>subnode 2</a>
-                                                        <ul>
-                                                            <li><a href="#">Inbox</a></li>
-                                                            <li><a href="#">Outbox</a></li>
-                                                            <li><a href="#">Drafts</a></li>
-                                                            <li><a href="#">Rss-channels</a></li>
-                                                            <li><a href="#">Trash</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="node">
-
-                                        <a href="#"><span class="node-toggle"></span>support@metroui.net</a>
-                                        <ul>
-                                            <li><a href="#">Inbox</a></li>
-                                            <li><a href="#">Outbox</a></li>
-                                            <li><a href="#">Drafts</a></li>
-                                            <li><a href="#">Rss-channels</a></li>
-                                            <li><a href="#">Trash</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="node collapsed">
-
-                                        <a href="#"><span class="node-toggle"></span>info@metroui.net</a>
-                                        <ul>
-                                            <li><a href="#">Inbox</a></li>
-                                            <li><a href="#">Outbox</a></li>
-                                            <li><a href="#">Drafts</a></li>
-                                            <li><a href="#">Rss-channels</a></li>
-                                            <li><a href="#">Trash</a></li>
-                                        </ul>
-                                    </li>
-                                </ul></div>
-	         </div>
-                                </div>
-                                
-                                </div>
-                                
-                               
-	<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
-	<script src="assets/js/jquery.js"></script>
-	<script src="assets/js/chosen.jquery.js"></script>
-	<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
-	<script src="assets/js/metro.min.js"></script>
-	<script src="assets/js/core.js"></script>
-	<script src="assets/js/form.js"></script>
-	<script src="assets/js/headers.js"></script>
-	<script src="assets/js/home.js"></script>
-	<script src="assets/js/eq_editor.js"></script>
-	 </body>
+    <head>
+        <meta charset="utf-8">
+        <title>jQuery When - Example</title>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    </head>
+    <body>
+<div id="target"></div>
+        <script>
+            var 
+            aj1 = $.get('home.html'),
+            aj2 = $.get('home.html'),
+            aj3 = $.get('home.html');         
+ 
+            $.when(aj1,aj2,aj3).done(function(a,b,c){
+                $('#target').html('');
+                $('#target').append(a[0]);
+                $('#target').append(b[0]);
+                $('#target').append(c[0]);
+            });
+        </script>
+    </body>
 </html>
