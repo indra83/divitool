@@ -948,6 +948,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 		
 	}
 	
+	,attachpostContent:function(appendTo,showToggle){
+		
+	}
+	
 	,showContent:function(appendTo,showToggle){
 		var appendElem = appendTo;
 		if(this.reference){
@@ -956,6 +960,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			this.attachpreContent(appendElem, showToggle);
 		}
 		this.prepareForm(appendElem,showToggle);
+		this.attachpostContent(appendElem, showToggle);
 		this.formPanel.setValue('id', this.prepareId());
 		if(this.reference){
 			this.prepareForm.call(this.reference,$(appendTo).find('#_page_2'),showToggle);
@@ -1208,8 +1213,47 @@ divi.audio = divi.extend(divi.element,{
 		$.extend(this,cfg);
 		divi.audio.superclass.constructor.call(this);
 	}
+
+	,addAddValues:function(dom,childdom){
+		childdom.removeAttribute('thumb');
+	}
+
 });
 
+divi.imageset = divi.extend(divi.element,{
+	table:'imageset',
+	idCount:1,
+	elementsNo:1,
+	prevElem:'previewImages',
+	elems:[],
+	idPrefix:'imgSet',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.imageset.superclass.constructor.call(this);
+		this.elems = [];
+	}
+
+	,attachpostContent:function(appendTo,showToggle){
+		var elem;
+		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
+		appendTo = appendTo.find("."+this.prevElem);
+		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
+			var elem = new divi.image({parent:this,isNew:true,home:this.home});
+			this.elems[i] = elem.prepareForm(appendTo,showToggle);
+		}
+	}
+	
+	,attachImgElement:function(appendTo,showToggle){
+		var elem;
+		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus'><a><i></i></a></div>");
+		appendTo = appendTo.find("."+this.prevElem);
+		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
+			var elem = new divi.image({parent:this,isNew:true,home:this.home});
+			this.elems[i] = elem.prepareForm(appendTo,showToggle);
+		}
+	}
+
+});
 
 divi.image = divi.extend(divi.element,{
 	tag:'img',
@@ -1220,7 +1264,6 @@ divi.image = divi.extend(divi.element,{
 		$.extend(this,cfg);
 		divi.image.superclass.constructor.call(this);
 	}
-
 
 	,previewElement:function(values,appendSel){
 		var tag = document.createElement(this.tag || this.table);
@@ -1552,11 +1595,11 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,confirmDelete:function(event,scope,target,text){
 		this.beforeDelete(event);
-		this.update.call(this.parent,null,this.parent.getValues());
-		if(this.isTopic(this)){
-			var book = this.retrieveBook();
-			book.draw();
-		}
+		this.parent.persistData();
+		this.getSelector(this.contentPreview).empty();
+		var book = this.retrieveBook();
+		book.draw();
+		book.home.updateBcrumb(book);
 	}
 	
 	,beforeDelete:function(event){
@@ -2566,7 +2609,8 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope},
 		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope},
 		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope},
-		         {tag:'.addsubtopic',listType:'click',parent:divi.book,listenerFn:'addelement',key:'subtopic',mapTo:scope}];
+		         {tag:'.addsubtopic',listType:'click',parent:divi.book,listenerFn:'addelement',key:'subtopic',mapTo:scope},
+		         {tag:'.addimageset',listType:'click',parent:divi.book,listenerFn:'addelement',key:'imageset',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){

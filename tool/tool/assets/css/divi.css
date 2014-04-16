@@ -3083,7 +3083,7 @@ a {
   position: relative;
   background-color: #fff;
   outline: 0;
-  height: 34px;
+  height: 25px;
   width: 100%;
 }
 .metro .input-control.text .btn-clear,
@@ -3113,7 +3113,7 @@ a {
 .metro .input-control.tel .btn-search {
   background-color: #F0F0F0;
   position: absolute;
-  top: 5px;
+  top: 2px;
   z-index: 2;
   border: 0;
   right: 4px;

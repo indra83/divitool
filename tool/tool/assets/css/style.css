@@ -98,10 +98,19 @@ span{
 	padding: 10px;
 }
 
+
+.previewElem h4,.previewElem h3{
+	height:5%;
+}
+
 .previewElem .mainElem{
 	height:35%;
 	width:45%;
 	display: inline-block;
+}
+
+.metro .ui-dialog .addmore a{
+	cursor:pointer;
 }
 
 
@@ -316,7 +325,7 @@ img.toggle{
 
 .metro div.formfield.larger label.labelStyle{
 	width:255px;
-	font-size: 15px;
+	font-size: 13px;
 }
 
 .metro div.formfield div.input-control{
@@ -543,6 +552,12 @@ div.editableDiv{
 	display:inline;
 }
 
+.metro .ui-dialog .ui-dialog-buttonpane{
+	padding:0px;
+}
+.metro .ui-dialog-buttonset button{
+	padding: 0px 5px;
+} 
 
 
 .modal_close { position: absolute; top: 12px; right: 12px; display: block; width: 14px; height: 14px; background: url(../img/modal_close.png); z-index: 2; }
