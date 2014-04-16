@@ -63,6 +63,13 @@ divi.app.heading3 = new divi.pageBase({
 	}
 });
 
+divi.app.subtopic = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"id", "desc": "Sub Topic ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"subtopic", "desc": "Sub Topic", "type": "textfield","isRequired": true},];
+	}
+});
+
 divi.app.video = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"src", "desc": "Video File", "type": "videofield","isRequired": true},
@@ -124,6 +131,7 @@ divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:<
 divi.tpl.image = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.html = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.heading3 = '<h3>${heading}</h3>';
+divi.tpl.subtopic = '<h4>${subtopic}</h4>';
 divi.tpl.eachHeader = '<div class="previewElem"></div>'
 divi.tpl.formula = '<div class="formula"><div class="formulaUploadContainer"><div class="formulaUploadContainerInner"><div class="toolbarContainer container"><div id="toolbar"></div></div><div class="formulapreviewCon"><div class="formulaTextContainer stdContainer stcontainer" tabindex="1"><div><h4>Enter Formula</h4></div><div><textarea name="formula" id="formulaText" class="textareacontainer" autofocus></textarea></div></div><div class="previewCon stcontainer"><div class="prContainerHeader"><h4>Formula Preview</h4></div><div class="prContainer stdContainer" style="overflow-y:auto;"><img src="" name="prFormula" id="prFormula"/></div></div></div></div></div></div><div class="form-actions place-right"><button class="button primary insertWin">Insert</button>&nbsp;<button class="button cancelWin" type="button">Cancel</button></div>';
 divi.tpl.deleteBts = '<div  class="place-left">Are you sure you want to Delete?</div><div class="form-actions place-right"><button class="button primary deleteWin">Delete</button>&nbsp;<button class="button cancelWin" type="button">Cancel</button></div>';

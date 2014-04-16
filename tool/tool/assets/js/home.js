@@ -1075,6 +1075,48 @@ divi.heading3 = divi.extend(divi.element,{
 });
 
 
+divi.subtopic = divi.extend(divi.element,{
+	table:'subtopic',
+	idCount:1,
+	idPrefix:'subtopic',
+	tag:'span',
+	noreference:true,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.subtopic.superclass.constructor.call(this);
+	}
+
+	,drawElement:function(selector){
+		var currSel = selector;
+		if(selector){
+			var results = $.tmpl(this.table,this.getValues());
+			currSel.append(results);
+		}
+	}
+
+	,prepareLoadValues:function(currNode,values){
+		values[this.idPrefix] = currNode.textContent;
+		return values;
+	}
+
+	,prepareParentDom:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.setAttribute('id', values['id']);
+			this.addAddValues(dom,childdom);
+		}
+	}
+	
+	,prepareDomValues:function(dom,child,values,parent){
+		var key,val;
+		for(var eachValue in values){
+			if(values.hasOwnProperty(eachValue) && !this.ignoreFields.contains(eachValue)){
+				child.textContent = values[eachValue];
+			}
+		}
+	}
+});
+
+
 divi.html = divi.extend(divi.element,{
 	ignoreFields:['data','references'],
 	table:'html',
@@ -2523,7 +2565,8 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addimage',listType:'click',parent:divi.book,listenerFn:'addelement',key:'image',mapTo:scope},
 		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope},
 		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope},
-		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope}];
+		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope},
+		         {tag:'.addsubtopic',listType:'click',parent:divi.book,listenerFn:'addelement',key:'subtopic',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){
