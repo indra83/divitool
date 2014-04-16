@@ -531,6 +531,7 @@ divi.appBase = divi.extend(divi.base, {
 			var file = new Blob([jsxml.toXml(dom)]);
 			file.name = scope.fileName;
 			scope.persist({url:url,data:[file]});
+			scope.persist({url:url,data:files});
 		}
 	}
 	
@@ -784,7 +785,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			var fieldConfig = table.getFieldConfig();
 			for(var index in fieldConfig){
 				if(fieldConfig.hasOwnProperty(index)){
-					condition = (this.table == "references") ? this.referenceFields.contains(index) : !this.referenceFields.contains(index);
+					condition = this.isReference ? this.referenceFields.contains(index) : !this.referenceFields.contains(index);
 					if(condition){
 						eachCfg = fieldConfig[index];
 						this.values[eachCfg.name] = eachCfg.value || '';
@@ -819,6 +820,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 	}
 	
+	,prepareLoadValues:function(currNode,values){
+		return values;
+	}
+	
 	,loadElement:function(currNode,appendSel){
 		var values = {};
 		var children = currNode.children;
@@ -837,9 +842,14 @@ divi.elementbase = divi.extend(divi.appBase,{
 				var key = attributes[index];
 				values[key.nodeName] = key.nodeValue;
 			}
+			this.prepareLoadValues(currNode,values);
 			this.setValues(values);
 			if(this.reference){
 				this.reference.loadElement(refNode,appendSel);
+				var elemDom = $.tmpl(this.elemTable,{});
+				appendSel.append(elemDom);
+				this.drawElement(elemDom);
+			}else if(!this.reference && !this.isReference){
 				var elemDom = $.tmpl(this.elemTable,{});
 				appendSel.append(elemDom);
 				this.drawElement(elemDom);
@@ -948,7 +958,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		this.prepareForm(appendElem,showToggle);
 		this.formPanel.setValue('id', this.prepareId());
 		if(this.reference){
-			this.prepareForm.call(this.reference,$(appendElem).find('#_page_2'),showToggle);
+			this.prepareForm.call(this.reference,$(appendTo).find('#_page_2'),showToggle);
 			$('.tab-control').tabcontrol();
 		}
 	}
@@ -985,6 +995,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 
 divi.references = divi.extend(divi.elementbase,{
 	table:'references',
+	isReference:true,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.references.superclass.constructor.call(this);
@@ -1026,10 +1037,24 @@ divi.heading3 = divi.extend(divi.element,{
 	table:'heading3',
 	idCount:1,
 	idPrefix:'heading',
+	tag:'span',
 	noreference:true,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.heading3.superclass.constructor.call(this);
+	}
+
+	,drawElement:function(selector){
+		var currSel = selector;
+		if(selector){
+			var results = $.tmpl(this.table,this.getValues());
+			currSel.append(results);
+		}
+	}
+
+	,prepareLoadValues:function(currNode,values){
+		values[this.idPrefix] = currNode.textContent;
+		return values;
 	}
 
 	,prepareParentDom:function(dom,childdom,values,parent){
@@ -1048,6 +1073,7 @@ divi.heading3 = divi.extend(divi.element,{
 		}
 	}
 });
+
 
 divi.html = divi.extend(divi.element,{
 	ignoreFields:['data','references'],
