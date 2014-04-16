@@ -56,6 +56,13 @@ divi.app.audio = new divi.pageBase({
 	}
 });
 
+divi.app.heading3 = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"id", "desc": "Heading ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"heading", "desc": "Heading3", "type": "textfield","isRequired": true},];
+	}
+});
+
 divi.app.video = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"src", "desc": "Video File", "type": "videofield","isRequired": true},

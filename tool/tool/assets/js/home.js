@@ -920,7 +920,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}else if(this.reference){
 			this.reference.getPersistValues(dom,child);
 			dom.documentElement.appendChild(child);
+		}else{
+			dom.documentElement.appendChild(child);
 		}
+		
 	}
 	
 	,setParent:function(scope,values){
@@ -936,15 +939,18 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 	
 	,showContent:function(appendTo,showToggle){
-		$(appendTo).append(divi.tpl.tabs);
-		var page1 = $(appendTo).find('#_page_1');
-		this.attachpreContent(page1, showToggle);
-		this.prepareForm(page1,showToggle);
+		var appendElem = appendTo;
+		if(this.reference){
+			$(appendTo).append(divi.tpl.tabs);
+			var appendElem = $(appendTo).find('#_page_1');
+			this.attachpreContent(appendElem, showToggle);
+		}
+		this.prepareForm(appendElem,showToggle);
 		this.formPanel.setValue('id', this.prepareId());
 		if(this.reference){
-			this.prepareForm.call(this.reference,$(appendTo).find('#_page_2'),showToggle);
+			this.prepareForm.call(this.reference,$(appendElem).find('#_page_2'),showToggle);
+			$('.tab-control').tabcontrol();
 		}
-		$('.tab-control').tabcontrol();
 	}
 	
 	,prepareForm:function(appendElem,showToggle,ref){
@@ -999,7 +1005,9 @@ divi.element = divi.extend(divi.elementbase,{
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.element.superclass.constructor.call(this);
-		this.reference = new divi.references({parent:this});
+		if(!this.noreference){
+			this.reference = new divi.references({parent:this});
+		}
 	
 	}
 });
@@ -1011,6 +1019,33 @@ divi.video = divi.extend(divi.element,{
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.video.superclass.constructor.call(this);
+	}
+});
+
+divi.heading3 = divi.extend(divi.element,{
+	table:'heading3',
+	idCount:1,
+	idPrefix:'heading',
+	noreference:true,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.heading3.superclass.constructor.call(this);
+	}
+
+	,prepareParentDom:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.setAttribute('id', values['id']);
+			this.addAddValues(dom,childdom);
+		}
+	}
+	
+	,prepareDomValues:function(dom,child,values,parent){
+		var key,val;
+		for(var eachValue in values){
+			if(values.hasOwnProperty(eachValue) && !this.ignoreFields.contains(eachValue)){
+				child.textContent = values[eachValue];
+			}
+		}
 	}
 });
 
@@ -2461,7 +2496,8 @@ divi.home =  divi.extend(divi.appBase,{
 		 return [{tag:'.addvideo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'video',mapTo:scope},
 		         {tag:'.addimage',listType:'click',parent:divi.book,listenerFn:'addelement',key:'image',mapTo:scope},
 		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope},
-		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope}];
+		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope},
+		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){
