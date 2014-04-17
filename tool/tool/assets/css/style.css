@@ -98,6 +98,10 @@ span{
 	padding: 10px;
 }
 
+.metro .ui-dialog .previewImages{
+	overflow-y:auto; 
+}
+
 
 .previewElem h4,.previewElem h3{
 	height:5%;

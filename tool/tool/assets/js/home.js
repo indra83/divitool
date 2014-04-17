@@ -189,6 +189,7 @@ divi.appBase = divi.extend(divi.base, {
 	equations:'./equations',
 	comboMaster:{},
 	listenerKey:'editor',
+	tabsKey:'tabs',
 	htmlValKey:undefined,
 	getFileAction:'/getfiles',
 	toolbarCls:'.toolbarCls',
@@ -575,18 +576,32 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
+	,validateForm:function(form){
+		var isValidForm = false;
+		if(form){
+			isValidForm = form.validateForm();
+		}
+		return isValidForm;
+	}
+	
+	,prepareSubmitValues:function(scope,form){
+		scope = scope || this;
+		var values = form.getValues({});
+		if(scope.reference){
+			$.extend(values,scope.reference.formPanel.getValues({}));
+		}
+		return values;
+	}
+	
 	,submitForm:function(b,e){
 		var scope = this;
 		var values;
 		var form = scope.formPanel;
 		if(form){
-			var isValidForm = form.validateForm();
+			var isValidForm = scope.validateForm(form);
 	    	if(isValidForm){
 	    		if(scope.isNew){
-					values = form.getValues({});
-					if(scope.reference){
-						$.extend(values,scope.reference.formPanel.getValues({}));
-					}
+	    			values = this.prepareSubmitValues(scope,form);
 					this.setParent(scope,values);
 					var key = scope.table;
 					var lookupKey = this.pluralize(key);
@@ -952,18 +967,20 @@ divi.elementbase = divi.extend(divi.appBase,{
 		
 	}
 	
-	,showContent:function(appendTo,showToggle){
-		var appendElem = appendTo;
+	,showContent:function(appendTo,showToggle,index){
+		var appendElem = $(appendTo);
 		if(this.reference){
-			$(appendTo).append(divi.tpl.tabs);
-			var appendElem = $(appendTo).find('#_page_1');
+			index = index || 1;
+			var index2 = index+1;
+			appendElem.append($.tmpl(this.tabsKey,{i1:index,i2:index2}));
+			appendElem = appendElem.find('._page_'+index);
 			this.attachpreContent(appendElem, showToggle);
+			this.prepareForm.call(this.reference,appendElem.parent().find('._page_'+index2),showToggle);
 		}
 		this.prepareForm(appendElem,showToggle);
 		this.attachpostContent(appendElem, showToggle);
 		this.formPanel.setValue('id', this.prepareId());
 		if(this.reference){
-			this.prepareForm.call(this.reference,$(appendTo).find('#_page_2'),showToggle);
 			$('.tab-control').tabcontrol();
 		}
 	}
@@ -1023,6 +1040,8 @@ divi.element = divi.extend(divi.elementbase,{
 		divi.element.superclass.constructor.call(this);
 		if(!this.noreference){
 			this.reference = new divi.references({parent:this});
+		}else{
+			$.template(this.tabsKey,divi.tpl.tabs);
 		}
 	
 	}
@@ -1225,34 +1244,99 @@ divi.imageset = divi.extend(divi.element,{
 	idCount:1,
 	elementsNo:1,
 	prevElem:'previewImages',
+	appendElem:undefined,
 	elems:[],
+	noreference:true,
 	idPrefix:'imgSet',
+	showToggle:false,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.imageset.superclass.constructor.call(this);
 		this.elems = [];
 	}
 
-	,attachpostContent:function(appendTo,showToggle){
-		var elem;
-		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
-		appendTo = appendTo.find("."+this.prevElem);
-		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
-			var elem = new divi.image({parent:this,isNew:true,home:this.home});
-			this.elems[i] = elem.prepareForm(appendTo,showToggle);
+	,addSplValues:function(dom,child,values,parent){
+		for(var i=0;i< this.elems.length;i++){
+			elem = this.elems[i];
+			if(elem && elem.formPanel){
+				elem.getPersistValues(dom);
+			}
 		}
 	}
 	
-	,attachImgElement:function(appendTo,showToggle){
-		var elem;
-		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus'><a><i></i></a></div>");
-		appendTo = appendTo.find("."+this.prevElem);
-		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
-			var elem = new divi.image({parent:this,isNew:true,home:this.home});
-			this.elems[i] = elem.prepareForm(appendTo,showToggle);
+	,prepareSubmitValues:function(scope,form){
+		divi.appBase.prototype.prepareSubmitValues.call(this,scope,form);
+		for(var i=0;i< this.elems.length;i++){
+			elem = this.elems[i];
+			if(elem && elem.formPanel){
+				elem.updated = true;
+				elem.setValues(elem.prepareSubmitValues(elem,elem.formPanel));
+			}
 		}
 	}
 
+	,validateForm:function(form){
+		var elem,isValidForm = false;
+		if(form){
+			isValidForm = form.validateForm();
+			for(var i=0;i< this.elems.length;i++){
+				elem = this.elems[i];
+				if(elem && elem.formPanel){
+					isValidForm = isValidForm*(elem.formPanel.validateForm());
+				}
+			}
+		}
+		return isValidForm;
+	}
+
+	,attachpostContent:function(appendTo,showToggle){
+		this.showToggle = showToggle;
+		var elem;
+		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
+		this.appendElem = appendTo = appendTo.find("."+this.prevElem);
+		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
+			this.attachImgElement(appendTo, this.showToggle,i);
+		}
+		this.attachLis(appendTo.parent().find('.addmore'));
+	}
+	
+	,attachImgElement:function(appendTo,showToggle,index){
+		var count =	this.elems.length;
+		var elem = new divi.image({parent:this,isNew:true,home:this.home});
+		var parDom = elem.dom = divi.domBase.create({tag:'div','class':'eachImage',scope:this},appendTo);
+		this.elems[count] = elem;
+		var parentDom = $(parDom.dom);
+		parentDom.append("<div class='closeIcon place-right icon-minus-sign'></div>");
+		elem.showContent(parentDom,showToggle,index+1);
+		elem.formPanel.setValue('id', elem.prepareId());
+		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
+	}
+	
+	,addMoreClick:function(e){
+		var scope = e.data.scope;
+		scope.attachImgElement(scope.appendElem, scope.showToggle,scope.elems.length+1);
+	}
+	
+	,onCloseImage:function(e){
+		var elem = e.data.scope;
+		var parent = e.data.parent;
+		var dom = elem.dom;
+		var ref = elem.dom.id;
+		parent.elems.remove(elem);
+		divi.domBase.destroy(ref);
+	}
+	
+	,attachCloseLis:function(elem,imageElem){
+		if(elem){
+			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
+		}
+	}
+	
+	,attachLis:function(elem){
+		if(elem){
+			elem.on('click',null,{scope:this},this.addMoreClick)
+		}
+	}
 });
 
 divi.image = divi.extend(divi.element,{
@@ -2329,7 +2413,6 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		if(callback){
 	    	callback.apply(cbScope,[saveVal]);
 	    }
-		
 	}
 	
 	,restoreSelection:function () {
