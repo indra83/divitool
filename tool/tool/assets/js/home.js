@@ -1331,7 +1331,7 @@ divi.imageset = divi.extend(divi.element,{
 	,addSplValues:function(dom,child,values,parent){
 		for(var i=0;i< this.elems.length;i++){
 			elem = this.elems[i];
-			if(elem && elem.formPanel){
+			if(elem){
 				elem.getPersistValues(dom,child,true,'item');
 			}
 		}
