@@ -1169,6 +1169,13 @@ divi.formPanel = divi.extend(divi.panelBase,{
 
     }
     
+    ,hideField:function(field){
+    	if(field){
+    		var fieldVal = this.elementsMap[field];
+    		fieldVal.hide();
+    	}
+    }
+    
     ,enableButton:function(button,toShow){
     	if(button){
     		var jButton = $(button);

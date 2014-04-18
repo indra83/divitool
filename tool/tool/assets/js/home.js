@@ -990,7 +990,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		var appendElem = $(appendTo);
 		if(this.reference){
 			index = index || 1;
-			var index2 = index+1;
+			var index2 = (100-index);
 			appendElem.append($.tmpl(this.tabsKey,{i1:index,i2:index2}));
 			appendElem = appendElem.find('._page_'+index);
 			this.attachpreContent(appendElem, showToggle);
@@ -1385,7 +1385,8 @@ divi.imageset = divi.extend(divi.element,{
 		var parentDom = $(parDom.dom);
 		parentDom.append("<div class='closeIcon place-right icon-minus-sign'></div>");
 		elem.showContent(parentDom,showToggle,index+1);
-		elem.formPanel.setValue('id', elem.prepareId());
+		elem.formPanel.setValue('id', elem.guid());
+		elem.formPanel.hideField('id');
 		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
 	}
 	
@@ -1749,8 +1750,20 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 
 	,addElem:function(event,val,jTarget,key){
+		var backUpKey;
+		if(key == "info" || key == "alert" || key == "other"){
+			backUpKey ="box_"+key;
+			if(key == "other"){
+				backUpKey = "other";
+			}
+			key = 'html';
+		}
 		var eachElem = new divi[key]({parent:this,isNew:true,home:this.home});
 		this.launchPopUp.call(eachElem,eachElem);
+		if(backUpKey){
+			eachElem.formPanel.setValue('boxtype', backUpKey);
+			eachElem.formPanel.hideField('boxtype');
+		}
 	}
 	
 	,edit:function(event,val,jTarget){
@@ -2782,7 +2795,10 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope},
 		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope},
 		         {tag:'.addsubtopic',listType:'click',parent:divi.book,listenerFn:'addelement',key:'subtopic',mapTo:scope},
-		         {tag:'.addimageset',listType:'click',parent:divi.book,listenerFn:'addelement',key:'imageset',mapTo:scope}];
+		         {tag:'.addimageset',listType:'click',parent:divi.book,listenerFn:'addelement',key:'imageset',mapTo:scope},
+		         {tag:'.addinfo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'info',mapTo:scope},
+		         {tag:'.addalert',listType:'click',parent:divi.book,listenerFn:'addelement',key:'alert',mapTo:scope},
+		         {tag:'.addother',listType:'click',parent:divi.book,listenerFn:'addelement',key:'other',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){

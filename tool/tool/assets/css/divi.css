@@ -12864,3 +12864,64 @@ button.btn.btn-mini,input[type="submit"].btn.btn-mini{*padding-top:1px;*padding-
 	filter: alpha(opacity=0);
 	width:40px;
 }
+.metro .dropdown-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  display: none;
+  z-index: 1000;
+  background: #ffffff;
+  min-width: 150px;
+  width: auto;
+  border: 1px solid #dcddde;
+}
+.metro .dropdown-menu li {
+  display: inline;
+  margin: 10px 0;
+  padding: 0;
+  vertical-align: baseline;
+  position: relative;
+  font-family: 'Segoe UI_', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+}
+.metro .dropdown-menu li a {
+  display: inline;
+  text-decoration: none;
+  font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  color: #000000;
+  letter-spacing: 0.00em;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.01em;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 2.2rem;
+  font-size: 2.2rem;
+  color: inherit;
+}
+.metro .dropdown-menu li.title {
+  font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  color: #000000;
+  letter-spacing: 0.00em;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.01em;
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+.metro .dropdown-menu.compact a {
+  font-weight: normal;
+  font-size: 10.5pt;
+  line-height: 12pt;
+  color: inherit;
+}
+.metro .dropdown-menu.compact li.title {
+  margin-bottom: 10px;
+  font-family: 'Segoe UI Semibold_', 'Open Sans Bold', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #000000;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
+  letter-spacing: 0.02em;
+}

@@ -92,6 +92,16 @@ span{
 	overflow-y:auto; 
 }
 
+.metro nav.horizontal-menu ul li{
+	margin:0px;
+}
+.metro nav.horizontal-menu ul li a{
+	padding:0px;
+}
+.metro nav.horizontal-menu.compact ul li{
+	margin:0px;
+}
+
 .previewElem{
 	height:35%;
 	border-bottom:1px dotted;
@@ -313,7 +323,7 @@ form div.formfield{
 	color: #222222;
 	border-radius: 0;
 	cursor: pointer;
-	display: inline-block;
+	display: inline;
 	outbtline: none;
 }
 
@@ -558,6 +568,7 @@ div.editableDiv{
 .metro .window .caption .title h3{
 	display:inline;
 }
+
 
 .metro .ui-dialog .ui-dialog-buttonpane{
 	padding:0px;
