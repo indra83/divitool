@@ -98,6 +98,10 @@ span{
 	padding: 10px;
 }
 
+.metro .previewElem .carousel {
+	height:35%;
+}
+
 .metro .ui-dialog .previewImages{
 	overflow-y:auto; 
 }

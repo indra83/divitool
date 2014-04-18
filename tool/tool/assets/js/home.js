@@ -820,66 +820,76 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,drawElement:function(selector){
-		var currSel = selector;
-		if(selector && this.tpl){
+	,drawElement:function(){
+		var leftSel,rightSel,results,elemDom;
+		if(this.tpl){
+			leftSel = $('<div class="insideElem"></div>');
 			var values = this.getValues();
 			if(this.reference){
-				this.previewElement(values,selector);
-				currSel =  elemDom = $('<div class="contentElem place-right"></div>');
-				selector.append(elemDom);
-				this.reference.drawElement(currSel);
+				leftSel.append(this.previewElement(values));
+				rightSel = $('<div class="contentElem place-right"></div>');
+				rightSel.append(this.reference.drawElement());
 			}
-			var results = $.tmpl(this.table,values);
-			currSel.append(results);
+			results = $.tmpl(this.table,values);
+			if(rightSel){
+				rightSel.after(results);
+				leftSel.append(rightSel);
+			}else{
+				leftSel = results;
+			}
 		}
+		return leftSel;
 	}
 	
 	,prepareLoadValues:function(currNode,values){
 		return values;
 	}
 	
-	,loadElement:function(currNode,appendSel){
-		var values = {};
+	,loadValues:function(currNode,values){
+		var refNode;
 		var children = currNode.children;
 		var attributes = currNode.attributes;
-		var refNode;
-		if(children){
-			for(var index = 0;index < children.length;index++){
-				var key = children[index];
-				if(key.tagName == "references"){
-					refNode = key;
-				}else{
-					values[key.tagName] = key.textContent;
-				}
+		for(var index = 0;index < children.length;index++){
+			var key = children[index];
+			if(key.tagName == "references"){
+				refNode = key;
+			}else{
+				values[key.tagName] = key.textContent;
 			}
-			for(var index = 0;index < attributes.length;index++){
-				var key = attributes[index];
-				values[key.nodeName] = key.nodeValue;
-			}
-			this.prepareLoadValues(currNode,values);
-			this.setValues(values);
-			if(this.reference){
-				this.reference.loadElement(refNode,appendSel);
-				var elemDom = $.tmpl(this.elemTable,{});
-				appendSel.append(elemDom);
-				this.drawElement(elemDom);
-			}else if(!this.reference && !this.isReference){
-				var elemDom = $.tmpl(this.elemTable,{});
-				appendSel.append(elemDom);
-				this.drawElement(elemDom);
-			}
+		}
+		for(var index = 0;index < attributes.length;index++){
+			var key = attributes[index];
+			values[key.nodeName] = key.nodeValue;
+		}
+		return refNode;
+	}
+	
+	,populateValues:function(currNode){
+		values = {};
+		var refNode = this.loadValues(currNode,values);
+		this.prepareLoadValues(currNode,values);
+		this.setValues(values);
+		if(this.reference && refNode){
+			this.reference.populateValues(refNode);
 		}
 	}
 	
-	,previewElement:function(values,appendSel){
+	,loadElement:function(currNode,appendSel){
+		this.populateValues(currNode);
+		var elemDom = $.tmpl(this.elemTable,{});
+		var dom = this.drawElement(elemDom);
+		appendSel.append(elemDom.append(dom));
+	}
+	
+	,previewElement:function(values){
 		var tag = document.createElement(this.tag || this.table);
 		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
 		if(values['src']){
 			tag.setAttribute('src',url+'/'+values['src']);
 			tag.setAttribute('controls','');
 		}
-		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
+		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
+		return elemDom;
 	}
 
 	,persistData:function(){
@@ -927,24 +937,28 @@ divi.elementbase = divi.extend(divi.appBase,{
 			childdom.setAttribute('id', values['id']);
 			childdom.setAttribute('src', values['src']);
 			childdom.setAttribute('thumb', values['thumb']);
-			this.addAddValues(dom,childdom);
+			this.addAddValues(dom,childdom,values,parent);
 		}
 	}
 	
-	,addAddValues:function(dom,childdom,values,paren){
+	,addAddValues:function(dom,childdom,values,parent){
 		
 	}
 	
-	,getPersistValues:function(dom,parent){
-		var child = dom.createElement(this.table);
+	,getPersistValues:function(dom,parent,attachParent,tag){
+		var child = dom.createElement(tag || this.table);
 		var values = this.getValues();
 		this.prepareParentDom(dom,child,values,parent);
 		this.prepareDomValues(dom,child,values,parent);
-		if(parent){
+		if(parent && !attachParent){
 			parent.appendChild(child);
 		}else if(this.reference){
 			this.reference.getPersistValues(dom,child);
-			dom.documentElement.appendChild(child);
+			if(attachParent){
+				parent.appendChild(child);
+			}else{
+				dom.documentElement.appendChild(child);
+			}
 		}else{
 			dom.documentElement.appendChild(child);
 		}
@@ -1040,10 +1054,8 @@ divi.element = divi.extend(divi.elementbase,{
 		divi.element.superclass.constructor.call(this);
 		if(!this.noreference){
 			this.reference = new divi.references({parent:this});
-		}else{
 			$.template(this.tabsKey,divi.tpl.tabs);
 		}
-	
 	}
 });
 
@@ -1068,12 +1080,11 @@ divi.heading3 = divi.extend(divi.element,{
 		divi.heading3.superclass.constructor.call(this);
 	}
 
-	,drawElement:function(selector){
-		var currSel = selector;
-		if(selector){
-			var results = $.tmpl(this.table,this.getValues());
-			currSel.append(results);
-		}
+	,drawElement:function(){
+		var currSel = $('<div class="insideElem"></div>');
+		var results = $.tmpl(this.table,this.getValues());
+		currSel.append(results);
+		return currSel;
 	}
 
 	,prepareLoadValues:function(currNode,values){
@@ -1110,12 +1121,11 @@ divi.subtopic = divi.extend(divi.element,{
 		divi.subtopic.superclass.constructor.call(this);
 	}
 
-	,drawElement:function(selector){
-		var currSel = selector;
-		if(selector){
-			var results = $.tmpl(this.table,this.getValues());
-			currSel.append(results);
-		}
+	,drawElement:function(){
+		var currSel = $('<div class="insideElem"></div>');
+		var results = $.tmpl(this.table,this.getValues());
+		currSel.append(results);
+		return currSel;
 	}
 
 	,prepareLoadValues:function(currNode,values){
@@ -1178,7 +1188,8 @@ divi.html = divi.extend(divi.element,{
 			var tag = document.createElement('div');
 			$(tag).html(val);
 		}
-		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
+		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
+		return elemDom;
 	}
 
 	,attachpreContent:function(appendTo,showToggle){
@@ -1242,8 +1253,11 @@ divi.audio = divi.extend(divi.element,{
 divi.imageset = divi.extend(divi.element,{
 	table:'imageset',
 	idCount:1,
+	isImageSet:true,
 	elementsNo:1,
+	ignoreFields:['id','src','title'],
 	prevElem:'previewImages',
+	slideKey:'slide',
 	appendElem:undefined,
 	elems:[],
 	noreference:true,
@@ -1255,24 +1269,76 @@ divi.imageset = divi.extend(divi.element,{
 		this.elems = [];
 	}
 
+	,loadElement:function(currNode,appendSel){
+		this.populateValues(currNode);
+		var eachImage,eachImageNode,refNode,imgValues,images = [];
+		var children = currNode.children;
+		for(var index = 0;index < children.length;index++){
+			var key = children[index];
+			if(key.tagName == "item"){
+				eachImageNode = key;
+				eachImage = new divi.image({parent:this,home:this.home});
+				eachImage.populateValues(eachImageNode);
+				images.push(eachImage);
+			}
+		}
+		this.elems = images;
+		var elemDom = $.tmpl(this.elemTable,{});
+		var dom = this.drawElement(elemDom);
+		appendSel.append(elemDom.append(dom));
+	}
+	
+	,drawElement:function(selector){
+		var currSel = $('<div class="insideElem"></div>');
+		var key,results,slideHtml=$('<div>'),imageDom,currSel = selector;
+		if(selector){
+			for(var index = 0;index < this.elems.length;index++){
+				key = this.elems[index];
+				imageDom = key.drawElement();
+				slideHtml.append($(divi.tpl[this.slideKey]).append(imageDom));
+			}
+			results = $.tmpl(this.table,{});
+			$(results).prepend(slideHtml.children());
+			currSel.append(results);
+		}
+		return currSel;
+	}
+
+	,prepareLoadValues:function(currNode,values){
+		delete values['item'];
+		return values;
+	}
+
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('src', values['src']);
+			childdom.removeAttribute('thumb', values['thumb']);
+			childdom.setAttribute('title', values['title']);
+		}
+	}
+
 	,addSplValues:function(dom,child,values,parent){
 		for(var i=0;i< this.elems.length;i++){
 			elem = this.elems[i];
 			if(elem && elem.formPanel){
-				elem.getPersistValues(dom);
+				elem.getPersistValues(dom,child,true,'item');
 			}
 		}
 	}
 	
 	,prepareSubmitValues:function(scope,form){
 		divi.appBase.prototype.prepareSubmitValues.call(this,scope,form);
+		var files = [];
 		for(var i=0;i< this.elems.length;i++){
 			elem = this.elems[i];
 			if(elem && elem.formPanel){
 				elem.updated = true;
 				elem.setValues(elem.prepareSubmitValues(elem,elem.formPanel));
+				var elemFiles = elem.formPanel ? elem.formPanel.files : [];
+				files = files.concat(elemFiles);
 			}
 		}
+		this.formPanel.files = files;
 	}
 
 	,validateForm:function(form){
@@ -1349,13 +1415,20 @@ divi.image = divi.extend(divi.element,{
 		divi.image.superclass.constructor.call(this);
 	}
 
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb', values['thumb']);
+		}
+	}
+
 	,previewElement:function(values,appendSel){
 		var tag = document.createElement(this.tag || this.table);
 		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
 		if(values['src']){
 			tag.setAttribute('src',url+'/'+values['src']);
 		}
-		appendSel.append($('<div class="mainElem place-left elemPreview"></div>').append(tag));
+		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
+		return elemDom;
 	}
 });
 
@@ -1730,7 +1803,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 					}
 				}
 			}
+			this.activateElements();
 		}
+	}
+	
+	,activateElements:function(){
+		$('.carousel').carousel({auto: false,period: 3000,duration: 2000,height:'100%',markers: {type: "square",position:"bottom-center"}});
 	}
 	
 	,readFileFail:function(data){
