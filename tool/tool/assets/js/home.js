@@ -641,12 +641,17 @@ divi.appBase = divi.extend(divi.base, {
 		return values;
 	}
 	
+	,fetchUpdateValues:function(form,values){
+		return values;
+	}
+	
 	,update:function(form,values){
 		form = form || this;
 		values = values || form.values;
 		if(!values){
 			values = form.getValues({});
 		}
+		this.fetchUpdateValues(form, values);
 		if(!$.isEmptyObject(values)){
 			this.updated = true;
 			this.setValues(values);
@@ -1269,6 +1274,12 @@ divi.imageset = divi.extend(divi.element,{
 		this.elems = [];
 	}
 
+	,fetchUpdateValues:function(form,values){
+		this.formPanel.files = this.files;
+		delete this.files;
+		return values;
+	}
+
 	,loadElement:function(currNode,appendSel){
 		this.populateValues(currNode);
 		var eachImage,eachImageNode,refNode,imgValues,images = [];
@@ -1338,7 +1349,7 @@ divi.imageset = divi.extend(divi.element,{
 				files = files.concat(elemFiles);
 			}
 		}
-		this.formPanel.files = files;
+		this.files = files;
 	}
 
 	,validateForm:function(form){
