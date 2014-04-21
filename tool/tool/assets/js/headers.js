@@ -51,8 +51,7 @@ divi.app.audio = new divi.pageBase({
 		 return [{name:"src", "desc": "Audio File", "type": "audiofield","isRequired": true},
 		         {name:"id", "desc": "Audio ID", "type": "textfield","isRequired": true,isReadOnly:true},
 		         {name:"title", "desc": "Title", "type": "textfield"},
-		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
-		         {name:"url","desc": "URL", "type": "textfield"}];
+		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true}];
 	}
 });
 
@@ -76,8 +75,7 @@ divi.app.video = new divi.pageBase({
 		         {name:"thumb", "desc": "Thumbnail", "type": "imagefield","isRequired": true},
 		         {name:"id", "desc": "Video ID", "type": "textfield","isRequired": true,isReadOnly:true},
 		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
-		         {name:"title", "desc": "Title", "type": "textfield"},
-		         {name:"url","desc": "URL", "type": "textfield"}];
+		         {name:"title", "desc": "Title", "type": "textfield"}];
 	}
 });
 
@@ -87,7 +85,9 @@ divi.app.image = new divi.pageBase({
 		         {name:"id", "desc": "Image ID", "type": "textfield","isRequired": true,isReadOnly:true},
 		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
 		         {name:"title", "desc": "Title", "type": "textfield"},
-		         {name:"url","desc": "URL", "type": "textfield"}];
+		         {name:"allowFullscreen","desc": "Allow FullScreen", "type": "bool"},
+		         {name:"showBorder","desc": "Show Border", "type": "bool"}];
+		 
 	}
 });
 

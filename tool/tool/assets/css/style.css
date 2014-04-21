@@ -50,7 +50,7 @@ span{
 
 .bookcontent{
 	margin-top:0.25%;
-	height:74.5%;
+	height:73%;
 	vertical-align:top;
 }
 
@@ -102,14 +102,37 @@ span{
 	margin:0px;
 }
 
-.previewElem{
+.metro div.previewElem{
 	height:35%;
 	border-bottom:1px dotted;
 	padding: 10px;
+	text-decoration: none;
+    display: block;
+    opacity: 1;
+    -webkit-transform: scale(1,1);
+    -webkit-transition-timing-function: ease-out;
+    -webkit-transition-duration: 250ms;
+    -moz-transform: scale(1,1);
+    -moz-transition-timing-function: ease-out;
+    -moz-transition-duration: 250ms;
 }
 
 .metro .previewElem .carousel {
 	height:35%;
+}
+
+.metro div.previewElem:hover {
+	border:dotted 1px;
+	background:#bebebe !important;
+	opacity: .7;
+	-webkit-transform: scale(1.02,1.02);
+	-webkit-transition-timing-function: ease-out;
+	-webkit-transition-duration: 250ms;
+	-moz-transform: scale(1.02,1.02);
+	-moz-transition-timing-function: ease-out;
+	-moz-transition-duration: 250ms;
+	position: relative;
+	z-index: 99;
 }
 
 .metro .ui-dialog .previewImages{
@@ -122,7 +145,7 @@ span{
 }
 
 .previewElem .mainElem{
-	width:45%;
+	width:62%;
 	display: inline-block;
 }
 
@@ -131,15 +154,15 @@ span{
 }
 
 
-.previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video{
-	width:55%;
+.previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video,.mainElem div{
 	position:relative;
 	height:100%;
+	overflow-y:auto;
 }
 
 .previewElem .contentElem{
 	position:relative;
-	width:54%;
+	width:37%;
 	height: 30%;
 	display: inline-block;
 }
@@ -436,8 +459,11 @@ metro .chosen-single{
 }
 
 span.lblValue{
-	width:250px;
 	margin:0px 5px;
+}
+
+.metro div.formfield{
+	width:100%;
 }
 
 div.editableDiv{

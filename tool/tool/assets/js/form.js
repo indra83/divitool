@@ -1645,7 +1645,23 @@ divi.form.bool  = divi.extend(divi.baseField, {
 	inputDivdflts:{tag:"div",'class':"input-control checkbox"},
 	init:function(cfg){
 		$.extend(this,cfg);
-		divi.baseField.superclass.init.call(this);
+		divi.form.bool.superclass.init.call(this);
+	}
+	
+	,getValue:function(){
+		var cmp = this.retrieveJInputDom();		
+		if(cmp){
+			this.value = cmp.prop('checked');
+		}
+		return this.value;
+	}
+	
+	,setValue:function(value,supress){
+		this.value = value;
+		var cmp = this.retrieveJInputDom();		
+		if(cmp){
+			cmp.prop('checked',(value == "true"));
+		}
 	}
 	
 	,createField:function(options,parDom){
@@ -1670,11 +1686,9 @@ divi.form.bool  = divi.extend(divi.baseField, {
 		this.doms[this.inputDiv] = inputDiv;
 	}
 	
-	,validateField:function(event,targetVal,target){
+	,validateField:function(event,targetVal,jtarget){
 		var target = divi.util.getTarget(event);
-		targetVal = target.checked;
-		targetVal = this.values[targetVal];
-		divi.baseField.prototype.validateField(event,targetVal,target);
+		this.value = target.checked;
 	}
 });
  
@@ -1961,22 +1975,24 @@ divi.form.file = divi.extend(divi.baseField, {
 		jTarget = jTarget ? jTarget : divi.domBase.fetchJSel(this.doms[this.inputdom].id);
 		if(target){
 			var files = target.files;
-			if(files && files.length > 0){
-				var baseFile = files[0];
-				if(baseFile && !$.isEmptyObject(this.validTypes)){
-					if(this.validTypes.indexOf(baseFile.type) == -1){
-						isValid = false;
+			if(this.scope.isNew){
+				if(files && files.length > 0){
+					var baseFile = files[0];
+					if(baseFile && !$.isEmptyObject(this.validTypes)){
+						if(this.validTypes.indexOf(baseFile.type) == -1){
+							isValid = false;
+						}
+						if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
+							jTarget.remove();
+							var inputDiv = this.doms[this.inputDiv];
+							this.createField({},inputDiv.dom);
+							this.setProperties({});
+							alert('File format is not expected.Please select relevent file');
+						}
 					}
-					if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
-						jTarget.remove();
-						var inputDiv = this.doms[this.inputDiv];
-						this.createField({},inputDiv.dom);
-						this.setProperties({});
-						alert('File format is not expected.Please select relevent file');
-					}
+				}else if(this.isRequired){
+					isValid = false
 				}
-			}else if(this.isRequired){
-				isValid = false
 			}
 			this.isValid = isValid;
 		}
