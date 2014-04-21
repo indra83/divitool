@@ -1231,7 +1231,8 @@ divi.html = divi.extend(divi.element,{
 	}
 
 	,attachpreContent:function(appendTo,showToggle){
-		this.createEditor(appendTo,"");
+		var htmlValue = this.getFieldValue('data');
+		this.createEditor(appendTo,htmlValue);
 	}
 	
 	,addSplValues:function(dom,child,values,parent){
@@ -2555,7 +2556,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		var scope = this;
 		var selection = window.getSelection();
 		if(scope.editor){
-			var selectedRange = scope.getCurrentRange();
+			var selectedRange = scope.selectedRange;
 			if (selectedRange) {
 				try {
 					selection.removeAllRanges();
@@ -2630,7 +2631,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	}
 	
 	,editorListener:function(event,target,jTarget){
-		this.saveSelection();
+		this.saveSelection(event);
 		this.parent.updateToolbar();
 	}
 	
@@ -2673,7 +2674,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		$(this.parent.sel).closest(".ui-dialog").css('display','block');
 	}
 	
-	,saveSelection:function () {
+	,saveSelection:function (event) {
 		this.selectedRange = this.getCurrentRange();
 	}
 	
