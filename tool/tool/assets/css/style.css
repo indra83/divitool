@@ -160,6 +160,11 @@ span{
 	overflow-y:auto;
 }
 
+
+.previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video{
+	width:60%;
+}
+
 .previewElem .contentElem{
 	position:relative;
 	width:37%;

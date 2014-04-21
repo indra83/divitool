@@ -101,7 +101,7 @@ divi.app.imageset = new divi.pageBase({
 
 divi.app.html = new divi.pageBase({
 	fieldconfig:function(){
-		return [{name:"boxtype", "desc": "Type", "type": "combofield","isRequired": true,"listener":"boxInfo"},
+		return [{name:"boxType", "desc": "Type", "type": "combofield","isRequired": true,"listener":"boxType"},
 		        {name:"boxTitle","desc": "Title", "type": "textfield","isRequired": true},
 		        {name:"data","desc": "data", "type": "textfield",hidden:true}];
 	}

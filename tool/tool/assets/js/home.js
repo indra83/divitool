@@ -277,7 +277,7 @@ divi.appBase = divi.extend(divi.base, {
 		  	{description:"Box Info",id:"box_info"},
 		  	{description:"Box Alert",id:"box_alert"},
 		  	{description:"Other",id:"other"}];
-		this.setData({'boxInfo':boxInfoData},true);
+		this.setData({'boxType':boxInfoData},true);
 	}
 	
 	,loadinitialCombos:function(){
@@ -734,8 +734,8 @@ divi.appBase = divi.extend(divi.base, {
 	,launchElem:function(elem,key){
 		this.launchPopUp.call(elem,elem);
 		if(key){
-			eachElem.formPanel.setValue('boxtype', key);
-			eachElem.formPanel.hideField('boxtype');
+			eachElem.formPanel.setValue('boxType', key);
+			eachElem.formPanel.hideField('boxType');
 		}
 	}
 	
@@ -1293,7 +1293,6 @@ divi.imageset = divi.extend(divi.element,{
 	table:'imageset',
 	idCount:1,
 	isImageSet:true,
-	elementsNo:1,
 	ignoreFields:['id','src','title'],
 	prevElem:'previewImages',
 	slideKey:'slide',
@@ -1406,17 +1405,24 @@ divi.imageset = divi.extend(divi.element,{
 		var elem;
 		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
 		this.appendElem = appendTo = appendTo.find("."+this.prevElem);
-		for(var i=0;this.elementsNo && i < this.elementsNo;i++){
-			this.attachImgElement(appendTo, this.showToggle,i);
+		if(this.isNew){
+			this.attachImgElement(appendTo, this.showToggle,i,null,true);
+		}else{
+			var length = this.elems.length;
+			for(var i=0;i < length;i++){
+				this.attachImgElement(appendTo, this.showToggle,i,this.elems[i]);
+			}
 		}
 		this.attachLis(appendTo.parent().find('.addmore'));
 	}
 	
-	,attachImgElement:function(appendTo,showToggle,index){
-		var count =	this.elems.length;
-		var elem = new divi.image({parent:this,isNew:true,home:this.home});
-		var parDom = elem.dom = divi.domBase.create({tag:'div','class':'eachImage',scope:this},appendTo);
-		this.elems[count] = elem;
+	,attachImgElement:function(appendTo,showToggle,index,elem,isNew){
+		elem = elem || new divi.image({parent:this,isNew:true,home:this.home});
+		if(isNew){
+			var count =	this.elems.length;
+			this.elems[count] = elem;
+		}
+		var parDom = elem.dom = elem.dom || divi.domBase.create({tag:'div','class':'eachImage',scope:this},appendTo);
 		var parentDom = $(parDom.dom);
 		parentDom.append("<div class='closeIcon place-right icon-minus-sign'></div>");
 		elem.showContent(parentDom,showToggle,index+1);
@@ -2804,6 +2810,8 @@ divi.home =  divi.extend(divi.appBase,{
 		this.updateBcrumb(selected);
 		if(selected && this.isTopic(selected)){
 			selected.loadFile();
+		}else{
+			this.getSelector(this.contentPreview).empty();
 		}
 	}
 	
