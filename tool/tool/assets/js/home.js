@@ -272,6 +272,20 @@ divi.appBase = divi.extend(divi.base, {
 		this.setData({'license':licenseData},true);
 	}
      
+	,assessTypeData:function(){
+		var typeData = [{description:"Test",id:"test"},
+		  	{description:"Assignment",id:"assignment"},
+		  	{description:"Quiz",id:"quiz"}];
+		this.setData({'type':typeData},true);
+	}
+	
+	,difficultData:function(){
+		var diffData = [{description:"Easy",id:"easy"},
+		  	{description:"Medium",id:"medium"},
+		  	{description:"Difficult",id:"difficult"}];
+		this.setData({'difficulty':diffData},true);
+	}
+	
 	,boxInfoData:function(){
 		var boxInfoData = [{description:"None",id:"none"},
 		  	{description:"Box Info",id:"box_info"},
@@ -301,6 +315,8 @@ divi.appBase = divi.extend(divi.base, {
 			this.setComboMaster({});
 			this.licenseData();
 			this.boxInfoData();
+			this.difficultData();
+			this.assessTypeData();
 		}
 	}
 	
@@ -1274,6 +1290,18 @@ divi.html = divi.extend(divi.element,{
 });
 
 
+divi.mcq = divi.extend(divi.element,{
+	table:'mcq',
+	idCount:1,
+	idPrefix:'aud',
+	noreference:true,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.mcq.superclass.constructor.call(this);
+	}
+
+});
+
 divi.audio = divi.extend(divi.element,{
 	table:'audio',
 	idCount:1,
@@ -2136,11 +2164,17 @@ divi.topic = divi.extend(divi.bookBase,{
 
 divi.assessment = divi.extend(divi.bookBase,{
 	parent:undefined,
-	idPrefix:'a',
+	idPrefix:'ass',
 	idCount:0,
 	table:'assessment',
+	isAssessment:true,
 	comboKey:'assessment',
 	sequence:undefined,
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
+	lidDefaults:{tag:"li",prefix:'sidebar_'},
+	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
+	iconDefaults:{tag:'i','class':"icon-briefcase",prefix:'sidebar_'},
+	
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
@@ -2154,7 +2188,14 @@ divi.assessment = divi.extend(divi.bookBase,{
 	}
 
 	,prepareSideBar:function(parent,toClean,currKey,index){
+		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
+		livDiv = this.doms[this.divs['liDiv']] = divi.domBase.create($.extend(this.lidDefaults,{scope:this}),parent);
+		aDiv = this.doms[this.divs['aDiv']] = divi.domBase.create( $.extend(this.aDefaults,{scope:this,listeners:this.listeners[this.defaultKey]}),livDiv.dom);
+		aDiv.dom.setAttribute('id',aDiv.id);
+		iconDiv = this.doms[this.divs['iconDiv']] = divi.domBase.create( $.extend(this.iconDefaults,{scope:this}),aDiv.dom);
+		values = this.getValues();
+		aDiv.dom.innerHTML += values['name'];
 	}
 });
 
@@ -2783,7 +2824,11 @@ divi.home =  divi.extend(divi.appBase,{
 	editors:1,
 	callback:undefined,
 	editContent:'.titleHolder',
+	assessHolder:'.assessHolder',
 	topicTit:'.topicTit',
+	assessTit:'.assessTit',
+	assessbtns:'.assessbtns',
+	topicbtns:'.topicbtns',
 	chapTit:'.chapTit',
 	selector:'textarea.html_input',
 	previewSel:'.treepreview',
@@ -2800,9 +2845,16 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,enableTopEditBtns:function(selected){
 		if(selected && selected.table == 'topic'){
+			this.getSelector(this.assessbtns).hide();
+			this.getSelector(this.topicbtns).show();
 			divi.listeners.attachListenersWS(this.editBtnListeners(selected),this);
+		}else if(selected && selected.table == 'assessment'){
+			this.getSelector(this.assessbtns).show();
+			this.getSelector(this.topicbtns).hide();
+			divi.listeners.attachListenersWS(this.editAssessListeners(selected),this);
 		}else{
 			divi.listeners.unbindListeners(this.editBtnListeners(selected),this);
+			divi.listeners.unbindListeners(this.editAssessListeners(selected),this);
 		}
 	}
 	
@@ -2818,9 +2870,17 @@ divi.home =  divi.extend(divi.appBase,{
 	,updateBcrumb:function(selected){
 		if(this.isTopic(selected)){
 			var chapter = this.retrieveElem(selected,'chapter');
+			this.getSelector(this.assessHolder).addClass('hidden');
 			this.getSelector(this.editContent).removeClass('hidden');
 			this.getSelector(this.chapTit).html(chapter.getFieldValue('name'));
 			this.getSelector(this.topicTit).html(selected.getFieldValue('name'));
+		}else if(selected.isAssessment){
+			var chapter = this.retrieveElem(selected,'chapter');
+			this.getSelector(this.editContent).addClass('hidden');
+			this.getSelector(this.assessHolder).removeClass('hidden');
+			this.getSelector(this.chapTit).html(chapter.getFieldValue('name'));
+			this.getSelector(this.assessTit).html(selected.getFieldValue('name'));
+			
 		}else{
 			this.getSelector(this.editContent).addClass('hidden');
 		}
@@ -2842,6 +2902,10 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addinfo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'info',mapTo:scope},
 		         {tag:'.addalert',listType:'click',parent:divi.book,listenerFn:'addelement',key:'alert',mapTo:scope},
 		         {tag:'.addother',listType:'click',parent:divi.book,listenerFn:'addelement',key:'other',mapTo:scope}];
+	}
+	
+	,editAssessListeners:function(scope){
+		 return [{tag:'.addmcq',listType:'click',parent:divi.book,listenerFn:'addelement',key:'mcq',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){

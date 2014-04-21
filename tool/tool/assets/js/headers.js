@@ -26,7 +26,10 @@ divi.app.assessment = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
 		         {name:"id", "desc": "Assessment ID", "type": "numberfield","isRequired": true,isReadOnly:true},
-		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true}];
+		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true},
+		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type"},
+		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
+		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true}];
 	}
 });
 

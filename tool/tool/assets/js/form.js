@@ -1706,23 +1706,35 @@ divi.form.bool  = divi.extend(divi.baseField, {
  
 divi.form.numberfield  = divi.extend(divi.form.textfield, {
 	defaults:{tag:"input",type: 'text',attachLis:true},
+	events:['mousedown','change','focusout','keypress'],
 	applyFormat:true,
 	defaultValue:'',
+	specialKeys:undefined,
 	init:function(cfg){
 		$.extend(this,cfg);
 		if(this.name && (this.name.indexOf('_id') != -1 || this.name.indexOf('_ID') != -1)){
 			this.defaultValue = -1;
 		}
-		divi.form.emailfield.superclass.init.call(this);
+		this.specialKeys = new Array();
+		this.specialKeys.push(8);
+		divi.form.numberfield.superclass.init.call(this);
 	}
 	
-	,isEmpty:function(val){
-		isEmpty = divi.baseField.prototype.isEmpty.call(this,val);
-		if(!isEmpty && val == "-1"){
-			isEmpty = true;
+	,validateField:function(event,targetVal,target){
+		if(event.type == "keypress"){
+			if(!this.checkNumeric(event)){
+				event.preventDefault();
+			}	
+		}else{
+			divi.baseField.prototype.validateField.call(this,event,targetVal,target);
 		}
-		return isEmpty;
 	}
+	
+    ,checkNumeric:function(e) {
+        var keyCode = e.which ? e.which : e.keyCode
+        var ret = ((keyCode >= 48 && keyCode <= 57) || this.specialKeys.indexOf(keyCode) != -1);
+        return ret;
+    }
 });
 
 divi.form.phoneNumField  = divi.extend(divi.form.textfield, {
