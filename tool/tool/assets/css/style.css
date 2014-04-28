@@ -144,7 +144,7 @@ span{
 	height:5%;
 }
 
-.previewElem .mainElem{
+.previewElem .mainElem,.metro  .mainElem{
 	width:62%;
 	display: inline-block;
 }
@@ -165,12 +165,13 @@ span{
 	width:60%;
 }
 
-.previewElem .contentElem{
+.previewElem .contentElem,.metro .contentElem,{
 	position:relative;
 	width:37%;
 	height: 30%;
 	display: inline-block;
 }
+
 
 .editContent{
 	height:5%;
@@ -472,7 +473,6 @@ span.lblValue{
 }
 
 div.editableDiv{
-	max-height: 450px;
 	height: 450px;
 	background-color: white;
 	border-collapse: separate; 
@@ -483,10 +483,46 @@ div.editableDiv{
 	box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
 	border-top-right-radius: 3px; border-bottom-right-radius: 3px;
 	border-bottom-left-radius: 3px; border-top-left-radius: 3px;
-	overflow: scroll;
+	overflow: auto;
 	outline: none;
 }
 
+
+div.editableDiv.question{
+	height: 100px;
+}
+
+div.answerDiv{
+	margin-bottom:5px;
+}
+
+
+div.answerDiv input{
+	display:inline-block;
+	width: 20px;
+	height: 20px;
+	margin-top: -20px;
+}
+
+.media div.answerDiv input[type="checkbox"]{
+	width: 20px;
+	height: 20px;
+	margin-top: -20px;
+}
+
+div.answerDiv div{
+	display:inline-block;
+	margin-left:10px;
+}
+
+.metro div.options a{
+ 	cursor:pointer;
+ }
+
+div.editableDiv.answer {
+	height: 60px;
+	width:90%;
+}
 
 .metro div.ui-dialog{
 	position: absolute;

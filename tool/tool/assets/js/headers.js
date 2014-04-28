@@ -40,6 +40,25 @@ divi.app.chapter = new divi.pageBase({
 	}
 });
 
+
+divi.app.question = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Question ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		         {name:"version", "desc": "Version", "type": "numberfield",value:'1',hidden:true},
+		         {name:"type", "desc": "ansType", "type": "textfield","isRequired": true},
+		         {name:"data", "desc": "data", "type": "textfield","isRequired": true},
+		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"}];
+	}
+});
+
+divi.app.answer = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		         {name:"isAnswer", "desc": "isCorrectAns", "type": "bool"},
+		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
+	}
+});
+
 divi.app.references = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"license", "desc": "License", "type": "combofield","listener":"license"},

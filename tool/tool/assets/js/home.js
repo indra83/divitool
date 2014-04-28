@@ -392,6 +392,56 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
+
+	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
+		var currKey;
+		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
+			currKey = this.childrenKeys[i];
+			addParams = addParams || [];
+			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
+		}
+	}
+	
+	,attachEachChild:function(callback,toClean,input,currKey,initialize,addParams,skipChildren){
+		var eachChild;
+		if(initialize){
+			this.initilizeChild(input,currKey,skipChildren)
+		}
+		var currChildren = this.children[currKey];
+		for(var i=0;currChildren && i < currChildren.length;i++){
+			eachChild = currChildren[i];
+			var params = [input,toClean,currKey,i].concat(addParams).concat([skipChildren]);
+			eachChild[callback].apply(eachChild,params);
+		}
+	}
+	
+	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
+		if(input){
+			if(isArray){
+				if(skipChildren){
+					input = input[currKey];
+				}else{
+					input = input.children[currKey];
+				}
+			}
+			var newObj = {};
+			var values = this.getValues();
+			if(toClean){
+				values = this.cleanValues(values);
+			}
+			$.extend(newObj,values);
+			this.setComboMasterData(values);
+			this.setComboData(values);
+			this.attachChildren(newObj,toClean,'prepareData',true,[true],true);
+			if(isArray){
+				input.push(newObj);
+			}else{
+				$.extend(input,newObj);
+			}
+		}
+	}
+	
+	
 	,pluralize:function(key){
 		if(key){
 			key = key+'s';
@@ -456,11 +506,12 @@ divi.appBase = divi.extend(divi.base, {
 		return this.contents[refKey];
 	}
 	
-	,getFirstEditor:function(editor){
+	,getEditorByIndex:function(editor,index){
 		var first;
 		if(editor){
+			index = index || 0;
 			var sortedKeys = Object.keys(editor.getEditors()).sort();
-			first = editor.getEditors()[sortedKeys[0]];
+			first = editor.getEditors()[sortedKeys[index]];
 		}
 		return first;
 	}
@@ -471,23 +522,27 @@ divi.appBase = divi.extend(divi.base, {
 			var dlgConfig  = {position: "top",autoOpen: false,modal: true,top:'1%',width: '80%', buttons: {"Insert": {fn:instance.editorCBack,scope:instance},Cancel: {fn:instance.closeDailog,scope:instance}},close:{fn:'closeDailog',scope:instance}};
 			sel.superDialog(dlgConfig).superDialog('open').removeClass('hidden');
 			var value = instance.getFieldValue(instance.htmlValKey);
-			instance.createEditor.call(instance,sel,value);
+			var editrs = {};
+			this.prepareEditableDom(null,editrs,value);
+			instance.createEditor.call(instance,{editors:editrs,sel:sel,attachtbar:true});
 		}
 	}
 	
-	,createEditor:function(sel,value){
+	,createEditor:function(ops){
+		ops = ops || {};
+		sel = ops.sel;
+		editors = ops.editors;
+		attachtbar = ops.attachtbar;
 		if(sel){
-			sel.find(this.toolbarCls).remove();
-			sel.find("div."+this.editableDiv).remove();
-			sel.append(divi.tpl.richtoolbar);
-			this.initiliazeEditor();
-			var editorDom = divi.domBase.create({tag:'div','class':this.editableDiv});
-			sel.append(editorDom.dom);
-			var params = {};
-			params['editors'] = {};
-			$(editorDom.dom).attr('ref',editorDom.id);
-			params['editors'][editorDom.id] = {'editor':editorDom.dom,value:value};
-			$.extend(params,{toolbardomCls:'.toolbarCls',sel:sel});
+			attachtbar = (attachtbar == undefined)? true : attachtbar;
+			if(attachtbar){
+				sel.find(this.toolbarCls).remove();
+				sel.find("div."+this.editableDiv).remove();
+				sel.append(divi.tpl.richtoolbar);
+				this.initiliazeEditor();
+			}
+			this.attachEditorContent(sel,editors);
+			var params = this.prepareEditorParams(editors);
 			if(!this.editor){
 				this.editor = new divi.contentEditor(params);
 			}else{
@@ -505,14 +560,15 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
-	,persistData:function(){
-		 var book = this.retrieveBook(this);
+	,persistData:function(elem,url,fileName){
+		 var book = elem || this.retrieveBook(this);
 		 if(book){
 			 window.URL = window.webkitURL || window.URL;
 	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-	         var file = new Blob([JSON.stringify(this.stringify(true), undefined, 2)]);
-	         file.name = this.masterFile;
-	         book.persist({url:this.savefileAction,data:[file]});
+	         var file = new Blob([JSON.stringify(book.stringify(true), undefined, 2)]);
+	         file.name = fileName || this.masterFile;
+	         url = url || this.savefileAction;
+	         book.persist({url:url,data:[file]});
 	         this.persistChild();
 		 }else{
 			 alert("Please Contact administrator. Could not save the changes");
@@ -524,7 +580,7 @@ divi.appBase = divi.extend(divi.base, {
 		var editor = scope.editor;
 		var value = "";
 		if(editor){
-			var first = this.getFirstEditor(editor);
+			var first = this.getEditorByIndex(editor);
 			if(first){
 				value = first.getValue();
 			}
@@ -532,6 +588,7 @@ divi.appBase = divi.extend(divi.base, {
 	}
 
 	,persistChild:function(){
+		var isAssessment = this.isAssessment ? true :false;
 		var scope = this.elements ? this : this.parent;
 		if(scope && scope.fileName){
 			var eachSet;
@@ -567,7 +624,7 @@ divi.appBase = divi.extend(divi.base, {
 	,prepareFilePath:function(scope,url,action){
 		url = url || "";
 		url = action || scope.savefileAction;
-		var topic = scope.isTopic(scope) ? scope : scope.parent;
+		var topic = (scope.isTopic(scope) || scope.isAssessment) ? scope : scope.parent;
 		var elemId =  topic.getFieldValue('id');
 		var chapterId = topic.prepareCompleteId();
 		url += "/"+chapterId+"/"+elemId;
@@ -617,25 +674,29 @@ divi.appBase = divi.extend(divi.base, {
 		return values;
 	}
 	
+	,submit:function(scope,form,event){
+		var values = this.prepareSubmitValues(scope,form);
+		this.setParent(scope,values);
+		if(scope.isNew){
+			var key = scope.table;
+			var lookupKey = this.pluralize(key);
+			this.initilizeChild(scope.parent,lookupKey);
+			this.addChild(scope.parent,lookupKey,scope);
+		}
+		if(form){
+			scope.update(form,values);
+		}
+		divi.home.prototype.cancelDailog(event);
+	}
+	
 	,submitForm:function(b,e){
 		var scope = this;
-		var values;
-		var form = scope.formPanel;
+		var isValidForm = true;
+		var form = scope.formPanel ? scope.formPanel : this;
 		if(form){
 			var isValidForm = scope.validateForm(form);
 	    	if(isValidForm){
-	    		values = this.prepareSubmitValues(scope,form);
-				this.setParent(scope,values);
-	    		if(scope.isNew){
-	    			var key = scope.table;
-					var lookupKey = this.pluralize(key);
-					this.initilizeChild(scope.parent,lookupKey);
-					this.addChild(scope.parent,lookupKey,scope);
-				}
-	    		if(form){
-	    			scope.update(form,values);
-	    		}
-	    		divi.home.prototype.cancelDailog(b,e);
+	    		this.submit(scope,form,b);
 	    	}
 		}
 	}
@@ -647,6 +708,11 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
+	,setValueForKey:function(key,value){
+		if(key){
+			this.values[key] = value;
+		}
+	}
 	
 	,setParent:function(scope,values){
 		var parent = this.getComboMasterValue(this.parent.comboKey,values[this.parent.comboKey]);
@@ -726,7 +792,7 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,launchPopUp:function(instance){
 		if(instance){
-			instance.home.preparepopUp.call(instance.home);
+			instance.home.preparepopUp.call(instance.home,instance);
 			var popupDiv = this.retrievePopUpDiv();
 			var mydialog = popupDiv.superDialog();
 			var buttons = mydialog.superDialog("option", "buttons");
@@ -798,7 +864,97 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		$.Dialog.close();
 	}
+	
+	,loadFile:function(url){
+		var scope = this;
+		var url = url || this.prepareFilePath(this,null,this.getFileAction);
+		$.ajax({dataType: "xml",url:divi.core.prepareUrl(url,this.fileName)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+	}
+	
+	,readFile:function(data){
+		var topicChild = data.firstChild;
+		if(topicChild){
+			var selected = this;
+			var parentCont = this.getSelector(this.contentPreview);
+			parentCont.empty();
+			selected.elements = [];// resetting the elems
+			var eachChild,eachElem,children = topicChild.children;
+			for(var index = 0; index  < children.length;index++){
+				eachChild = children[index];
+				if(eachChild){
+					var key = eachChild.tagName;
+					var eachElem = new divi[key]({parent:selected,home:selected.home});
+					if(eachElem){
+						eachElem.loadElement(eachChild,parentCont);
+						eachElem.addChild(selected,'',eachElem);
+					}
+				}
+			}
+			this.activateElements();
+		}
+	}
+	
+	,activateElements:function(){
+		$('.carousel').carousel({auto: false,period: 3000,duration: 2000,height:'100%',markers: {type: "square",position:"bottom-center"}});
+	}
+	
+	,readFileFail:function(data){
+		
+	}
+	
+	,prepareEditableDom:function(ops,editors,value,isQuestion){
+		ops = ops || {};
+		cls = ops.cls ? this.editableDiv+" "+ops.cls : this.editableDiv;
+		delete ops.cls;
+		var editorDom = divi.domBase.create($.extend(ops,{tag:'div','class':cls}));
+		$(editorDom.dom).attr('id',editorDom.id);
+		if(editors){
+			editors[editorDom.id] = {editor:editorDom.dom,value:value,isQuestion:isQuestion};
+		}
+		return editorDom;
+	}
+	
+	,attachEditorContent:function(sel,editors){
+		
+		if(sel){
+			for(var edt in editors){
+				if(editors.hasOwnProperty(edt)){
+					sel.append(editors[edt].editor);	
+				}
+			}
+		}
+	}
+	
+	,prepareEditorParams:function(editors){
+		var params = {};
+		params['editors'] = editors;
+		$.extend(params,{toolbardomCls:'.toolbarCls',sel:sel});
+		return params;
+	}
     
+	
+	,persist:function(fileOps){
+		fileOps = fileOps || {};
+		var url = fileOps.url;
+		var formData = new FormData();
+		var eachFile;
+		var file = fileOps.data;
+		for(var ind = 0;ind < file.length;ind++){
+			eachFile = file[ind];
+			formData.append(eachFile.name, eachFile, eachFile.name);
+		}
+		var toStringify = fileOps.toStringify;
+		if(toStringify){
+			formData = {'data': JSON.stringify(formData)};
+		}
+		var xhr;
+		if(url){
+			 xhr = new XMLHttpRequest();
+		     xhr.open('POST', url, true);
+		     xhr.send(formData);
+		}
+		return xhr;
+	}
 });
 
 divi.elementbase = divi.extend(divi.appBase,{
@@ -1045,7 +1201,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		this.prepareForm(appendElem,showToggle);
 		this.attachpostContent(appendElem, showToggle);
-		if(this.isNew){
+		if(this.isNew && this.formPanel){
 			this.formPanel.setValue('id', this.prepareId());
 		}
 		if(this.reference){
@@ -1075,11 +1231,12 @@ divi.elementbase = divi.extend(divi.appBase,{
 	
 	,addChild:function(input,key,child){
 		if(input.elements){
-			child.fileName = input.fileName;
+			child.fileName = input.fileName || child.fileName;
 			input.elements.push(child);
 			child.addToCount();
 		}
 	}
+
 });
 
 
@@ -1109,6 +1266,38 @@ divi.element = divi.extend(divi.elementbase,{
 		if(!this.noreference){
 			this.reference = new divi.references({parent:this});
 			$.template(this.tabsKey,divi.tpl.tabs);
+		}
+	}
+
+	,attachMoreLis:function(elem){
+		if(elem){
+			elem.on('click',null,{scope:this},this.addMoreClick)
+		}
+	}
+	
+	,addMoreClick:function(e){
+		var scope = e.data.scope;
+		scope.attachElement(scope.appendElem, scope.showToggle,scope.elems.length+1);
+	}
+	
+	,attachCloseLis:function(elem,imageElem){
+		if(elem){
+			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
+		}
+	}
+	
+	,onCloseImage:function(e){
+		var elem = e.data.scope;
+		var parent = e.data.parent;
+		var dom = elem.dom;
+		var ref = elem.dom.id;
+		parent.elems.remove(elem);
+		divi.domBase.destroy(ref);
+	}
+	
+	,attachCloseLis:function(elem,imageElem){
+		if(elem){
+			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
 		}
 	}
 });
@@ -1248,7 +1437,9 @@ divi.html = divi.extend(divi.element,{
 
 	,attachpreContent:function(appendTo,showToggle){
 		var htmlValue = this.getFieldValue('data');
-		this.createEditor(appendTo,htmlValue);
+		var editrs = {};
+		this.prepareEditableDom(null,editrs,htmlValue);
+		this.createEditor({editors:editrs,sel:appendTo,attachtbar:true});
 	}
 	
 	,addSplValues:function(dom,child,values,parent){
@@ -1266,7 +1457,7 @@ divi.html = divi.extend(divi.element,{
 	,persistChild:function(){
 		var editor = this.editor;
 		if(editor){
-			var first = this.getFirstEditor(editor);
+			var first = this.getEditorByIndex(editor);
 			if(first){
 				first.getValue(this,this.htmlcallBack);
 			}
@@ -1289,18 +1480,6 @@ divi.html = divi.extend(divi.element,{
 	}
 });
 
-
-divi.mcq = divi.extend(divi.element,{
-	table:'mcq',
-	idCount:1,
-	idPrefix:'aud',
-	noreference:true,
-	constructor: function (cfg) {
-		$.extend(this,cfg);
-		divi.mcq.superclass.constructor.call(this);
-	}
-
-});
 
 divi.audio = divi.extend(divi.element,{
 	table:'audio',
@@ -1434,17 +1613,17 @@ divi.imageset = divi.extend(divi.element,{
 		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
 		this.appendElem = appendTo = appendTo.find("."+this.prevElem);
 		if(this.isNew){
-			this.attachImgElement(appendTo, this.showToggle,i,null,true);
+			this.attachElement(appendTo, this.showToggle,i,null,true);
 		}else{
 			var length = this.elems.length;
 			for(var i=0;i < length;i++){
-				this.attachImgElement(appendTo, this.showToggle,i,this.elems[i]);
+				this.attachElement(appendTo, this.showToggle,i,this.elems[i]);
 			}
 		}
-		this.attachLis(appendTo.parent().find('.addmore'));
+		this.attachMoreLis(appendTo.parent().find('.addmore'));
 	}
 	
-	,attachImgElement:function(appendTo,showToggle,index,elem,isNew){
+	,attachElement:function(appendTo,showToggle,index,elem,isNew){
 		elem = elem || new divi.image({parent:this,isNew:true,home:this.home});
 		if(isNew){
 			var count =	this.elems.length;
@@ -1459,31 +1638,8 @@ divi.imageset = divi.extend(divi.element,{
 		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
 	}
 	
-	,addMoreClick:function(e){
-		var scope = e.data.scope;
-		scope.attachImgElement(scope.appendElem, scope.showToggle,scope.elems.length+1);
-	}
 	
-	,onCloseImage:function(e){
-		var elem = e.data.scope;
-		var parent = e.data.parent;
-		var dom = elem.dom;
-		var ref = elem.dom.id;
-		parent.elems.remove(elem);
-		divi.domBase.destroy(ref);
-	}
 	
-	,attachCloseLis:function(elem,imageElem){
-		if(elem){
-			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
-		}
-	}
-	
-	,attachLis:function(elem){
-		if(elem){
-			elem.on('click',null,{scope:this},this.addMoreClick)
-		}
-	}
 });
 
 divi.image = divi.extend(divi.element,{
@@ -1672,7 +1828,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		
 	}
 	
-	
 	,load:function(data){
 		this.read(data);
 		this.loadinitialCombos(this);// need this initialize combos.
@@ -1687,28 +1842,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		return masterObj;
 	}
 	
-	,persist:function(fileOps){
-		fileOps = fileOps || {};
-		var url = fileOps.url;
-		var formData = new FormData();
-		var eachFile;
-		var file = fileOps.data;
-		for(var ind = 0;ind < file.length;ind++){
-			eachFile = file[ind];
-			formData.append(eachFile.name, eachFile, eachFile.name);
-		}
-		var toStringify = fileOps.toStringify;
-		if(toStringify){
-			formData = {'data': JSON.stringify(formData)};
-		}
-		var xhr;
-		if(url){
-			 xhr = new XMLHttpRequest();
-		     xhr.open('POST', url, true);
-		     xhr.send(formData);
-		}
-		return xhr;
-	}
 	
 	,destinationUrl:function(){
 		
@@ -1760,53 +1893,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
-		var currKey;
-		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
-			currKey = this.childrenKeys[i];
-			addParams = addParams || [];
-			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
-		}
-	}
-	
-	,attachEachChild:function(callback,toClean,input,currKey,initialize,addParams,skipChildren){
-		var eachChild;
-		if(initialize){
-			this.initilizeChild(input,currKey,skipChildren)
-		}
-		var currChildren = this.children[currKey];
-		for(var i=0;currChildren && i < currChildren.length;i++){
-			eachChild = currChildren[i];
-			var params = [input,toClean,currKey,i].concat(addParams).concat([skipChildren]);
-			eachChild[callback].apply(eachChild,params);
-		}
-	}
-	
-	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
-		if(input){
-			if(isArray){
-				if(skipChildren){
-					input = input[currKey];
-				}else{
-					input = input.children[currKey];
-				}
-			}
-			var newObj = {};
-			var values = this.getValues();
-			if(toClean){
-				values = this.cleanValues(values);
-			}
-			$.extend(newObj,values);
-			this.setComboMasterData(values);
-			this.setComboData(values);
-			this.attachChildren(newObj,toClean,'prepareData',true,[true],true);
-			if(isArray){
-				input.push(newObj);
-			}else{
-				$.extend(input,newObj);
-			}
-		}
-	}
 	
 	,add:function(event,val,jTarget,key){
 		if(key){
@@ -1871,42 +1957,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 	}
 	
-	,loadFile:function(){
-		var scope = this;
-		var url = this.prepareFilePath(this,null,this.getFileAction);
-		$.ajax({dataType: "xml",url:divi.core.prepareUrl(url,this.fileName)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
-	}
 	
-	,readFile:function(data){
-		var topicChild = data.firstChild;
-		if(topicChild){
-			var selected = this;
-			var parentCont = this.getSelector(this.contentPreview);
-			parentCont.empty();
-			selected.elements = [];// resetting the elems
-			var eachChild,eachElem,children = topicChild.children;
-			for(var index = 0; index  < children.length;index++){
-				eachChild = children[index];
-				if(eachChild){
-					var key = eachChild.tagName;
-					var eachElem = new divi[key]({parent:selected,home:selected.home});
-					if(eachElem){
-						eachElem.loadElement(eachChild,parentCont);
-						eachElem.addChild(selected,'',eachElem);
-					}
-				}
-			}
-			this.activateElements();
-		}
-	}
-	
-	,activateElements:function(){
-		$('.carousel').carousel({auto: false,period: 3000,duration: 2000,height:'100%',markers: {type: "square",position:"bottom-center"}});
-	}
-	
-	,readFileFail:function(data){
-		
-	}
 	
 	,createContextMenu:function(items){
 		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
@@ -1993,7 +2044,7 @@ divi.book = divi.extend(divi.bookBase,{
 		var editor = scope.editor;
 		var value = "";
 		if(editor){
-			var first = this.getFirstEditor(editor);
+			var first = this.getEditorByIndex(editor);
 			if(first){
 				first.getValue(this,this.htmlCallBack);
 			}
@@ -2167,8 +2218,12 @@ divi.assessment = divi.extend(divi.bookBase,{
 	idPrefix:'ass',
 	idCount:0,
 	table:'assessment',
+	assessFile:'assessments.json',
 	isAssessment:true,
+	elements:[],
 	comboKey:'assessment',
+	childrenKeys:['questions'],
+	elements:[],
 	sequence:undefined,
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
@@ -2186,6 +2241,42 @@ divi.assessment = divi.extend(divi.bookBase,{
 		delete values.chapter;
 		return values;
 	}
+	
+	,persistChild:function(){
+		//do nothing.
+	}
+	
+	,loadFile:function(){
+		var scope = this;
+		var url = this.prepareFilePath(this,null,this.getFileAction);
+		$.ajax({dataType: "json",url:divi.core.prepareUrl(url,this.assessFile)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+	}
+	
+	,readFile:function(data){
+		this.getSelector(this.contentPreview).empty();
+		if(data){
+			this.read(data);
+		}
+	}
+	
+	,persistData:function(elem,url){
+		divi.appBase.prototype.persistData.call(this);//save master.json
+		this.persistCurr();
+	}
+	
+	,persistCurr:function(){
+		var url = this.prepareFilePath(this);
+		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile);//save assessments.json
+	}
+	
+
+	,stringify:function(){
+		var masterObj= {};
+		if(this.isAssessment){
+			this.prepareData(masterObj,true);
+		}
+		return masterObj;
+	}
 
 	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
@@ -2198,6 +2289,418 @@ divi.assessment = divi.extend(divi.bookBase,{
 		aDiv.dom.innerHTML += values['name'];
 	}
 });
+
+
+divi.question = divi.extend(divi.element,{
+	ansCnt:2,
+	maxansCnt:undefined,
+	answers:[],
+	popWdith:'80%',
+	doms:{},
+	elems:[],
+	isQuestion:true,
+	editorKey:undefined,
+	divs:{'rating':'rating'},
+	fileName:'question.xml',
+	editors:{},
+	answerKey:'answer',
+//	/noreference:true,
+	ignoreFields:['data','references','id'],
+	table:'question',
+	htmlValKey:'data',
+	idCount:1,
+	prssIndex:-1,
+	editor:undefined,
+	idPrefix:'ques', 
+	
+	constructor : function (cfg) {
+		$.extend(this,cfg);
+		divi.question.superclass.constructor.call(this);
+	}
+
+	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
+		var currKey;
+		for(var i=0;input && this.childrenKeys && i< this.childrenKeys.length;i++){
+			currKey = this.childrenKeys[i];
+			addParams = addParams || [];
+			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
+		}
+	}
+	
+	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
+		if(input){
+			if(isArray){
+				if(skipChildren){
+					input = input[currKey];
+				}else{
+					input = input.children[currKey];
+				}
+			}
+			var newObj = {};
+			newObj['id'] = this.getFieldValue('id');
+			input.push(newObj);
+		}
+	}
+	
+	,getSaveHtmlLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.savefileAction);
+		return url+"/"+this.imageLoc;
+	}
+	
+	,getEquationsLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
+		return url+"/"+this.equationLocExact;
+	}
+	
+	
+	,getSaveEquationsHtmlLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.saveformulaAction);
+		return url;
+		
+	}
+	
+	,getHtmlLoc:function(){
+		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
+		return url+"/"+this.imageLoc;
+	}
+	
+	
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+		}
+	}
+	
+	,submit:function(scope,form,event){
+		if(scope.isNew){
+			var key = scope.table;
+			var lookupKey = this.pluralize(key);
+			this.initilizeChild(scope.parent,lookupKey);
+			scope.parent.addChild(scope.parent,lookupKey,scope);
+		}
+		if(form){
+			scope.update(form);
+		}
+		divi.home.prototype.cancelDailog(event);
+	}
+	
+	,validate:function(){
+		var values = this.getValues();
+		return true;
+	}
+
+	,validateForm:function(){
+		var elem,isValidForm = this.validate();
+		for(var i=0;i< this.elems.length;i++){
+			elem = this.elems[i];
+			if(elem){
+				isValidForm = isValidForm*elem.validate();
+			}
+		}
+		return isValidForm;
+	}
+
+	,previewElement:function(values,appendSel){
+		var val = values['data'];
+		if(val){
+			var tag = document.createElement('div');
+			$(tag).html(val);
+		}
+		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
+		return elemDom;
+	}
+	
+	,attachpreContent:function(appendTo){
+		if(this.isNew){
+			this.setValueForKey('id',this.prepareId());
+		}
+		var htmlValue = this.getFieldValue('data');
+		appendTo.find(this.editableDiv).remove();
+		this.editors = {};
+		var editorDom = this.prepareEditableDom({cls:"question"},this.editors,htmlValue,true);
+		this.editorKey = editorDom.id;
+		this.createEditor({editors:this.editors,sel:appendTo,attachtbar:true});
+	}
+	
+	
+	,attachChildPreCont:function(appendTo,index,elem,isNew){
+		elem = elem || new divi[this.answerKey]({parent:this,isNew:true,home:this.home});
+		if(isNew){
+			elem.setValueForKey('id',elem.prepareId());
+			elem.setValueForKey('isAnswer',false);
+			this.addAnswer(this,elem);
+		}
+		elem.draw(appendTo);
+		if(this.editor){
+			this.editor.addEditors(this.editors);
+		}
+	}
+	
+	,attachEditorContent:function(appendTo,editors){
+		if(appendTo){
+			for(var edt in editors){
+				if(editors.hasOwnProperty(edt)){
+					appendTo.append(editors[edt].editor);	
+				}
+			}
+			appendTo.append("<div class='dottedLine padding5'></div>");
+			appendTo.append("<div class='place-left mainElem'></div><div class='place-right contentElem'></div>");
+			this.appendElem = appendTo =  appendTo.find('.mainElem');
+			appendTo.append("<div class=''>Answers</div>");
+			var childCnt = this.isNew ? this.ansCnt : this.answers.length;
+			for(var i=0;i < childCnt;i++){ 
+				var elem = this.isNew ? null : this.elems[i];
+				this.attachChildPreCont(appendTo,i,elem,this.isNew);
+			}
+			editors = this.editors;
+		}
+	}
+	
+	,prepareForm:function(appendElem,showToggle){
+		if(this.isReference){
+			divi.elementbase.prototype.prepareForm.call(this,appendElem,showToggle);
+		}else{
+			appendElem =  appendElem.find('.contentElem');
+			difficulty = this.getFieldValue('difficulty');
+			appendElem.append('<div>Difficulty Level</div>');
+			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
+			appendElem.append('<div class="options"><a>+Add More Options</a></div>');
+		}
+	}
+	
+	,attachpostContent:function(appendTo,showToggle){
+		this.initiateRating();
+		this.attachMoreLis(appendTo.find('div.options'));
+	}
+	
+	,updateRating:function(value){
+		var values = this.getValues();
+		values['difficulty'] = value;
+		this.setValues(values);
+	}
+	
+	,initiateRating:function(){
+		var scope = this;
+		$(".rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],
+				click: function(value, rating){rating.rate(value);scope.updateRating(value);}});
+	}
+
+	,addAnswer:function(input,child){
+		if(input.elems){
+			input.elems.push(child);
+			child.addToCount();
+		}
+	}
+	
+	,attachElement:function(appendTo,showToggle,index,elem,isNew){
+		this.attachChildPreCont(appendTo,index,elem,isNew);
+	}
+	
+	,addSplValues:function(dom,child,values,parent){
+		var values = this.cleanValues(values);
+		var dataF = values[this.htmlValKey];
+		var data;
+		if(dataF){
+			data = dom.createElement('data');
+            cdata = dom.createCDATASection(unescape(dataF));
+            data.appendChild(cdata);
+            child.appendChild(data);
+		}
+	}
+	
+	,persistChild:function(){
+		var editor = this.editor;
+		if(editor){
+			var first = editor.getEditorsForKey(this.editorKey);
+			if(first){
+				first.getValue(this,this.htmlcallBack);
+			}
+		}else{
+			this.htmlcallBack();
+		}
+	}
+
+	,prepareFilePath:function(scope,url,action){
+		var url = divi.appBase.prototype.prepareFilePath.call(this,this,url,action);
+		url += "/"+this.getFieldValue('id');
+		return url;
+	}
+	
+	,htmlcallBack:function(val){
+		var scope = this;
+		var values = this.getValues();
+		values[this.htmlValKey] = val;
+		this.setValues(values);
+		this.persistChildHtml(this.prssIndex);
+	}
+	
+	,persistChildHtml:function(index){
+		if(index+1 < this.elems.length){
+			var elem = this.elems[index+1];
+			var editorIn = this.editor.getEditorsForKey(elem.editorKey);
+			if(editorIn && elem){
+				editorIn.getValue(elem,elem.htmlcallBack);
+			}
+		}else{
+			this.parent.persistCurr();
+			this.persistElem();
+		}
+	}
+	
+	,persistElem:function(){
+		var scope = this;
+		if(scope && scope.fileName){
+			var eachSet;
+			var elemId,eachElem;
+			var elements = scope.elems;
+			elemId =  scope.getFieldValue('id');
+			var files = [];
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + elemId+ '"/>');
+			this.getPersistValues(dom,null,false,'html');
+			
+			var ops = dom.createElement('options');
+			dom.documentElement.appendChild(ops);
+			
+			var masterObj = {};
+			for(var index = 0; index  < elements.length;index++){
+				eachElem = elements[index];
+				if(eachElem){
+					eachElem.getPersistValues(dom,ops,false,'option');
+				}
+			}
+			var url = this.prepareFilePath(this,url);
+			var file = new Blob([jsxml.toXml(dom)]);
+			file.name = scope.fileName;
+			scope.persist({url:url,data:[file]});
+		}
+	}
+	
+	,prepareParentDom:function(dom,childdom,values,parent){
+		if(childdom){
+		}
+	}
+});
+
+
+divi.answer = divi.extend(divi.element,{
+	ansCnt:2,
+	maxansCnt:2,
+	table:'answer',
+	htmlValKey:'data',
+	noreference:true,
+	elemLisKey:'elemList',
+	ignoreFields:['id','isAnswer','thumb','references','data'],
+	listeners:{},
+	evtDflts:{attachLis:true,events:['change','mouseout','keypress']},
+	doms:{},
+	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv'},
+	idCount:1,
+	editor:undefined,
+	idPrefix:'ans',
+	editorKey:undefined,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.answer.superclass.constructor.call(this);
+		this.listeners = {};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+	}
+	
+	,validate:function(){
+		var values = this.getValues(),validateForm = true;
+		for(var key in values){
+			if(values.hasOwnProperty(key)){
+				validateForm = validateForm*values[key];
+			}
+		}
+		return true;
+	}
+	
+	,htmlcallBack:function(val){
+		var scope = this;
+		var values = this.getValues();
+		values[this.htmlValKey] = val;
+		this.setValues(values);
+		this.parent.persistChildHtml(this.getIndexForElem());
+	}
+	
+	,getSaveHtmlLoc:function(){
+		return this.parent.getSaveHtmlLoc();
+	}
+	
+	,getEquationsLoc:function(){
+		return this.parent.getEquationsLoc();
+	}
+	
+	
+	,getSaveEquationsHtmlLoc:function(){
+		return this.parent.getSaveEquationsHtmlLoc();
+	}
+	
+	,getHtmlLoc:function(){
+		return this.parent.getHtmlLoc();
+	}
+	
+	,getIndexForElem:function(){
+		var matchedInd,elem,elems = this.parent.elems;
+		for(var i =0;elems && i < elems.length;i++){
+			elem = elems[i];
+			if(elem == this){
+				matchedInd = i;
+				break;
+			}
+		}
+		return matchedInd;
+	}
+	
+	,prepareSubmitValues:function(){
+		scope = scope || this;
+		return scope.getValues();
+	}
+	
+	,addSplValues:function(dom,child,values,parent){
+		this.parent.addSplValues(dom,child,values,parent);
+	}
+	
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+			childdom.setAttribute('isAnswer',this.getFieldValue('isAnswer'));
+		}
+	}
+	
+	,changeListener:function(event,val,jTarget,type,target){
+		var key = "data",val;
+		if(target && target.name == "isAnswer"){
+			key = "isAnswer";
+			val = jTarget.prop('checked') ? true : false;
+		}else{
+			val = jTarget.html();
+		}
+		this.setValueForKey(key,val);
+	}
+	
+	,draw:function(append){
+		var values = this.getValues();
+		var answerKey = this.getFieldValue("isAnswer");
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var elem = this.doms[this.divs.check] || divi.domBase.create($.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control'},this.evtDflts),parDom.dom);
+		$(elem.dom).attr('id',elem.id);
+		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer"},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
+		this.editorKey = answerDom.id;
+		$(parDom.dom).append(answerDom.dom);
+	}
+});
+
+divi.mcq = divi.extend(divi.question,{
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.mcq.superclass.constructor.call(this);
+	}
+});
+
 
 
 divi.contentEditor = divi.extend(divi.appBase,{
@@ -2242,6 +2745,11 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		divi.contentEditor.superclass.constructor.call(this);
 		this.initialize();
 	}
+
+	,addEditors:function(editors){
+		this.editors = editors;
+		divi.listeners.attachElementListeners(this.initiateEditors(),this,null,this.listenerKey);
+	}
 	
 	,getEditors:function(){
 		return this._editors;
@@ -2259,7 +2767,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,setActiveToolbar:function(event,target,jTarget){
 		var scope = event.data.scope;
 		var currEditor = jTarget.hasClass("."+this.editableDiv) ? jTarget : jTarget.closest("div."+this.editableDiv);
-		scope.activateToolBar(scope,currEditor.attr('ref'));
+		scope.activateToolBar(scope,currEditor.attr('id'));
 	}
 	
 	,activateToolBar:function(scope,refKey){
@@ -2267,10 +2775,13 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			scope.removeActiveToolbar.call(scope);
 			scope.activeKey = refKey;
 			scope.activeEditor = scope.getEditorsForKey(refKey);
-			var toolbar = this.getSelector(this.btnToolbar);
-			$('div.'+this.dsbltoolbar).remove();
+			if(scope.activeEditor){
+				scope.activeEditor.activate();
+				scope.updateToolbar();
+				var toolbar = this.getSelector(this.btnToolbar);
+				$('div.'+this.dsbltoolbar).remove();
+			}
 		}
-		
 	}
 	
 	,execCommand:function (commandWithArgs, valueArg) {
@@ -2328,12 +2839,15 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	
 	,initiateEditors:function(){
 		var editors = [],eachEdit,mainEditors = {};
+		var exsEditors = this.getEditors();
 		for(var ind in this.editors){
 			if(this.editors.hasOwnProperty(ind)){
 				eachEdit = this.editors[ind];
-				if(eachEdit){
+				if(eachEdit && !exsEditors[ind]){
 					editors.push(eachEdit.editor);
-					mainEditors[ind] = new divi.indEditor({editor:$(eachEdit.editor),parent:this,value:eachEdit.value});
+					mainEditors[ind] = new divi.indEditor({editor:$(eachEdit.editor),parent:this,value:eachEdit.value,isQuestion:eachEdit.isQuestion});
+				}else{
+					mainEditors[ind] = exsEditors[ind];
 				}
 			}
 		}
@@ -2485,6 +2999,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	value:'',
 	listeners:{},
 	files:{},
+	isQuestion:false,
 	imgFiles:{},
 	ref:undefined,
 	events:'mouseup keyup keydown mouseout',
@@ -2860,7 +3375,7 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,previewContent:function(selected){
 		this.updateBcrumb(selected);
-		if(selected && this.isTopic(selected)){
+		if(selected && (this.isTopic(selected) || selected.isAssessment)){
 			selected.loadFile();
 		}else{
 			this.getSelector(this.contentPreview).empty();
@@ -2924,14 +3439,12 @@ divi.home =  divi.extend(divi.appBase,{
 		divi.listeners.attachListenersWS(this.defaultListeners(),this);
 	}
 	
-	
-	
-	,preparepopUp:function(lstnCfg){
+	,preparepopUp:function(elem){
 		var popupDiv = this.retrievePopUpDiv();
-		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: '60%', buttons: {Cancel:{scope:this,fn:this.cancelDailog}},close:{scope:this,fn:'cancelDailog'}};
+		width = elem.popWdith || '60%';
+		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {Cancel:{scope:this,fn:this.cancelDailog}},close:{scope:this,fn:'cancelDailog'}};
 		popupDiv.empty().superDialog(dlgConfig);
 	}
-	
 	
 	,readBook:function(data){
 		var master_json = {};

@@ -1646,6 +1646,7 @@ divi.form.passwordfield  = divi.extend(divi.baseField, {
 	
 });
 
+
 divi.form.bool  = divi.extend(divi.baseField, {
 	values:{'true':'1','false':'0'},
 	datarole:'checkbox',
@@ -1657,6 +1658,9 @@ divi.form.bool  = divi.extend(divi.baseField, {
 	inputDivdflts:{tag:"div",'class':"input-control checkbox"},
 	init:function(cfg){
 		$.extend(this,cfg);
+		if(cfg.blockLis){
+			$.extend(this.defaults,{attachLis:false});
+		}
 		divi.form.bool.superclass.init.call(this);
 	}
 	
@@ -1703,6 +1707,53 @@ divi.form.bool  = divi.extend(divi.baseField, {
 		this.value = target.checked;
 	}
 });
+
+divi.form.multibool  = divi.extend(divi.form.bool, {
+	elements:1,
+	isMulti:true,
+	elems:[],
+	elemsCfg:undefined,
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.multibool.superclass.init.call(this);
+	}
+
+	,createField:function(options,parDom){
+		var bool;
+		for(var i= 0;i < this.elemsCfg.length;i++){
+			eachElem = this.elemsCfg[i];
+			bool = new divi.form.bool($.extend(eachField,{scope:this,validateField:this.validateField}));
+    		this.elems.push(bool);
+		}
+	}
+
+	,validateField:function(event,targetVal,target){
+		if(event.type == "keypress"){
+			if(!this.checkForMulti(event)){
+				event.preventDefault();
+			}	
+		}else{
+			divi.baseField.prototype.validateField.call(this,event,targetVal,target);
+		}
+	}
+	
+	,checkForMulti:function(event){
+		var rtnValue = true;
+		if(!this.isMulti){
+			var eachElem,val;
+			for(var i= 0;i < this.elems.length;i++){
+				eachElem = this.elems[i];
+				if(eachElem.getValue()){
+					rtnValue = false;
+					break;
+				}
+			}
+		}
+		return rtnValue;
+	}
+	
+});
+
  
 divi.form.numberfield  = divi.extend(divi.form.textfield, {
 	defaults:{tag:"input",type: 'text',attachLis:true},

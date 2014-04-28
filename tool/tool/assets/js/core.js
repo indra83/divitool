@@ -540,7 +540,7 @@ $.extend(divi.domBase,{
 	jSel:'jSel',
 	sel:'sel',
     scope:'scope',
-    ignore:['attachLis','tag','scope','listeners','prefix'],
+    ignore:['attachLis','tag','scope','listeners','prefix','events'],
 	add:function(key,elem,jqElem,scope){
 		if(elem && key){
 			var cElem = {};
@@ -746,7 +746,7 @@ $.extend(divi.eventBase,{
 						 eachListener =  evtListeners[key];
 						 if(eachListener){
 							 scope = scope || this;
-							 eachListener.apply(scope,[event,val,jTarget]);
+							 eachListener.apply(scope,[event,val,jTarget,type,target]);
 						 }
 					 }
 				 }
