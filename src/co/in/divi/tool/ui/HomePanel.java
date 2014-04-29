@@ -24,6 +24,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
+import co.in.divi.tool.FetchQuestions;
 import co.in.divi.tool.FileUploadServlet;
 import co.in.divi.tool.FormulaServlet;
 import co.in.divi.tool.PreviewServlet;
@@ -142,6 +143,9 @@ public class HomePanel extends JPanel implements ActionListener {
 
 		ServletContextHandler formulaContextHandler = new ServletContextHandler(server, "/saveformula", true, false);
 		formulaContextHandler.addServlet(FormulaServlet.class, "/*");
+		
+		ServletContextHandler questionHandler = new ServletContextHandler(server, "/getQuestions", true, false);
+		questionHandler.addServlet(FetchQuestions.class, "/*");
 
 		// preview related
 		ServletContextHandler previewContextHandler = new ServletContextHandler(server, "/preview", true, false);
@@ -161,6 +165,7 @@ public class HomePanel extends JPanel implements ActionListener {
 		contexts.addHandler(formulaContextHandler);
 		contexts.addHandler(previewContextHandler);
 		contexts.addHandler(previewStaticHandler);
+		contexts.addHandler(questionHandler);
 		contexts.addHandler(new DefaultHandler());
 		server.setHandler(contexts);
 

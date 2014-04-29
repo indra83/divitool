@@ -624,6 +624,12 @@ divi.appBase = divi.extend(divi.base, {
 	,prepareFilePath:function(scope,url,action){
 		url = url || "";
 		url = action || scope.savefileAction;
+		url = this.prepareInternalPath(scope, url, action);
+		return url;
+	}
+	
+
+	,prepareInternalPath:function(scope,url,action){
 		var topic = (scope.isTopic(scope) || scope.isAssessment) ? scope : scope.parent;
 		var elemId =  topic.getFieldValue('id');
 		var chapterId = topic.prepareCompleteId();
@@ -865,10 +871,17 @@ divi.appBase = divi.extend(divi.base, {
 		$.Dialog.close();
 	}
 	
-	,loadFile:function(url){
+	,loadFile:function(url,ops,fileName){
 		var scope = this;
 		var url = url || this.prepareFilePath(this,null,this.getFileAction);
-		$.ajax({dataType: "xml",url:divi.core.prepareUrl(url,this.fileName)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+		fileName = fileName || scope.fileName;
+		ops = ops || {};
+		var dataType = ops.dataType ? ops.dataType : "xml";
+		var data = {};
+		if(ops){
+			$.extend(data,ops.data);
+		}
+		$.ajax({dataType: dataType,url:divi.core.prepareUrl(url,fileName),data:data}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
 	}
 	
 	,readFile:function(data){
@@ -1892,8 +1905,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
-	
+
 	,add:function(event,val,jTarget,key){
 		if(key){
 			var eachChild = new divi[key]({parent:this,isNew:true,home:this.home});
@@ -1956,8 +1968,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.readEachChild(currElem,currKey);
 		}
 	}
-	
-	
 	
 	,createContextMenu:function(items){
 		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
@@ -2218,6 +2228,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	idPrefix:'ass',
 	idCount:0,
 	table:'assessment',
+	questIds:[],
 	assessFile:'assessments.json',
 	isAssessment:true,
 	elements:[],
@@ -2225,6 +2236,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	childrenKeys:['questions'],
 	elements:[],
 	sequence:undefined,
+	getQuestions:'getQuestions',
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
@@ -2233,6 +2245,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
+		this.questIds = [];
 	}
 
 	,getValues:function(){
@@ -2246,16 +2259,21 @@ divi.assessment = divi.extend(divi.bookBase,{
 		//do nothing.
 	}
 	
-	,loadFile:function(){
+	,loadFile:function(url,fileName){
 		var scope = this;
 		var url = this.prepareFilePath(this,null,this.getFileAction);
-		$.ajax({dataType: "json",url:divi.core.prepareUrl(url,this.assessFile)}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+		$.ajax({dataType: "json",url:divi.core.prepareUrl(url,this.assessFile)}).done(function (data) {scope.readAssessmentFile(data);}).fail(function (data) {scope.readFileFail(data);});
 	}
 	
-	,readFile:function(data){
+	,readAssessmentFile:function(data){
 		this.getSelector(this.contentPreview).empty();
 		if(data){
 			this.read(data);
+			var questIds = this.questIds;
+			if(questIds && questIds.length > 0){
+				url = this.prepareFilePath(this,null,'/');
+				divi.appBase.prototype.loadFile.call(this,'../'+this.getQuestions,{data:{url:url,ids:questIds},dataType:'json'},divi.question.prototype.fileName);
+			}
 		}
 	}
 	
@@ -2288,6 +2306,53 @@ divi.assessment = divi.extend(divi.bookBase,{
 		values = this.getValues();
 		aDiv.dom.innerHTML += values['name'];
 	}
+	
+	,readEachChild:function(children,currKey){
+		var eachChild,rchild;
+		this.initilizeChild(this,currKey)
+		this.loadQuestions(children);
+	}
+	
+	,loadQuestions:function(children){//better approach.TBD.
+		var ids = "";
+		for(var i=0;children && children && i < children.length;i++){
+			rchild = children[i];
+			if(divi[rchild['type']]){
+				ids = rchild['id'];
+				if(i != 0 && i != children.length){
+					ids += ",";
+				}
+			}
+		}
+		this.questIds = ids;
+	}
+
+	,readFile:function(data){
+		var xml,jXml,xmlDoc,currData = data,currKey = this.childrenKeys[0];
+		delete currData.Success;
+		var selected = this;
+		for(var eachKey in currData){
+			if(currData.hasOwnProperty(eachKey)){
+				xml = currData[eachKey];
+				xmlDoc = $.parseXML(xml);
+				var quesChild = xmlDoc.firstChild;
+				if(quesChild){
+					var self = quesChild.children[0];
+					var answers = quesChild.children[1].children;
+					//jXml = $(topicChild);
+					selected.elemes = [];// resetting the elems
+					//var self = jXml.find('html');
+					var type = $(self).find('type').html();
+					if(divi[type]){
+						eachChild = new divi[type]({parent:this,home:this.home});
+						eachChild.loadQuestion(self,answers);
+						this.addChild(this, currKey, eachChild);
+					}
+				}
+			}
+		}
+	}
+	
 });
 
 
@@ -2317,6 +2382,11 @@ divi.question = divi.extend(divi.element,{
 		$.extend(this,cfg);
 		divi.question.superclass.constructor.call(this);
 	}
+	
+	,initializeValues:function(){
+		divi.appBase.prototype.initializeValues.call(this);
+		this.values['type'] = this.type;
+	}
 
 	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
 		var currKey;
@@ -2324,6 +2394,18 @@ divi.question = divi.extend(divi.element,{
 			currKey = this.childrenKeys[i];
 			addParams = addParams || [];
 			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
+		}
+	}
+	
+
+	,loadQuestion:function(self,answers){
+		this.populateValues(self);
+		var eachAns,elem;
+		for(var i=0;i < answers.length;i++){
+			eachAns = answers[i];
+			elem = new divi[this.answerKey]({parent:this,home:this.home});
+			elem.loadAnswer(eachAns);
+			this.addAnswer(this,elem);
 		}
 	}
 	
@@ -2338,8 +2420,13 @@ divi.question = divi.extend(divi.element,{
 			}
 			var newObj = {};
 			newObj['id'] = this.getFieldValue('id');
+			newObj['type'] = this.getFieldValue('type');
 			input.push(newObj);
 		}
+	}
+	
+	,read:function(input){
+		this.setValues(input);
 	}
 	
 	,getSaveHtmlLoc:function(){
@@ -2422,7 +2509,6 @@ divi.question = divi.extend(divi.element,{
 		this.editorKey = editorDom.id;
 		this.createEditor({editors:this.editors,sel:appendTo,attachtbar:true});
 	}
-	
 	
 	,attachChildPreCont:function(appendTo,index,elem,isNew){
 		elem = elem || new divi[this.answerKey]({parent:this,isNew:true,home:this.home});
@@ -2607,6 +2693,10 @@ divi.answer = divi.extend(divi.element,{
 		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
 	
+	,loadAnswer:function(answer){
+		this.populateValues(answer);
+	}
+	
 	,validate:function(){
 		var values = this.getValues(),validateForm = true;
 		for(var key in values){
@@ -2695,6 +2785,7 @@ divi.answer = divi.extend(divi.element,{
 });
 
 divi.mcq = divi.extend(divi.question,{
+	type:'mcq',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.mcq.superclass.constructor.call(this);
