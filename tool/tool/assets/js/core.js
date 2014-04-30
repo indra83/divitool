@@ -513,7 +513,7 @@ divi = {
 	    config = config || {};    
 	    this.initialConfig = config;
 	    $.extend(this, config);
-	    this.init();
+	    this.init(config);
 	};	
 	
 })();

@@ -1024,7 +1024,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	
 	,draw:function(){
 		var parent = this.parent;
-		if(this.isTopic(parent)){
+		if(this.isTopic(parent) || parent.isAssessment){
 			parent.loadFile();
 		}
 	}
@@ -2266,6 +2266,8 @@ divi.assessment = divi.extend(divi.bookBase,{
 	}
 	
 	,readAssessmentFile:function(data){
+		this.children = {};
+		this.children[this.childrenKeys[0]] = [];
 		this.getSelector(this.contentPreview).empty();
 		if(data){
 			this.read(data);
@@ -2295,7 +2297,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		}
 		return masterObj;
 	}
-
+	
 	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -2318,8 +2320,8 @@ divi.assessment = divi.extend(divi.bookBase,{
 		for(var i=0;children && children && i < children.length;i++){
 			rchild = children[i];
 			if(divi[rchild['type']]){
-				ids = rchild['id'];
-				if(i != 0 && i != children.length){
+				ids += rchild['id'];
+				if(i != children.length-1){
 					ids += ",";
 				}
 			}
@@ -2331,30 +2333,28 @@ divi.assessment = divi.extend(divi.bookBase,{
 		var xml,jXml,xmlDoc,currData = data,currKey = this.childrenKeys[0];
 		delete currData.Success;
 		var selected = this;
-		for(var eachKey in currData){
-			if(currData.hasOwnProperty(eachKey)){
-				xml = currData[eachKey];
+		var questIds = this.questIds.split(",");
+		for(var eachKey in questIds){
+			if(questIds.hasOwnProperty(eachKey)){
+				xml = currData[questIds[eachKey]];
 				xmlDoc = $.parseXML(xml);
 				var quesChild = xmlDoc.firstChild;
 				if(quesChild){
 					var self = quesChild.children[0];
 					var answers = quesChild.children[1].children;
-					//jXml = $(topicChild);
 					selected.elemes = [];// resetting the elems
-					//var self = jXml.find('html');
 					var type = $(self).find('type').html();
 					if(divi[type]){
 						eachChild = new divi[type]({parent:this,home:this.home});
-						eachChild.loadQuestion(self,answers);
+						eachChild.loadQuestion(quesChild,self,answers);
+						eachChild.drawQuestion();
 						this.addChild(this, currKey, eachChild);
 					}
 				}
 			}
 		}
 	}
-	
 });
-
 
 divi.question = divi.extend(divi.element,{
 	ansCnt:2,
@@ -2370,7 +2370,7 @@ divi.question = divi.extend(divi.element,{
 	editors:{},
 	answerKey:'answer',
 //	/noreference:true,
-	ignoreFields:['data','references','id'],
+	ignoreFields:['data','references','id','version'],
 	table:'question',
 	htmlValKey:'data',
 	idCount:1,
@@ -2381,11 +2381,44 @@ divi.question = divi.extend(divi.element,{
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.question.superclass.constructor.call(this);
+		this.elems = [];
 	}
 	
 	,initializeValues:function(){
 		divi.appBase.prototype.initializeValues.call(this);
 		this.values['type'] = this.type;
+	}
+	
+	
+	,drawChildren:function(){
+		var currSSel =$('<div>');
+		var currAns,ansDom,answers = this.elems;
+		var tmpl = divi.tpl[this.answerKey];
+		for(var i=0;answers && i < answers.length;i++){
+			currAns = answers[i];
+			ansDom = $(tmpl);
+			ansDom.find('label').append(currAns.getFieldValue('data'));
+			if(currAns.getFieldValue('isAnswer') =="true"){
+				ansDom.find('input').attr('checked',true);
+			}
+			currSSel.append(ansDom);
+		}
+		return currSSel;
+	}
+	
+	,drawElement:function(){
+		var dom = $(divi.tpl.question);
+		dom.append(this.getFieldValue('data'));
+		return dom;
+	}
+	
+	,drawQuestion:function(){
+		var parentCont = this.getSelector(this.contentPreview);
+		var elemDom = $.tmpl(this.elemTable,{});
+		var dom = this.drawElement(elemDom);
+		var childDom = this.drawChildren();
+		parentCont.append(elemDom.append(dom).append(childDom));
+		this.enableEditList(elemDom);
 	}
 
 	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
@@ -2398,8 +2431,12 @@ divi.question = divi.extend(divi.element,{
 	}
 	
 
-	,loadQuestion:function(self,answers){
+	,loadQuestion:function(questionChild,self,answers){
+		this.populateValues(questionChild);
 		this.populateValues(self);
+		var values = this.getValues();
+		delete values['options'];
+		delete values['html'];
 		var eachAns,elem;
 		for(var i=0;i < answers.length;i++){
 			eachAns = answers[i];
@@ -2461,7 +2498,7 @@ divi.question = divi.extend(divi.element,{
 	
 	,submit:function(scope,form,event){
 		if(scope.isNew){
-			var key = scope.table;
+			var key = divi.question.prototype.table;
 			var lookupKey = this.pluralize(key);
 			this.initilizeChild(scope.parent,lookupKey);
 			scope.parent.addChild(scope.parent,lookupKey,scope);
@@ -2534,7 +2571,7 @@ divi.question = divi.extend(divi.element,{
 			appendTo.append("<div class='place-left mainElem'></div><div class='place-right contentElem'></div>");
 			this.appendElem = appendTo =  appendTo.find('.mainElem');
 			appendTo.append("<div class=''>Answers</div>");
-			var childCnt = this.isNew ? this.ansCnt : this.answers.length;
+			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
 			for(var i=0;i < childCnt;i++){ 
 				var elem = this.isNew ? null : this.elems[i];
 				this.attachChildPreCont(appendTo,i,elem,this.isNew);
@@ -2548,7 +2585,6 @@ divi.question = divi.extend(divi.element,{
 			divi.elementbase.prototype.prepareForm.call(this,appendElem,showToggle);
 		}else{
 			appendElem =  appendElem.find('.contentElem');
-			difficulty = this.getFieldValue('difficulty');
 			appendElem.append('<div>Difficulty Level</div>');
 			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
 			appendElem.append('<div class="options"><a>+Add More Options</a></div>');
@@ -2568,7 +2604,8 @@ divi.question = divi.extend(divi.element,{
 	
 	,initiateRating:function(){
 		var scope = this;
-		$(".rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],
+		difficulty = this.getFieldValue('difficulty') || 0;
+		$(".rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:difficulty,
 				click: function(value, rating){rating.rate(value);scope.updateRating(value);}});
 	}
 
@@ -2617,7 +2654,6 @@ divi.question = divi.extend(divi.element,{
 		var scope = this;
 		var values = this.getValues();
 		values[this.htmlValKey] = val;
-		this.setValues(values);
 		this.persistChildHtml(this.prssIndex);
 	}
 	
@@ -2711,7 +2747,6 @@ divi.answer = divi.extend(divi.element,{
 		var scope = this;
 		var values = this.getValues();
 		values[this.htmlValKey] = val;
-		this.setValues(values);
 		this.parent.persistChildHtml(this.getIndexForElem());
 	}
 	
@@ -2774,9 +2809,13 @@ divi.answer = divi.extend(divi.element,{
 	
 	,draw:function(append){
 		var values = this.getValues();
-		var answerKey = this.getFieldValue("isAnswer");
+		var isAnswer = this.getFieldValue("isAnswer");
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var elem = this.doms[this.divs.check] || divi.domBase.create($.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control'},this.evtDflts),parDom.dom);
+		var inptDflts = $.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control'},this.evtDflts); 
+		if(isAnswer == "true"){
+			$.extend(inptDflts,{'checked':true});
+		}
+		var elem = this.doms[this.divs.check] || divi.domBase.create(inptDflts,parDom.dom);
 		$(elem.dom).attr('id',elem.id);
 		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer"},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
 		this.editorKey = answerDom.id;
@@ -2786,6 +2825,7 @@ divi.answer = divi.extend(divi.element,{
 
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
+	table:'mcq',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.mcq.superclass.constructor.call(this);
