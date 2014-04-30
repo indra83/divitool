@@ -12,6 +12,17 @@ span{
 	display:inline-block;
 }
 
+div.preview.question{
+	font-weight:bold;
+	font-size: 15px;
+}
+
+
+div.preview.question div{
+	display:inline;
+}
+
+
 .maincontainer{
 	margin:auto;
 	width:99%;
