@@ -2357,8 +2357,8 @@ divi.assessment = divi.extend(divi.bookBase,{
 });
 
 divi.question = divi.extend(divi.element,{
-	ansCnt:2,
-	maxansCnt:undefined,
+	ansCnt:1,
+	maxansCnt:2,
 	answers:[],
 	popWdith:'80%',
 	doms:{},
@@ -2558,6 +2558,11 @@ divi.question = divi.extend(divi.element,{
 		if(this.editor){
 			this.editor.addEditors(this.editors);
 		}
+		if(this.checkMax()){
+			appendTo.parent().find('div.options').find('a').addClass('disabled');
+		}else{
+			appendTo.parent().find('div.options').find('a').removeClass('disabled');
+		}
 	}
 	
 	,attachEditorContent:function(appendTo,editors){
@@ -2587,13 +2592,18 @@ divi.question = divi.extend(divi.element,{
 			appendElem =  appendElem.find('.contentElem');
 			appendElem.append('<div>Difficulty Level</div>');
 			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
-			appendElem.append('<div class="options"><a>+Add More Options</a></div>');
+			var aCls = this.checkMax() ? 'disabled' : '';
+			appendElem.append('<div class="options"><a class="'+aCls+'">+Add More Options</a></div>');
 		}
 	}
 	
 	,attachpostContent:function(appendTo,showToggle){
 		this.initiateRating();
 		this.attachMoreLis(appendTo.find('div.options'));
+	}
+	
+	,checkMax:function(){
+		return (this.maxansCnt && this.elems.length >= this.maxansCnt); 
 	}
 	
 	,updateRating:function(value){
@@ -2617,7 +2627,9 @@ divi.question = divi.extend(divi.element,{
 	}
 	
 	,attachElement:function(appendTo,showToggle,index,elem,isNew){
-		this.attachChildPreCont(appendTo,index,elem,isNew);
+		if(!this.checkMax()){
+			this.attachChildPreCont(appendTo,index,elem,isNew);
+		}
 	}
 	
 	,addSplValues:function(dom,child,values,parent){
@@ -2832,6 +2844,17 @@ divi.mcq = divi.extend(divi.question,{
 	}
 });
 
+
+divi.torf = divi.extend(divi.question,{
+	type:'torf',
+	table:'torf',
+	ansCnt:2,
+	maxansCnt:2,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.torf.superclass.constructor.call(this);
+	}
+});
 
 
 divi.contentEditor = divi.extend(divi.appBase,{

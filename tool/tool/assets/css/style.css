@@ -17,7 +17,6 @@ div.preview.question{
 	font-size: 15px;
 }
 
-
 div.preview.question div{
 	display:inline;
 }
@@ -528,6 +527,16 @@ div.answerDiv div{
 
 .metro div.options a{
  	cursor:pointer;
+ }
+
+.metro div.options a.disabled{
+ 	color: #222222;
+ 	cursor:auto;
+ }
+ 
+.metro div.options a.disabled:hover{
+ 	color: #222222;
+ 	cursor:auto;
  }
 
 div.editableDiv.answer {
