@@ -514,11 +514,16 @@ div.answerDiv input{
 	margin-top: -20px;
 }
 
-.media div.answerDiv input[type="checkbox"]{
+.metro div.answerDiv input[type="checkbox"]{
 	width: 20px;
 	height: 20px;
 	margin-top: -20px;
 }
+
+.metro div.answerDiv input[type="radio"]{
+	margin:5px;
+}
+
 
 div.answerDiv div{
 	display:inline-block;

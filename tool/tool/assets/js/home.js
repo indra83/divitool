@@ -613,7 +613,7 @@ divi.appBase = divi.extend(divi.base, {
 			var file = new Blob([jsxml.toXml(dom)]);
 			file.name = scope.fileName;
 			scope.persist({url:url,data:[file]});
-			scope.persist({url:url,data:files});
+			scope.persist({url:url,data:files,succcb:this.drawOnSuccess});
 		}
 	}
 	
@@ -754,9 +754,12 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		if(this.updated){
 			this.persistData();
-			this.draw();
 			this.updated = false;
 		}
+	}
+	
+	,drawOnSuccess:function(r){
+		this.draw();
 	}
 	
 	,prepareCompleteId:function(){
@@ -949,6 +952,8 @@ divi.appBase = divi.extend(divi.base, {
 	,persist:function(fileOps){
 		fileOps = fileOps || {};
 		var url = fileOps.url;
+		context = fileOps.context || this;
+		var callback = fileOps.succcb;
 		var formData = new FormData();
 		var eachFile;
 		var file = fileOps.data;
@@ -966,6 +971,15 @@ divi.appBase = divi.extend(divi.base, {
 		     xhr.open('POST', url, true);
 		     xhr.send(formData);
 		}
+		 xhr.onreadystatechange=function(){
+        	if (xhr.readyState==4 && xhr.status==200){
+    			if(callback){
+    				callback.call(context,xhr.responseText);
+    			}
+        	}
+    		return;
+        }
+		 
 		return xhr;
 	}
 });
@@ -2069,8 +2083,6 @@ divi.book = divi.extend(divi.bookBase,{
 		this.update(null,values);
 	}
 	
-	
-	
 	,draw:function(){
 		var values = this.getValues();
 		this.drawonScreen(values);
@@ -2401,11 +2413,15 @@ divi.question = divi.extend(divi.element,{
 			if(currAns.getFieldValue('isAnswer') =="true"){
 				ansDom.find('input').attr('checked',true);
 			}
+			this.updateChildDom(ansDom);
 			currSSel.append(ansDom);
 		}
 		return currSSel;
 	}
 	
+	,updateChildDom:function(ansDom){
+		
+	}
 	,drawElement:function(){
 		var dom = $(divi.tpl.question);
 		dom.append(this.getFieldValue('data'));
@@ -2554,7 +2570,7 @@ divi.question = divi.extend(divi.element,{
 			elem.setValueForKey('isAnswer',false);
 			this.addAnswer(this,elem);
 		}
-		elem.draw(appendTo);
+		elem.draw(appendTo,index);
 		if(this.editor){
 			this.editor.addEditors(this.editors);
 		}
@@ -2675,6 +2691,8 @@ divi.question = divi.extend(divi.element,{
 			var editorIn = this.editor.getEditorsForKey(elem.editorKey);
 			if(editorIn && elem){
 				editorIn.getValue(elem,elem.htmlcallBack);
+			}else{
+				this.persistChildHtml(index+1);
 			}
 		}else{
 			this.parent.persistCurr();
@@ -2706,7 +2724,7 @@ divi.question = divi.extend(divi.element,{
 			var url = this.prepareFilePath(this,url);
 			var file = new Blob([jsxml.toXml(dom)]);
 			file.name = scope.fileName;
-			scope.persist({url:url,data:[file]});
+			scope.persist({url:url,data:[file],succcb:this.drawOnSuccess});
 		}
 	}
 	
@@ -2835,9 +2853,73 @@ divi.answer = divi.extend(divi.element,{
 	}
 });
 
+divi.torfAns = divi.extend(divi.answer,{
+	trueText:'True',
+	falseText:'False',
+	idPrefix:'torfAns',
+	htmlValKey:undefined,
+	ignoreFields:['id','isAnswer'],
+	table:'torfAns',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.answer.superclass.constructor.call(this);
+		this.listeners = {};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+	}
+
+	,addSplValues:function(dom,child,values,parent){
+	}
+
+	,changeListener:function(event,val,jTarget,type,target){
+		var key = "isAnswer";
+		val = jTarget.prop('checked') ? true : false;
+		this.setValueForKey(key,val);
+		var matched = this.getOtherTarget(jTarget);
+		if(matched){
+			matched.setValueForKey(key,!val);
+		}
+	}
+	
+	,getOtherTarget:function(jTarget){
+		var matched,elem,parent = this.parent;
+		var elems = parent.elems;
+		for(var key = 0;elems && key < elems.length;key++){
+			elem = elems[key];
+			if(jTarget.attr('id') != elem.editorKey){
+				matched = elem;
+				break;
+			}
+		}
+		return matched;
+	}
+
+	,draw:function(append,index){
+		var values = this.getValues();
+		var isAnswer = this.getFieldValue("isAnswer");
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var inptDflts = $.extend({tag:'input',type:"radio",name:'r3','data-transform':'input-control'},this.evtDflts); 
+		if(isAnswer == "true"){
+			$.extend(inptDflts,{'checked':true});
+		}
+		var elem = this.doms[this.divs.check] || divi.domBase.create(inptDflts,parDom.dom);
+		$(elem.dom).attr('id',elem.id);
+		var text = this.trueText;
+		if(index == 1){
+			text = this.falseText;
+		}
+		this.setValueForKey('data',text);
+		var answerDom = this.doms[this.divs.elem] = divi.domBase.create({tag:'div',scope:this,value:text},append)
+		this.editorKey = elem.id;
+		$(parDom.dom).append(answerDom.dom);
+	}
+	
+});
+
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
 	table:'mcq',
+	idPrefix:'mcq',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.mcq.superclass.constructor.call(this);
@@ -2848,11 +2930,17 @@ divi.mcq = divi.extend(divi.question,{
 divi.torf = divi.extend(divi.question,{
 	type:'torf',
 	table:'torf',
+	answerKey:'torfAns',
+	idPrefix:'torf',
 	ansCnt:2,
 	maxansCnt:2,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.torf.superclass.constructor.call(this);
+	}
+
+	,updateChildDom:function(ansDom){
+		ansDom.find('input').attr('name',this.getFieldValue('id'));
 	}
 });
 
@@ -3574,7 +3662,8 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,editAssessListeners:function(scope){
-		 return [{tag:'.addmcq',listType:'click',parent:divi.book,listenerFn:'addelement',key:'mcq',mapTo:scope}];
+		 return [{tag:'.addmcq',listType:'click',parent:divi.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
+		         {tag:'.addtorf',listType:'click',parent:divi.book,listenerFn:'addelement',key:'torf',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){

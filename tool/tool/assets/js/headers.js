@@ -59,6 +59,14 @@ divi.app.answer = new divi.pageBase({
 	}
 });
 
+divi.app.torfAns = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		         {name:"isAnswer", "desc": "isCorrectAns", "type": "bool"},
+		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
+	}
+});
+
 divi.app.references = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"license", "desc": "License", "type": "combofield","listener":"license"},
@@ -170,5 +178,6 @@ divi.tpl.richtoolbar ='	<div class="toolbarCls"><div class="btn-toolbar" data-ro
 divi.tpl.tabs = '<div class="tab-control"><ul class="tabs"><li class="active"><a href="._page_${i1}">Basic Info</a></li><li><a href="._page_${i2}">Licensing</a></li></ul><div  class="frames"><div class="frame tabs _page_${i1}"></div><div class="frame tabs _page_${i2}"></div></div></div>';
 divi.tpl.imageset = '<div class="carousel"><a class="controls left"><i class="icon-arrow-left-3"></i></a><a class="controls right"><i class="icon-arrow-right-3"></i></a></div>';
 divi.tpl.answer = '<div class="input-control checkbox margin10" data-role="input-control"><label><input type="checkbox"><span class="check"></span></label></div>';
+divi.tpl.torfAns = '<div class="input-control radio default-style margin10" data-role="input-control"><label><input type="radio" name=""><span class="check"></span></label></div>';
 divi.tpl.question = '<div class="preview question">Q. </div>';
 divi.tpl.slide = '<div class="slide"></div>';
