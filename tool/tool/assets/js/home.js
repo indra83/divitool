@@ -2945,7 +2945,7 @@ divi.torfAns = divi.extend(divi.answer,{
 
 divi.fill_blankAns = divi.extend(divi.answer,{
 	idPrefix:'fobAns',
-	ignoreFields:['id'],
+	ignoreFields:['id','data'],
 	table:'fill_blankAns',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
