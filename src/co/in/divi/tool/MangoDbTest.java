@@ -14,7 +14,7 @@ import com.mongodb.ServerAddress;
 
 public class MangoDbTest {
 	public static void main(String[] args) {
-		try {
+		/*try {
 
 			// To directly connect to a single MongoDB server (note that this
 			// will not auto-discover the primary even
@@ -32,19 +32,19 @@ public class MangoDbTest {
 
 			DB db = mongoClient.getDB("mydb");
 
-			/**** Connect to MongoDB ****/
+			*//**** Connect to MongoDB ****//*
 			// Since 2.10.0, uses MongoClient
 			MongoClient mongo = new MongoClient("localhost", 27017);
 
-			/**** Get database ****/
+			*//**** Get database ****//*
 			// if database doesn't exists, MongoDB will create it for you
 			DB db = mongo.getDB("testdb");
 
-			/**** Get collection / table from 'testdb' ****/
+			*//**** Get collection / table from 'testdb' ****//*
 			// if collection doesn't exists, MongoDB will create it for you
 			DBCollection table = db.getCollection("user");
 
-			/**** Insert ****/
+			*//**** Insert ****//*
 			// create a document to store key and value
 			BasicDBObject document = new BasicDBObject();
 			document.put("name", "mkyong");
@@ -52,7 +52,7 @@ public class MangoDbTest {
 			document.put("createdDate", new Date());
 			table.insert(document);
 
-			/**** Find and display ****/
+			*//**** Find and display ****//*
 			BasicDBObject searchQuery = new BasicDBObject();
 			searchQuery.put("name", "mkyong");
 
@@ -62,7 +62,7 @@ public class MangoDbTest {
 				System.out.println(cursor.next());
 			}
 
-			/**** Update ****/
+			*//**** Update ****//*
 			// search document where name="mkyong" and update it with new values
 			BasicDBObject query = new BasicDBObject();
 			query.put("name", "mkyong");
@@ -75,7 +75,7 @@ public class MangoDbTest {
 
 			table.update(query, updateObj);
 
-			/**** Find and display ****/
+			*//**** Find and display ****//*
 			BasicDBObject searchQuery2 = new BasicDBObject().append("name",
 					"mkyong-updated");
 
@@ -85,14 +85,14 @@ public class MangoDbTest {
 				System.out.println(cursor2.next());
 			}
 
-			/**** Done ****/
+			*//**** Done ****//*
 			System.out.println("Done");
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (MongoException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 }

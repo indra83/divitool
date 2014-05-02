@@ -175,7 +175,20 @@ div.preview.question div{
 	width:60%;
 }
 
-.previewElem .contentElem,.metro .contentElem,{
+.previewElem .mainElem video{
+	webkit-filter: grayscale(100%);
+	-moz-filter: grayscale(100%);
+	-ms-filter: grayscale(100%);
+	filter: grayscale(100%);
+	object-fit: contain;
+	display: inline-block;
+	width: 80%;
+	height:90%;
+}
+
+
+
+.metro .previewElem .contentElem,.metro .contentElem{
 	position:relative;
 	width:37%;
 	height: 30%;
@@ -479,7 +492,7 @@ span.lblValue{
 }
 
 .metro div.formfield{
-	width:100%;
+	width:85%;
 }
 
 div.editableDiv{

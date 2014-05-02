@@ -1,7 +1,7 @@
 divi.namespace("divi.app");
 divi.app.book = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"License", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},
+		 return [{name:"license", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},
 		        {name:"name", "desc": "Author Name/Organization Name", "type": "textfield","isRequired": true},
 		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield","isRequired": true},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
@@ -63,6 +63,13 @@ divi.app.torfAns = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
 		         {name:"isAnswer", "desc": "isCorrectAns", "type": "bool"},
+		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
+	}
+});
+
+divi.app.fill_blankAns = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
 	}
 });
@@ -137,32 +144,8 @@ divi.app.html = new divi.pageBase({
 	}
 });
 
-/*divi.app.html = new divi.crossPageBase({
-	 tables:["htmlAlone","references"],
-	 sections:{"":{name:"", incAll:["htmlAlone","references"]}}
-});
-
-divi.app.video1 = new divi.crossPageBase({
-	 tables:["videoAlone","references"],
-	 sections:{"":{name:"", incAll:["videoAlone","references"]}}
-});
-
-
-divi.app.audio = new divi.crossPageBase({
-	 tables:["audioAlone","references"],
-	 sections:{"":{name:"", incAll:["audioAlone","references"]}}
-});
-
-
-divi.app.image = new divi.crossPageBase({
-	 tables:["imageAlone","references"],
-	 sections:{"":{name:"", incAll:["imageAlone","references"]}}
-});*/
-
 divi.namespace("divi.tpl");
-/*
- <!--    <div class="btn-group"><a class="btn dropdown-toggle" href="#" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a><ul class="dropdown-menu" data-role="dropdown"></ul></div><div class="btn-group"><a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="icon-text-height"></i>&nbsp;<b class="caret"></b></a><ul class="dropdown-menu"><li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li><li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li><li><a data-edit="fontSize 1"><font size="1">Small</font></a></li></ul></div> -->
- */
+divi.namespace("divi.tpl.prev");
 divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Author Name/ID/Organization Name:</span><span class="lblValue">${source}</span></div><div class="formfield larger"><span class="labelStyle">Name:</span><span class="lblValue">${name}</span></div><div class="formfield larger"><span class="labelStyle">Website URL:</span><span class="lblValue">${url}</span></div><div class="formfield larger"><span class="labelStyle">License:</span><span class="lblValue">${license}</span></div>';
 divi.tpl.video = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
@@ -179,5 +162,8 @@ divi.tpl.tabs = '<div class="tab-control"><ul class="tabs"><li class="active"><a
 divi.tpl.imageset = '<div class="carousel"><a class="controls left"><i class="icon-arrow-left-3"></i></a><a class="controls right"><i class="icon-arrow-right-3"></i></a></div>';
 divi.tpl.answer = '<div class="input-control checkbox margin10" data-role="input-control"><label><input type="checkbox"><span class="check"></span></label></div>';
 divi.tpl.torfAns = '<div class="input-control radio default-style margin10" data-role="input-control"><label><input type="radio" name=""><span class="check"></span></label></div>';
+divi.tpl.fill_blankAns = '<div class="input-control default-style margin10" data-role="input-control"><label></label></div>';
 divi.tpl.question = '<div class="preview question">Q. </div>';
 divi.tpl.slide = '<div class="slide"></div>';
+divi.tpl.prev.video = "<video controls poster='${thumb}'><source src='${src}' type='video/mp4' /></video>";
+divi.tpl.prev.audio = "<audio controls src='${src}'/></audio>";

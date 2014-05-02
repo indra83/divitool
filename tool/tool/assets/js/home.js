@@ -560,7 +560,10 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
-	,persistData:function(elem,url,fileName){
+	,persistData:function(elem,url,fileName,fileops){
+		fileops = fileops || {};
+		var attachCb = true;
+		if(fileops.hasOwnProperty('attachCb')){ attachCb = fileops['attachCb'];}
 		 var book = elem || this.retrieveBook(this);
 		 if(book){
 			 window.URL = window.webkitURL || window.URL;
@@ -568,8 +571,15 @@ divi.appBase = divi.extend(divi.base, {
 	         var file = new Blob([JSON.stringify(book.stringify(true), undefined, 2)]);
 	         file.name = fileName || this.masterFile;
 	         url = url || this.savefileAction;
-	         book.persist({url:url,data:[file]});
-	         this.persistChild();
+	         var prs = {url:url,data:[file]};
+	         var attach = this.childExists();
+	         if(!attach && attachCb){
+	        	 $.extend(prs,{succcb:this.drawOnSuccess,context:this});
+	         }
+	         book.persist(prs);
+	         if(attach){
+	        	 this.persistChild(attachCb);
+	         }
 		 }else{
 			 alert("Please Contact administrator. Could not save the changes");
 		 }
@@ -586,35 +596,42 @@ divi.appBase = divi.extend(divi.base, {
 			}
 		}
 	}
-
-	,persistChild:function(){
-		var isAssessment = this.isAssessment ? true :false;
+	
+	,childExists:function(){
 		var scope = this.elements ? this : this.parent;
-		if(scope && scope.fileName){
-			var eachSet;
-			var elemId,eachElem;
-			var elements = scope.elements;
-			elemId =  scope.getFieldValue('id');
-			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="' + elemId+ '"/>');
-			var masterObj = {};
-			for(var index = 0; index  < elements.length;index++){
-				eachElem = elements[index];
-				if(eachElem){
-					eachElem.getPersistValues(dom);
-					var elemFiles = eachElem.formPanel ? eachElem.formPanel.files : [];
-					if(elemFiles && elemFiles.length > 0){
-						files = files.concat(elemFiles);
-					}
+		return scope && scope.fileName;
+	}
+
+	,persistChild:function(attachCb){
+		var isAssessment = this.isAssessment ? true :false;
+		var eachSet;
+		var elemId,eachElem;
+		var scope = this.elements ? this : this.parent;
+		var elements = scope.elements;
+		elemId =  scope.getFieldValue('id');
+		var files = [];
+		var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><topic version="1" id="' + elemId+ '"/>');
+		var masterObj = {};
+		for(var index = 0; index  < elements.length;index++){
+			eachElem = elements[index];
+			if(eachElem){
+				eachElem.getPersistValues(dom);
+				var elemFiles = eachElem.formPanel ? eachElem.formPanel.files : [];
+				if(elemFiles && elemFiles.length > 0){
+					files = files.concat(elemFiles);
 				}
 			}
-			
-			var url = this.prepareFilePath(this,url);
-			var file = new Blob([jsxml.toXml(dom)]);
-			file.name = scope.fileName;
-			scope.persist({url:url,data:[file]});
-			scope.persist({url:url,data:files,succcb:this.drawOnSuccess});
 		}
+		
+		var url = this.prepareFilePath(this,url);
+		var file = new Blob([jsxml.toXml(dom)]);
+		file.name = scope.fileName;
+		scope.persist({url:url,data:[file]});
+		var ops = {url:url,data:files};
+		if(attachCb){
+			$.extend(ops,{succcb:this.drawOnSuccess});
+		}
+		scope.persist(ops);
 	}
 	
 	,isTopic:function(elem){
@@ -825,8 +842,8 @@ divi.appBase = divi.extend(divi.base, {
 	,launchElem:function(elem,key){
 		this.launchPopUp.call(elem,elem);
 		if(key){
-			eachElem.formPanel.setValue('boxType', key);
-			eachElem.formPanel.hideField('boxType');
+			elem.formPanel.setValue('boxType', key);
+			elem.formPanel.hideField('boxType');
 		}
 	}
 	
@@ -986,6 +1003,7 @@ divi.appBase = divi.extend(divi.base, {
 
 divi.elementbase = divi.extend(divi.appBase,{
 	table:'',
+	preview:'prev',
 	elemTable:'eachHeader',
 	ignoreFields:['id','src','thumb','references'],
 	referenceFields:['source','name','url','license'],
@@ -1006,6 +1024,9 @@ divi.elementbase = divi.extend(divi.appBase,{
 		this.elemTpl = currTpl = divi.tpl[table];
 		if(currTpl){
 			$.template(table,currTpl);
+		}
+		if(divi.tpl.prev[this.table]){
+			$.template(this.preview+this.table,divi.tpl.prev[this.table]);
 		}
 	}
 
@@ -1117,13 +1138,19 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 	
 	,previewElement:function(values){
-		var tag = document.createElement(this.tag || this.table);
-		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
-		if(values['src']){
-			tag.setAttribute('src',url+'/'+values['src']);
-			tag.setAttribute('controls','');
+		var elem,vals = {},url = this.prepareFilePath(this.parent,null,this.getFileAction);
+		var filePath = url+'/'+values['src'];
+		if(divi.tpl.prev[this.table]){
+			$.extend(vals,values);
+			if(vals['src'] ){
+				vals['src'] = filePath;
+			}
+			if(values['thumb']){
+				vals['thumb'] = url+'/'+values['thumb'];
+			}
+			elem = $.tmpl(this.preview+this.table,vals);
 		}
-		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
+		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(elem);
 		return elemDom;
 	}
 
@@ -1988,7 +2015,8 @@ divi.bookBase = divi.extend(divi.appBase,{
 		if(items){
 			for(var ech in items){
 				if(items.hasOwnProperty(ech)){
-					//childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.listeners[this.defaultKey]}),parDom.dom);
+					// childDom =
+					// divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.listeners[this.defaultKey]}),parDom.dom);
 					childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,attachLis:true,listeners:this.listeners[this.rclickKey]}),parDom.dom);
 					childDom.dom.setAttribute('id',childDom.id);
 				}
@@ -2036,6 +2064,9 @@ divi.book = divi.extend(divi.bookBase,{
 	
 	,getSaveEquationsHtmlLoc:function(){
 		return "";
+	}
+	
+	,setParent:function(scope,values){
 	}
 	
 	,getEquationsLoc:function(){
@@ -2120,8 +2151,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 		this.cmItems = {'Add Topic':{fn:this.add,key:'topic'},'Add Assessment':{fn:this.add,key:'assessment'},'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
 	}
-	
-	
+
 	,beforeDelete:function(event){
 		var lookupKey = this.pluralize(this.table);
 		var children = this.parent.children[lookupKey];
@@ -2202,6 +2232,10 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.createContextMenu(this.cmItems);
 	}
 	
+	,drawUpdate:function(){
+		this.loadFile();
+	}
+	
 	,beforeDelete:function(event,val,jTarget){
 		var lookupKey = this.pluralize(this.table);
 		var children = this.parent.children[lookupKey];
@@ -2268,7 +2302,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	}
 	
 	,persistChild:function(){
-		//do nothing.
+		// do nothing.
 	}
 	
 	,loadFile:function(url,fileName){
@@ -2292,13 +2326,14 @@ divi.assessment = divi.extend(divi.bookBase,{
 	}
 	
 	,persistData:function(elem,url){
-		divi.appBase.prototype.persistData.call(this);//save master.json
+		divi.appBase.prototype.persistData.call(this);// save master.json
 		this.persistCurr();
 	}
 	
 	,persistCurr:function(){
 		var url = this.prepareFilePath(this);
-		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile);//save assessments.json
+		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile,{attachCb:false});// save
+																				// assessments.json
 	}
 	
 
@@ -2327,7 +2362,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		this.loadQuestions(children);
 	}
 	
-	,loadQuestions:function(children){//better approach.TBD.
+	,loadQuestions:function(children){// better approach.TBD.
 		var ids = "";
 		for(var i=0;children && children && i < children.length;i++){
 			rchild = children[i];
@@ -2355,7 +2390,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 					var self = quesChild.children[0];
 					var answers = quesChild.children[1].children;
 					selected.elemes = [];// resetting the elems
-					var type = $(self).find('type').html();
+					var type = $(quesChild).attr('type');
 					if(divi[type]){
 						eachChild = new divi[type]({parent:this,home:this.home});
 						eachChild.loadQuestion(quesChild,self,answers);
@@ -2370,7 +2405,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 
 divi.question = divi.extend(divi.element,{
 	ansCnt:1,
-	maxansCnt:2,
+	maxansCnt:undefined,
 	answers:[],
 	popWdith:'80%',
 	doms:{},
@@ -2381,8 +2416,8 @@ divi.question = divi.extend(divi.element,{
 	fileName:'question.xml',
 	editors:{},
 	answerKey:'answer',
-//	/noreference:true,
-	ignoreFields:['data','references','id','version'],
+// /noreference:true,
+	ignoreFields:['data','references','id','version','type'],
 	table:'question',
 	htmlValKey:'data',
 	idCount:1,
@@ -2504,14 +2539,6 @@ divi.question = divi.extend(divi.element,{
 		return url+"/"+this.imageLoc;
 	}
 	
-	
-	,addAddValues:function(dom,childdom,values,parent){
-		if(childdom){
-			childdom.removeAttribute('thumb');
-			childdom.removeAttribute('src');
-		}
-	}
-	
 	,submit:function(scope,form,event){
 		if(scope.isNew){
 			var key = divi.question.prototype.table;
@@ -2567,7 +2594,9 @@ divi.question = divi.extend(divi.element,{
 		elem = elem || new divi[this.answerKey]({parent:this,isNew:true,home:this.home});
 		if(isNew){
 			elem.setValueForKey('id',elem.prepareId());
-			elem.setValueForKey('isAnswer',false);
+			if(elem.getValues().hasOwnProperty("isAnswer")){
+				elem.setValueForKey('isAnswer',false);
+			}
 			this.addAnswer(this,elem);
 		}
 		elem.draw(appendTo,index);
@@ -2644,7 +2673,7 @@ divi.question = divi.extend(divi.element,{
 	
 	,attachElement:function(appendTo,showToggle,index,elem,isNew){
 		if(!this.checkMax()){
-			this.attachChildPreCont(appendTo,index,elem,isNew);
+			this.attachChildPreCont(appendTo,index,elem,true);
 		}
 	}
 	
@@ -2706,14 +2735,12 @@ divi.question = divi.extend(divi.element,{
 			var eachSet;
 			var elemId,eachElem;
 			var elements = scope.elems;
-			elemId =  scope.getFieldValue('id');
 			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + elemId+ '"/>');
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type')+'"/>');
 			this.getPersistValues(dom,null,false,'html');
 			
 			var ops = dom.createElement('options');
 			dom.documentElement.appendChild(ops);
-			
 			var masterObj = {};
 			for(var index = 0; index  < elements.length;index++){
 				eachElem = elements[index];
@@ -2916,6 +2943,35 @@ divi.torfAns = divi.extend(divi.answer,{
 	
 });
 
+divi.fill_blankAns = divi.extend(divi.answer,{
+	idPrefix:'fobAns',
+	ignoreFields:['id'],
+	table:'fill_blankAns',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.fill_blankAns.superclass.constructor.call(this);
+		this.listeners = {};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+	}
+
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+		}
+	}
+
+	,draw:function(append,index){
+		var values = this.getValues();
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer"},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
+		this.editorKey = answerDom.id;
+		$(parDom.dom).append(answerDom.dom);
+	}
+	
+});
+
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
 	table:'mcq',
@@ -2941,6 +2997,34 @@ divi.torf = divi.extend(divi.question,{
 
 	,updateChildDom:function(ansDom){
 		ansDom.find('input').attr('name',this.getFieldValue('id'));
+	}
+});
+
+
+divi.fill_blank = divi.extend(divi.question,{
+	type:'fill_blank',
+	table:'fill_blank',
+	answerKey:'fill_blankAns',
+	idPrefix:'fob',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.fill_blank.superclass.constructor.call(this);
+	}
+
+	,drawChildren:function(){
+		var currSSel =$('<div>');
+		var currAns,ansDom,answers = this.elems;
+		var tmpl = divi.tpl[this.answerKey];
+		for(var i=0;answers && i < answers.length;i++){
+			currAns = answers[i];
+			ansDom = $(tmpl);
+			ansDom.find('label').append(currAns.getFieldValue('data'));
+			currSSel.append(ansDom);
+		}
+		return currSSel;
+	}
+
+	,updateChildDom:function(ansDom){
 	}
 });
 
@@ -3251,7 +3335,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.ref = this.editor.attr('ref');
 	}
 
-	,initialize:function(){//overriding the base initialize
+	,initialize:function(){// overriding the base initialize
 		
 	}
 	
@@ -3349,7 +3433,8 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 		if(imageFiles && imageFiles.length > 0){
 			saveVal = this.upateFormulas(saveVal, imageFiles);
-			//saveVal = this.prepareEquationPath(cbScope.equationLocExact, val, files, cbScope);
+			// saveVal = this.prepareEquationPath(cbScope.equationLocExact, val,
+			// files, cbScope);
 		}
 		if(callback){
 	    	callback.apply(cbScope,[saveVal]);
@@ -3520,7 +3605,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 		}
 	}
 
-	,initialize:function(){//overriding the base initialize
+	,initialize:function(){// overriding the base initialize
 		this.tpl = divi.tpl[this.table];
 		this.show();
 	}
@@ -3617,10 +3702,9 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,previewContent:function(selected){
 		this.updateBcrumb(selected);
+		this.getSelector(this.contentPreview).empty();
 		if(selected && (this.isTopic(selected) || selected.isAssessment)){
 			selected.loadFile();
-		}else{
-			this.getSelector(this.contentPreview).empty();
 		}
 	}
 	
@@ -3644,26 +3728,27 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 	
 	,btnListeners:function(scope){
-		 return [{tag:'.addtopic',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'topic',mapTo:scope},
-	        {tag:'.addassessment',listType:'click',parent:divi.book,listenerFn:'addcontent',key:'assessment',mapTo:scope}];
+		 return [{tag:'.addtopic',listType:'click',parent:this.book,listenerFn:'addcontent',key:'topic',mapTo:scope},
+	        {tag:'.addassessment',listType:'click',parent:this.book,listenerFn:'addcontent',key:'assessment',mapTo:scope}];
 	}
 	
 	,editBtnListeners:function(scope){
-		 return [{tag:'.addvideo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'video',mapTo:scope},
-		         {tag:'.addimage',listType:'click',parent:divi.book,listenerFn:'addelement',key:'image',mapTo:scope},
-		         {tag:'.addaudio',listType:'click',parent:divi.book,listenerFn:'addelement',key:'audio',mapTo:scope},
-		         {tag:'.addhtml',listType:'click',parent:divi.book,listenerFn:'addelement',key:'html',mapTo:scope},
-		         {tag:'.addheading',listType:'click',parent:divi.book,listenerFn:'addelement',key:'heading3',mapTo:scope},
-		         {tag:'.addsubtopic',listType:'click',parent:divi.book,listenerFn:'addelement',key:'subtopic',mapTo:scope},
-		         {tag:'.addimageset',listType:'click',parent:divi.book,listenerFn:'addelement',key:'imageset',mapTo:scope},
-		         {tag:'.addinfo',listType:'click',parent:divi.book,listenerFn:'addelement',key:'info',mapTo:scope},
-		         {tag:'.addalert',listType:'click',parent:divi.book,listenerFn:'addelement',key:'alert',mapTo:scope},
-		         {tag:'.addother',listType:'click',parent:divi.book,listenerFn:'addelement',key:'other',mapTo:scope}];
+		 return [{tag:'.addvideo',listType:'click',parent:this.book,listenerFn:'addelement',key:'video',mapTo:scope},
+		         {tag:'.addimage',listType:'click',parent:this.book,listenerFn:'addelement',key:'image',mapTo:scope},
+		         {tag:'.addaudio',listType:'click',parent:this.book,listenerFn:'addelement',key:'audio',mapTo:scope},
+		         {tag:'.addhtml',listType:'click',parent:this.book,listenerFn:'addelement',key:'html',mapTo:scope},
+		         {tag:'.addheading',listType:'click',parent:this.book,listenerFn:'addelement',key:'heading3',mapTo:scope},
+		         {tag:'.addsubtopic',listType:'click',parent:this.book,listenerFn:'addelement',key:'subtopic',mapTo:scope},
+		         {tag:'.addimageset',listType:'click',parent:this.book,listenerFn:'addelement',key:'imageset',mapTo:scope},
+		         {tag:'.addinfo',listType:'click',parent:this.book,listenerFn:'addelement',key:'info',mapTo:scope},
+		         {tag:'.addalert',listType:'click',parent:this.book,listenerFn:'addelement',key:'alert',mapTo:scope},
+		         {tag:'.addother',listType:'click',parent:this.book,listenerFn:'addelement',key:'other',mapTo:scope}];
 	}
 	
 	,editAssessListeners:function(scope){
-		 return [{tag:'.addmcq',listType:'click',parent:divi.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
-		         {tag:'.addtorf',listType:'click',parent:divi.book,listenerFn:'addelement',key:'torf',mapTo:scope}];
+		 return [{tag:'.addmcq',listType:'click',parent:this.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
+		         {tag:'.addtorf',listType:'click',parent:this.book,listenerFn:'addelement',key:'torf',mapTo:scope},
+		         {tag:'.addfill_blank',listType:'click',parent:this.book,listenerFn:'addelement',key:'fill_blank',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){
@@ -3716,7 +3801,7 @@ divi.home =  divi.extend(divi.appBase,{
 		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
 		        {tag:'.btnBkOverview',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.bookEdit',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
-		        {tag:'.addchapter',listType:'click',parent:divi.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
+		        {tag:'.addchapter',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
 		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
 	}
 	
