@@ -74,6 +74,14 @@ divi.app.fill_blankAns = new divi.pageBase({
 	}
 });
 
+divi.app.matchAns = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		         {name:"left", "desc": "Left", "type": "textfield","isRequired": true},
+		         {name:"right", "desc": "Left", "type": "textfield","isRequired": true}];
+	}
+});
+
 divi.app.references = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"license", "desc": "License", "type": "combofield","listener":"license"},

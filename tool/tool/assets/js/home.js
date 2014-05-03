@@ -323,10 +323,16 @@ divi.appBase = divi.extend(divi.base, {
 	,cleanValues:function(values,key){
 		var key = this.htmlValKey;
 		if(key){
-			value = values[key];
-			value = this.prepareResourcePath(value,this.getHtmlLoc(),this.imageLocExact);
-			value = this.prepareResourcePath(value,this.getEquationsLoc(),this.equationLocExact);
-			values[this.htmlValKey] = value;
+			var eachElem,keys =  this.htmlValKey.split(',');
+			for(var i=0;i < keys.length;i++){
+				eachElem = keys[i];
+				if(eachElem){
+					value = values[eachElem];
+					value = this.prepareResourcePath(value,this.getHtmlLoc(),this.imageLocExact);
+					value = this.prepareResourcePath(value,this.getEquationsLoc(),this.equationLocExact);
+					values[eachElem] = value;
+				}
+			}
 		}
 		return values;
 	}
@@ -746,10 +752,16 @@ divi.appBase = divi.extend(divi.base, {
 	,modifyValues:function(values){
 		var key = this.htmlValKey;
 		if(key){
-			value = values[key];
-			value = this.prepareResourcePath(value,this.imageLocExact,this.getHtmlLoc());
-			value = this.prepareResourcePath(value,this.equationLocExact,this.getEquationsLoc());
-			values[this.htmlValKey] = value;
+			var eachElem,keys =  this.htmlValKey.split(',');
+			for(var i=0;i < keys.length;i++){
+				eachElem = keys[i];
+				if(eachElem){
+					value = values[eachElem];
+					value = this.prepareResourcePath(value,this.imageLocExact,this.getHtmlLoc());
+					value = this.prepareResourcePath(value,this.equationLocExact,this.getEquationsLoc());
+					values[this.htmlValKey] = value;
+				}
+			}
 		}
 		return values;
 	}
@@ -2410,8 +2422,11 @@ divi.question = divi.extend(divi.element,{
 	popWdith:'80%',
 	doms:{},
 	elems:[],
+	optionsKey:'options',
+	optionKey:'option',
 	isQuestion:true,
 	editorKey:undefined,
+	mainEditorCls:"question",
 	divs:{'rating':'rating'},
 	fileName:'question.xml',
 	editors:{},
@@ -2486,7 +2501,7 @@ divi.question = divi.extend(divi.element,{
 		this.populateValues(questionChild);
 		this.populateValues(self);
 		var values = this.getValues();
-		delete values['options'];
+		delete values[this.optionsKey];
 		delete values['html'];
 		var eachAns,elem;
 		for(var i=0;i < answers.length;i++){
@@ -2585,7 +2600,7 @@ divi.question = divi.extend(divi.element,{
 		var htmlValue = this.getFieldValue('data');
 		appendTo.find(this.editableDiv).remove();
 		this.editors = {};
-		var editorDom = this.prepareEditableDom({cls:"question"},this.editors,htmlValue,true);
+		var editorDom = this.prepareEditableDom({cls:this.mainEditorCls},this.editors,htmlValue,true);
 		this.editorKey = editorDom.id;
 		this.createEditor({editors:this.editors,sel:appendTo,attachtbar:true});
 	}
@@ -2604,9 +2619,9 @@ divi.question = divi.extend(divi.element,{
 			this.editor.addEditors(this.editors);
 		}
 		if(this.checkMax()){
-			appendTo.parent().find('div.options').find('a').addClass('disabled');
+			appendTo.parent().find('div.'+this.optionsKey).find('a').addClass('disabled');
 		}else{
-			appendTo.parent().find('div.options').find('a').removeClass('disabled');
+			appendTo.parent().find('div.'+this.optionsKey).find('a').removeClass('disabled');
 		}
 	}
 	
@@ -2638,13 +2653,13 @@ divi.question = divi.extend(divi.element,{
 			appendElem.append('<div>Difficulty Level</div>');
 			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
 			var aCls = this.checkMax() ? 'disabled' : '';
-			appendElem.append('<div class="options"><a class="'+aCls+'">+Add More Options</a></div>');
+			appendElem.append('<div class="'+this.optionsKey+'"><a class="'+aCls+'">+Add More Options</a></div>');
 		}
 	}
 	
 	,attachpostContent:function(appendTo,showToggle){
 		this.initiateRating();
-		this.attachMoreLis(appendTo.find('div.options'));
+		this.attachMoreLis(appendTo.find('div.'+this.optionsKey));
 	}
 	
 	,checkMax:function(){
@@ -2682,7 +2697,7 @@ divi.question = divi.extend(divi.element,{
 		var dataF = values[this.htmlValKey];
 		var data;
 		if(dataF){
-			data = dom.createElement('data');
+			data = dom.createElement(this.htmlValKey);
             cdata = dom.createCDATASection(unescape(dataF));
             data.appendChild(cdata);
             child.appendChild(data);
@@ -2739,13 +2754,13 @@ divi.question = divi.extend(divi.element,{
 			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type')+'"/>');
 			this.getPersistValues(dom,null,false,'html');
 			
-			var ops = dom.createElement('options');
+			var ops = dom.createElement(this.optionsKey);
 			dom.documentElement.appendChild(ops);
 			var masterObj = {};
 			for(var index = 0; index  < elements.length;index++){
 				eachElem = elements[index];
 				if(eachElem){
-					eachElem.getPersistValues(dom,ops,false,'option');
+					eachElem.getPersistValues(dom,ops,false,this.optionKey);
 				}
 			}
 			var url = this.prepareFilePath(this,url);
@@ -2972,6 +2987,72 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	
 });
 
+
+divi.matchAns = divi.extend(divi.answer,{
+	idPrefix:'matchAns',
+	ignoreFields:['id','data','right','left','left,right'],
+	table:'matchAns',
+	leftKey:'left',
+	rightKey:'right',
+	htmlValKey:'left,right',
+	divs:{'left':'left','right':'right','main':'main'},
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.matchAns.superclass.constructor.call(this);
+		this.listeners = {};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+	}
+
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+		}
+	}
+	
+	,addSplValues:function(dom,child,values,parent){
+		var values = this.cleanValues(values);
+		var key = this.htmlValKey;
+		var eachElem,keys =  this.htmlValKey.split(',');
+		for(var i=0;i < keys.length;i++){
+			eachElem = keys[i];
+			var dataF = values[eachElem];
+			if(dataF){
+				data = dom.createElement(eachElem);
+	            cdata = dom.createCDATASection(unescape(dataF));
+	            data.appendChild(cdata);
+	            child.appendChild(data);
+			}
+		}
+	}
+	
+	,htmlcallBack:function(val,key){
+		var scope = this;
+		var values = this.getValues();
+		var paskey = key ? "left": "right";
+		var cldkey = (paskey == 'right') ? "": "left";
+		var ind = this.getIndexForElem();
+		var index = (paskey == 'left') ? (ind-1) : ind;
+		values[paskey] = val;
+		this.parent.persistChildHtml(index,cldkey);
+	}
+
+	,draw:function(append,index){
+		var values = this.getValues();
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var leftdom = this.doms[this.divs.left] = this.prepareEditableDom($.extend({cls:"answer place-left"},this.evtDflts),this.parent.editors,this.getFieldValue('left'));
+		var rightdom = this.doms[this.divs.right] = this.prepareEditableDom($.extend({cls:"answer place-right"},this.evtDflts),this.parent.editors,this.getFieldValue('right'));
+		this.leftKey = leftdom.id;
+		this.rightKey = rightdom.id;
+		$(parDom.dom).append(leftdom.dom);
+		$(parDom.dom).append(rightdom.dom);
+	}
+	
+	
+});
+
+
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
 	table:'mcq',
@@ -3020,6 +3101,77 @@ divi.fill_blank = divi.extend(divi.question,{
 			ansDom = $(tmpl);
 			ansDom.find('label').append(currAns.getFieldValue('data'));
 			currSSel.append(ansDom);
+		}
+		return currSSel;
+	}
+
+	,updateChildDom:function(ansDom){
+	}
+});
+
+divi.match = divi.extend(divi.question,{
+	type:'match',
+	table:'match',
+	mainEditorCls:'question matchthefol',
+	optionsKey:'matches',
+	optionKey:'match',
+	answerKey:'matchAns',
+	idPrefix:'mtc',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.match.superclass.constructor.call(this);
+	}
+
+	,attachEditorContent:function(appendTo,editors){
+		if(appendTo){
+			for(var edt in editors){
+				if(editors.hasOwnProperty(edt)){
+					appendTo.append(editors[edt].editor);	
+				}
+			}
+			appendTo.append("<div class='dottedLine padding5'></div>");
+			appendTo.append("<div class='place-left matchDiv'></div>");
+			appendTo.append("<div class='place-left contentElem'></div>");
+			this.appendElem = appendTo =  appendTo.find('.matchDiv');
+			appendTo.append("<div class=''>Answers</div>");
+			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
+			for(var i=0;i < childCnt;i++){ 
+				var elem = this.isNew ? null : this.elems[i];
+				this.attachChildPreCont(appendTo,i,elem,this.isNew);
+			}
+			editors = this.editors;
+		}
+	}
+
+	,persistChildHtml:function(index,key){
+		if(index+1 < this.elems.length){
+			var elem,key,passKey;
+			elem = this.elems[index+1];
+			key = !key ? elem.leftKey : elem.rightKey; 
+			passKey = (key ==  elem.leftKey) ? elem.leftKey : undefined;
+			var editorIn = this.editor.getEditorsForKey(key);
+			if(editorIn && elem){
+				editorIn.getValue(elem,elem.htmlcallBack,passKey);
+			}else{
+				this.persistChildHtml(index+1);
+			}
+		}else{
+			this.parent.persistCurr();
+			this.persistElem();
+		}
+	}
+
+	,drawChildren:function(){
+		var currSSel =$('<div>');
+		var answerdom;
+		var currAns,ansDom,answers = this.elems;
+		var tmpl = divi.tpl[this.answerKey];
+		for(var i=0;answers && i < answers.length;i++){
+			currAns = answers[i];
+			answerdom = $('<div class="matchedMain">');
+			answerdom.append("<div class='place-left padding5 matchedAns'>"+currAns.getFieldValue('left')+"</div>");
+			answerdom.append("<div class='place-right padding5 matchedAns'>"+currAns.getFieldValue('right')+"</div>");
+			currSSel.append(answerdom);
 		}
 		return currSSel;
 	}
@@ -3351,14 +3503,14 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 	}
 
-	,getValue:function(rtnScope,callback){
+	,getValue:function(rtnScope,callback,key){
 		var val = "";
 		if(this.editor){
-			this.saveinlineImages(rtnScope,this.editor.html(),callback);
+			this.saveinlineImages(rtnScope,this.editor.html(),callback,key);
 		}
 	}
 	
-	,saveinlineImages:function(rtnScope,value,callback){
+	,saveinlineImages:function(rtnScope,value,callback,key){
 		var scope = this;
 		var files = scope.files;
 		var cbScope = rtnScope;
@@ -3389,10 +3541,10 @@ divi.indEditor = divi.extend(divi.contentEditor,{
         }
         if(deferredArr.length > 0){
         	$.when.apply(this,deferredArr).done(function(a,b){
-        		scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope);
+        		scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope,key);
         	});
         }else{
-        	scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope);
+        	scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope,key);
         }
 	}
 	
@@ -3425,7 +3577,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    return val;
 	}
 	
-	,saveInlineSucess:function (val, files,imageFiles,callback,cbScope) {
+	,saveInlineSucess:function (val, files,imageFiles,callback,cbScope,key) {
 		var saveVal = val;
 		if(files && files.length > 0){
 			saveVal = this.prepareRetrievePath(cbScope.imageLocExact, val, files, cbScope);
@@ -3437,7 +3589,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 			// files, cbScope);
 		}
 		if(callback){
-	    	callback.apply(cbScope,[saveVal]);
+	    	callback.apply(cbScope,[saveVal,key]);
 	    }
 	}
 	
@@ -3748,7 +3900,8 @@ divi.home =  divi.extend(divi.appBase,{
 	,editAssessListeners:function(scope){
 		 return [{tag:'.addmcq',listType:'click',parent:this.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
 		         {tag:'.addtorf',listType:'click',parent:this.book,listenerFn:'addelement',key:'torf',mapTo:scope},
-		         {tag:'.addfill_blank',listType:'click',parent:this.book,listenerFn:'addelement',key:'fill_blank',mapTo:scope}];
+		         {tag:'.addfill_blank',listType:'click',parent:this.book,listenerFn:'addelement',key:'fill_blank',mapTo:scope},
+		         {tag:'.addmatch',listType:'click',parent:this.book,listenerFn:'addelement',key:'match',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){

@@ -495,6 +495,30 @@ span.lblValue{
 	width:85%;
 }
 
+.metro div.matchDiv{
+	width: 100%;
+}
+
+.metro div.editableDiv.question.matchthefol{
+	height:50px;
+}
+.metro div.matchedMain{
+	width:100%;
+}
+.metro div.matchedAns{
+	width:50%;
+}
+
+.metro div.matchedAns.place-left{
+	border-right: dotted 1px;
+}
+
+div.matchDiv .editableDiv.answer {
+	width: 47%;
+	margin-bottom: 8px;
+	height:50px;
+}
+
 div.editableDiv{
 	height: 450px;
 	background-color: white;
