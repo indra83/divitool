@@ -1283,6 +1283,7 @@ divi.baseField  = divi.extend(divi.panelBase, {
 	,buttondom:'buttondom'
 	,inputDiv:'inputDiv'
 	,unitsdom:'unitsdom'
+	,attachIndex:true
 	,clrBtn:'btn-clear'
 	,clrBtnText:'btn-clear'
 	,revealBtn:'btn-reveal'
@@ -1383,7 +1384,10 @@ divi.baseField  = divi.extend(divi.panelBase, {
 	
 	,createField:function(options,parent){
 		var dflts,inputdom,buttonDiv,unitsDiv;
-		dflts = $.extend({},this.defaults,{disabled:this.isReadOnly,scope:this,listeners:this.listeners,tabIndex:this.tabIndex});
+		dflts = $.extend({},this.defaults,{disabled:this.isReadOnly,scope:this,listeners:this.listeners});
+		if(this.attachIndex){
+			$.extend(dflts,{tabIndex:this.tabIndex});
+		}
 		inputdom = divi.domBase.create(dflts,parent);
 		this.doms[this.inputdom] = inputdom;
 		

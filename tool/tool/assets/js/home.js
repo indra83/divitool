@@ -20,14 +20,14 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 		}
 
 		$.each( buttons, function( name, btnProps ) {
-			var scope = btnProps.scope;
+			var scope = btnProps.scope,tabi = btnProps.tabindex;
 			var props = btnProps.fn;
 			var click, buttonOptions;
 			props = $.isFunction( props ) ?
 				{ click: props, text: name } :
 				props;
 			// Default to a non-submitting button
-			props = $.extend( { type: "button" }, props );
+			props = $.extend( { type: "button",tabindex:tabi}, props );
 			// Change the context for the click callback to be the main element
 			click = props.click;
 			props.click = function() {
@@ -628,7 +628,6 @@ divi.appBase = divi.extend(divi.base, {
 				}
 			}
 		}
-		
 		var url = this.prepareFilePath(this,url);
 		var file = new Blob([jsxml.toXml(dom)]);
 		file.name = scope.fileName;
@@ -828,17 +827,19 @@ divi.appBase = divi.extend(divi.base, {
 		});
 	}
 	
-	,launchPopUp:function(instance){
+	,launchPopUp:function(instance,edit){
 		if(instance){
 			instance.home.preparepopUp.call(instance.home,instance);
 			var popupDiv = this.retrievePopUpDiv();
-			var mydialog = popupDiv.superDialog();
-			var buttons = mydialog.superDialog("option", "buttons");
-			var newButtons = {};
-			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm}},buttons);
-			mydialog.superDialog("option", "buttons", newButtons);
 			popupDiv.empty().removeClass('hidden').superDialog('open');
-			instance.showContent(popupDiv);
+			instance.showContent(popupDiv,false,edit);
+			var mydialog = popupDiv.superDialog();
+			var newButtons = {};
+			var tabi = instance.formPanel.fieldCount;
+			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
+			mydialog.superDialog("option", "buttons", newButtons);
+			
+			
 		}
 	}
 	
@@ -1167,7 +1168,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 
 	,persistData:function(){
-		  this.persistChild();
+		  this.persistChild(true);
 	}
 	
 	,setValues:function(updated){
@@ -1476,6 +1477,7 @@ divi.html = divi.extend(divi.element,{
 		var url = this.prepareFilePath(this.parent,"",this.savefileAction);
 		return url+"/"+this.imageLoc;
 	}
+	
 	
 	,getEquationsLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
@@ -1852,7 +1854,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.doms = {};
 	}
 	
-	,showContent:function(appendTo,showToggle){
+	,showContent:function(appendTo,showToggle,edit){
 		if(!this.formPanel){
 			this.formPanel = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
 		}
@@ -1861,7 +1863,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.formPanel.createToggle();
 		}
 		this.formPanel.draw(appendTo);
-		this.formPanel.setValues(this.getValues());
+		this.formPanel.setValues(this.getValues(edit));
 	}
 	
 	,clearForm:function(){
@@ -1885,7 +1887,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var children = this.parent.children[currKey];
 		if(children){
 			var currSeq = children.length-1;// already children are updated
-			this.prepareSideBar(parDom,currKey,currSeq);
+			this.prepareSideBar(parDom,false,currKey,currSeq);
 			this.isNew = false;
 		}
 	}
@@ -1987,7 +1989,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 	,edit:function(event,val,jTarget){
-		this.launchPopUp(this,this);
+		this.launchPopUp(this,true);
 	}
 	
 	,deletefn:function(event,val,jTarget){
@@ -1996,7 +1998,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,confirmDelete:function(event,scope,target,text){
 		this.beforeDelete(event);
-		this.parent.persistData();
+		this.parent.persistData(null,null,null,true);
 		this.getSelector(this.contentPreview).empty();
 		var book = this.retrieveBook();
 		book.draw();
@@ -2226,7 +2228,9 @@ divi.topic = divi.extend(divi.bookBase,{
 	fileName:'topic.xml',
 	elements:[],
 	table:'topic',
+	statediting:false,
 	idPrefix:'t',
+	counts:{},
 	idCount:1,
 	sequence:undefined,
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
@@ -2240,12 +2244,57 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.listeners[this.rclickKey] = {'click':[this.onCmClick]};
 		divi.topic.superclass.constructor.call(this);
 		var parent = $('.contextmenu');
-		this.cmItems = {'Delete':{fn:this.deletefn}};
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
 	}
 	
+	,launchElem:function(elem,key){
+		divi.appBase.prototype.launchElem.call(this,elem,key);
+		if(elem && elem.key == 'html' && !key){
+			elem.formPanel.hideField('boxType');
+			elem.formPanel.relaxRequired('boxType');
+			elem.formPanel.hideField('boxTitle');
+			elem.formPanel.relaxRequired('boxTitle');
+		}
+	}
+	
 	,drawUpdate:function(){
-		this.loadFile();
+		if(this.statediting){
+			this.statediting = false;
+			var valueDom = this.doms[this.divs['aDiv']];
+			if(valueDom && valueDom.dom){
+				var values = this.getValues();
+				$(valueDom.dom).html('');
+				iconDiv = this.doms[this.divs['iconDiv']] = divi.domBase.create( $.extend(this.iconDefaults,{scope:this}),valueDom.dom);
+				valueDom.dom.innerHTML += values['name'];
+			}
+		}else{
+			this.loadFile();
+		}
+	}
+	
+	,initializeCnts:function(par){
+		if(par && !divi[this.table].prototype.counts[par]){
+			divi[this.table].prototype.counts[par] = {};
+			divi[this.table].prototype.counts[par].idCount = this.idCount;
+		}
+	}
+	
+	,getCount:function(){
+		var count,parId = this.parent.getFieldValue('id');
+		this.initializeCnts(parId);
+		if(parId){
+			count = divi[this.table].prototype.counts[parId].idCount;
+		}
+		return count;
+	}
+	
+	,setCount:function(id){
+		var count,parId = this.parent.getFieldValue('id');
+		this.initializeCnts(parId);
+		if(id){
+			divi[this.table].prototype.counts[parId].idCount = id;
+		}
 	}
 	
 	,beforeDelete:function(event,val,jTarget){
@@ -2260,10 +2309,15 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.destroydoms();
 	}
 	
-	,getValues:function(){
+	,getValues:function(edit){
 		var values = {};
 		$.extend(values,this.values);
-		delete values.chapter;
+		if(!edit){
+			delete values.chapter;
+		}else{
+			this.statediting = true;
+			$.extend(values,{chapter:this.parent.getFieldValue('id')});
+		}
 		return values;
 	}
 	
@@ -2987,6 +3041,50 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	
 });
 
+divi.labelingAns = divi.extend(divi.answer,{
+	idPrefix:'labelingAns',
+	ignoreFields:['id','data','right','left','left,right'],
+	divs:{'text':'text','upload':'upload'},
+	table:'labelingAns',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.labelingAns.superclass.constructor.call(this);
+		this.listeners = {};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+	}
+
+	,draw:function(append,index){
+		var values = this.getValues();
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var imageField = divi.form.imagefield({desc: "Image File",isRequired: true,larger: true,name: "src",scope: this,type: "imagefield"});
+		this.dom[this.divs.text] = imageField.doms[this.inputdom];
+		imageField.draw({},parDom.dom);
+	}
+	
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+		}
+	}
+	
+	,addSplValues:function(dom,child,values,parent){
+		var values = this.cleanValues(values);
+		var key = this.htmlValKey;
+		var eachElem,keys =  this.htmlValKey.split(',');
+		for(var i=0;i < keys.length;i++){
+			eachElem = keys[i];
+			var dataF = values[eachElem];
+			if(dataF){
+				data = dom.createElement(eachElem);
+	            cdata = dom.createCDATASection(unescape(dataF));
+	            data.appendChild(cdata);
+	            child.appendChild(data);
+			}
+		}
+	}
+});
 
 divi.matchAns = divi.extend(divi.answer,{
 	idPrefix:'matchAns',
@@ -3168,7 +3266,7 @@ divi.match = divi.extend(divi.question,{
 		var tmpl = divi.tpl[this.answerKey];
 		for(var i=0;answers && i < answers.length;i++){
 			currAns = answers[i];
-			answerdom = $('<div class="matchedMain">');
+			answerdom = $('<div class="matchedMain padding10">');
 			answerdom.append("<div class='place-left padding5 matchedAns'>"+currAns.getFieldValue('left')+"</div>");
 			answerdom.append("<div class='place-right padding5 matchedAns'>"+currAns.getFieldValue('right')+"</div>");
 			currSSel.append(answerdom);
@@ -3178,6 +3276,20 @@ divi.match = divi.extend(divi.question,{
 
 	,updateChildDom:function(ansDom){
 	}
+});
+
+
+divi.labeling = divi.extend(divi.question,{
+	type:'labeling',
+	table:'labeling',
+	mainEditorCls:'question matchthefol',
+	answerKey:'labelingAns',
+	idPrefix:'lbl',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.labeling.superclass.constructor.call(this);
+	}
+
 });
 
 
@@ -3480,6 +3592,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	isQuestion:false,
 	imgFiles:{},
 	ref:undefined,
+	//events1:'paste mouseup keyup keydown mouseout',
 	events:'mouseup keyup keydown mouseout',
 	constructor : function (cfg) {
 		$.extend(this,cfg);
@@ -3630,10 +3743,58 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 			this.editor.empty().append(this.value);
 		}
 		var parent = this.parent;
-		this.listeners[this.listenerKey] = {'keydown':[this.triggerCommand],'keyup':[this.triggerCommand,this.editorListener],'mouseup':[this.editorListener],'mouseout':[this.editorListener]};
+		this.listeners[this.listenerKey] = {'keydown':[this.triggerCommand],'keyup':[this.triggerCommand,this.editorListener],'mouseup':[this.editorListener],'mouseout':[this.editorListener],'paste':[this.pasteListener]};
 		divi.listeners.attachElementListeners([this.editor],this,null,this.listenerKey);
 		this.activate();
 	}
+	
+	,pasteListener:function(evt,target,jTarget){
+		var items = evt.originalEvent.clipboardData.items
+	      , paste;
+	 
+	    // Items have a "kind" (string, file) and a MIME type
+	    console.log( 'First item "kind":', items[0].kind );
+	    console.log( 'First item MIME type:', items[0].type );
+	 
+	    // If a user pastes image data, there are 2 items: the file name (at index 0) and the file (at index 1)
+	    // but if the user pastes plain text or HTML, index 0 is the data with markup and index 1 is the plain, unadorned text.
+	 
+	    if( items[0].kind === 'string' && items[1].kind === 'file' && items[1].type.match( /^image/ ) ) {
+	        // If the user copied a file from Finder (OS X) and pasted it in the window, this is the result. This is also the result if a user takes a screenshot and pastes it.
+	        // Unfortunately, you can't copy & paste a file from the desktop. It just returns the file's icon image data & filename (on OS X).
+	        item = items[0];
+	    } else if( items[0].kind === 'string' && items[1].kind === 'string' ) {
+	        // Get the plain text
+	        item = items[1];
+	    }
+	    var text = evt.originalEvent.clipboardData.getData('text/rtf');
+	    document.execCommand("insertHTML", false, text);
+	    return false;
+	    
+	    /*if(e.clipboardData){
+			 e.preventDefault();
+			 var text = e.clipboardData.getData("text/html");
+			 document.execCommand("insertHTML", false, text);
+		 }*/
+	}/*
+	
+	,waitforpastedata:function(elem, savedcontent) {
+		var  scope = this;
+	    if (elem.childNodes && elem.childNodes.length > 0) {
+	        this.processpaste(savedcontent);
+	    }
+	    else {
+	        that = {e: elem,s: savedcontent}
+	        that.callself = function () {
+	        	scope.waitforpastedata(that.e, that.s)
+	        }
+	        setTimeout(that.callself,20);
+	    }
+	}
+
+	,processpaste:function(savedcontent) {
+		document.execCommand('insertHTML',false, savedcontent);
+	}*/
 
 	,getCurrentRange:function () {
 		var sel = window.getSelection();
@@ -3732,7 +3893,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 	currSel:undefined,
 	value:undefined,
 	elems:['.insertWin','.cancelWin'],
-	tpl:undefined,
+	tpl:undefined,	
 	toolbar:'#toolbar',
 	value:undefined,
 	table:'formula',
@@ -3901,7 +4062,8 @@ divi.home =  divi.extend(divi.appBase,{
 		 return [{tag:'.addmcq',listType:'click',parent:this.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
 		         {tag:'.addtorf',listType:'click',parent:this.book,listenerFn:'addelement',key:'torf',mapTo:scope},
 		         {tag:'.addfill_blank',listType:'click',parent:this.book,listenerFn:'addelement',key:'fill_blank',mapTo:scope},
-		         {tag:'.addmatch',listType:'click',parent:this.book,listenerFn:'addelement',key:'match',mapTo:scope}];
+		         {tag:'.addmatch',listType:'click',parent:this.book,listenerFn:'addelement',key:'match',mapTo:scope},
+		         {tag:'.addlabeling',listType:'click',parent:this.book,listenerFn:'addelement',key:'labeling',mapTo:scope}];
 	}
 	
 	,enableTopBtns:function(selected){
@@ -3923,7 +4085,7 @@ divi.home =  divi.extend(divi.appBase,{
 	,preparepopUp:function(elem){
 		var popupDiv = this.retrievePopUpDiv();
 		width = elem.popWdith || '60%';
-		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {Cancel:{scope:this,fn:this.cancelDailog}},close:{scope:this,fn:'cancelDailog'}};
+		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
 		popupDiv.empty().superDialog(dlgConfig);
 	}
 	

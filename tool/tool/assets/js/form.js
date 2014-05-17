@@ -749,6 +749,7 @@
 					return 'null';
 				}
 				var data = o.data;
+				var scope = o.scope || {};
 				var dataElement = o.tag;
 				var emptyOption = o.emptyOption ?  o.emptyOption : true;
 				var valueField = o.valueField ?  o.valueField : "description";
@@ -768,7 +769,7 @@
 					return null;
 				}
 				
-				var prepareCombo = '<select data-placeholder="'+defaultText+'" class="chosen-select '+listener+' '+required+'" style="min-width:'+minWidth+'px" tabindex="2" name="'+name+'">';
+				var prepareCombo = '<select data-placeholder="'+defaultText+'" class="chosen-select '+listener+' '+required+'" style="min-width:'+minWidth+'px"  name="'+name+'">';
 				if(emptyOption){
 					prepareCombo += '<option value=""></option>';
 				}
@@ -786,8 +787,7 @@
 				if(isMultiple){
 					$('.'+listener).attr("multiple",true)
 				}
-				$('.chosen-select').chosen({allow_single_deselect: true });
-				$.orderInSequence();
+				$('.chosen-select').chosen({allow_single_deselect: true,tabindex:scope.tabIndex});
 			};
 			
 			
@@ -854,22 +854,6 @@
 			};
 }(jQuery));
 
-
-// Tab indexing for tab out
-$.orderInSequence = function(o){
-	  if (o === null || o==undefined) {
-			o = {};
-}
-	  var tabindex = 1;
-	  $('input,select,textarea').each(function() {
-	     if (this.type != "hidden") {
-	       var $input = $(this);
-	       $input.attr("tabindex", tabindex);
-	       tabindex++;
-	     }
-	  });
-	  return;
-};
 
 divi.formPanel = divi.extend(divi.panelBase,{
     tag: "form",
@@ -1176,6 +1160,13 @@ divi.formPanel = divi.extend(divi.panelBase,{
     	}
     }
     
+    ,relaxRequired:function(field){
+    	if(field){
+    		var fieldVal = this.elementsMap[field];
+    		fieldVal.isRequired = false;
+    	}
+    }
+    
     ,enableButton:function(button,toShow){
     	if(button){
     		var jButton = $(button);
@@ -1280,7 +1271,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     	var checkElem = divi.form[type];
     	if(checkElem){
     		$.extend(eachField,{scope:this});
-    		if(!this.hidden){
+    		if(!(eachField.hidden || eachField.isReadOnly)){
     			this.fieldCount++;
     			$.extend(eachField,{tabIndex:this.fieldCount});
     		}	
@@ -1487,16 +1478,29 @@ divi.formPanel = divi.extend(divi.panelBase,{
 	,setFocus:function(){
 		var form = this;
 		var elements = form.elementsMap || {};
-		var eachField;
+		var eachField,focusSet = false;
 		for(var key in elements){
-    		if(elements.hasOwnProperty(key) && elements[key] && !elements[key].hidden){
-    			var inputDom = elements[key].doms['inputdom'];
+    		if(elements.hasOwnProperty(key) && elements[key] && elements[key].focus){
+    			var inputDom = elements[key].doms['inputdom'];	
     			if(inputDom){
     				inputDom.dom.focus();
+    				focusSet = true;
     				break;
     			}
 			}
 		}
+		if(!focusSet){
+			for(var key in elements){
+	    		if(elements.hasOwnProperty(key) && elements[key] && !elements[key].hidden && !elements[key].isReadOnly){
+	    			var inputDom = elements[key].doms['inputdom'];	
+	    			if(inputDom){
+	    				inputDom.dom.focus();
+	    				break;
+	    			}
+				}
+			}
+		}
+		
 	}
 	
 	,afterFormRender: function(){
@@ -1506,7 +1510,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
     		var comboData = scope.comboData;
     		if(element && element.type == "combofield") {
     			var handler = element.listener ? element.origListener : element.name;
-    			$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',data:comboData[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:this.scope.rendered});
+    			$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',data:comboData[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:this.scope.rendered,scope:element});
     		}
     		else if(element && element.type=="datefield"){
 				  $("."+element.name+'_date').customDatePicker({format:"yyyy-mm-dd"});
@@ -1825,6 +1829,7 @@ divi.form.textarea  = divi.extend(divi.baseField, {
 
 divi.form.combofield  = divi.extend(divi.baseField, {
 	defaults:{tag:"div"},
+	attachIndex:false,
 	unitsdfts:{tag:'div',"class":'form_combovalue'},
 	format : "combo",
 	fieldType:'combofield',
@@ -2050,23 +2055,25 @@ divi.form.file = divi.extend(divi.baseField, {
 		jTarget = jTarget ? jTarget : divi.domBase.fetchJSel(this.doms[this.inputdom].id);
 		if(target){
 			var files = target.files;
-			if(this.scope.isNew){
-				if(files && files.length > 0){
-					var baseFile = files[0];
-					if(baseFile && !$.isEmptyObject(this.validTypes)){
-						if(this.validTypes.indexOf(baseFile.type) == -1){
-							isValid = false;
-						}
-						if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
-							jTarget.remove();
-							var inputDiv = this.doms[this.inputDiv];
-							this.createField({},inputDiv.dom);
-							this.setProperties({});
-							alert('File format is not expected.Please select relevent file');
-						}
+			if(files && files.length > 0){
+				var baseFile = files[0];
+				if(baseFile && !$.isEmptyObject(this.validTypes)){
+					if(this.validTypes.indexOf(baseFile.type) == -1){
+						isValid = false;
 					}
-				}else if(this.isRequired){
-					isValid = false
+					if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
+						jTarget.remove();
+						var inputDiv = this.doms[this.inputDiv];
+						this.createField({},inputDiv.dom);
+						this.setProperties({});
+						alert('File format is not expected.Please select relevent file');
+					}
+				}
+			}else if(this.isRequired){
+				if(this.scope && this.scope.scope.isNew){
+					isValid = false;
+				}else{
+					isValid = true;
 				}
 			}
 			this.isValid = isValid;

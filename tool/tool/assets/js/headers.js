@@ -18,7 +18,7 @@ divi.app.topic = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
 		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true,isReadOnly:true},
-		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true}];
+		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true,focus:true}];
 	}
 });
 
@@ -26,7 +26,7 @@ divi.app.assessment = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
 		         {name:"id", "desc": "Assessment ID", "type": "numberfield","isRequired": true,isReadOnly:true},
-		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true},
+		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true,focus:true},
 		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type"},
 		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
 		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true}];
@@ -71,6 +71,14 @@ divi.app.fill_blankAns = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
+	}
+});
+
+divi.app.labelingAns = new divi.pageBase({
+	 fieldconfig:function(){
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		         {name:"image", "desc": "image", "type": "textfield","isRequired": true},
+		         {name:"labels", "desc": "labels", "type": "textfield","isRequired": true}];
 	}
 });
 
