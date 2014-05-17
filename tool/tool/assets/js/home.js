@@ -3601,8 +3601,8 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	isQuestion:false,
 	imgFiles:{},
 	ref:undefined,
-	//events1:'paste mouseup keyup keydown mouseout',
-	events:'mouseup keyup keydown mouseout',
+	events:'paste mouseup keyup keydown mouseout',
+	//events:'mouseup keyup keydown mouseout',
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.indEditor.superclass.constructor.call(this);
@@ -3776,7 +3776,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	        // Get the plain text
 	        item = items[1];
 	    }
-	    var text = evt.originalEvent.clipboardData.getData('text/rtf');
+	    var text = evt.originalEvent.clipboardData.getData('text/html');
 	    document.execCommand("insertHTML", false, text);
 	    return false;
 	    
