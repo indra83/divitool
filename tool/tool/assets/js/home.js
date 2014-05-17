@@ -1510,6 +1510,13 @@ divi.html = divi.extend(divi.element,{
 		this.createEditor({editors:editrs,sel:appendTo,attachtbar:true});
 	}
 	
+	,attachpostContent:function(appendTo,showToggle){
+		this.formPanel.hideField('boxType');
+		this.formPanel.relaxRequired('boxType');
+		this.formPanel.hideField('boxTitle');
+		this.formPanel.relaxRequired('boxTitle');
+	}
+	
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
 		var dataF = values[this.htmlValKey];
@@ -1538,8 +1545,10 @@ divi.html = divi.extend(divi.element,{
 		var scope = this;
 		var values = this.getValues();
 		values[this.htmlValKey] = val;
+		delete values.boxType;
+		delete values.boxTitle;
 		this.setValues(values);
-		divi.appBase.prototype.persistChild.call(scope);
+		divi.appBase.prototype.persistChild.call(scope,true);
 	}
 	
 	,prepareParentDom:function(dom,childdom,values,parent){
@@ -3872,7 +3881,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		        range.pasteHTML(html);
 		    }
 		}
-		this.attachEquationsListeners();
+		this.editor.find(this.parent.formuleImages).on('click',null,{scope:this.parent},this.parent.onToolBarclick);
 		$(this.parent.sel).closest(".ui-dialog").css('display','block');
 	}
 	
