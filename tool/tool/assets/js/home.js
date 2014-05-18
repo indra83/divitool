@@ -4,7 +4,6 @@
 $(document).ready(function() {
   $.ajaxSetup({ cache: false });
 });
-
 $.widget( "custom.superDialog", $.ui.dialog, {
 	_createButtons: function() {
 		var that = this,
@@ -3758,53 +3757,22 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	}
 	
 	,pasteListener:function(evt,target,jTarget){
-		var items = evt.originalEvent.clipboardData.items
-	      , paste;
-	 
-	    // Items have a "kind" (string, file) and a MIME type
-	    console.log( 'First item "kind":', items[0].kind );
-	    console.log( 'First item MIME type:', items[0].type );
-	 
-	    // If a user pastes image data, there are 2 items: the file name (at index 0) and the file (at index 1)
-	    // but if the user pastes plain text or HTML, index 0 is the data with markup and index 1 is the plain, unadorned text.
-	 
-	    if( items[0].kind === 'string' && items[1].kind === 'file' && items[1].type.match( /^image/ ) ) {
-	        // If the user copied a file from Finder (OS X) and pasted it in the window, this is the result. This is also the result if a user takes a screenshot and pastes it.
-	        // Unfortunately, you can't copy & paste a file from the desktop. It just returns the file's icon image data & filename (on OS X).
+		var items = evt.originalEvent.clipboardData.items, paste;
+		if( items[0].kind === 'string' && items[1].kind === 'file' && items[1].type.match( /^image/ ) ) {
 	        item = items[0];
 	    } else if( items[0].kind === 'string' && items[1].kind === 'string' ) {
-	        // Get the plain text
-	        item = items[1];
+	        item = items[0];
 	    }
-	    var text = evt.originalEvent.clipboardData.getData('text/html');
-	    document.execCommand("insertHTML", false, text);
-	    return false;
-	    
-	    /*if(e.clipboardData){
-			 e.preventDefault();
-			 var text = e.clipboardData.getData("text/html");
-			 document.execCommand("insertHTML", false, text);
-		 }*/
-	}/*
+	    var text = evt.originalEvent.clipboardData.getData(item.type);
+	    if(text){
+	    	evt.preventDefault();
+	    	$('.richtext-html').html(text);
+	    	text = unescape($('.richtext-html').html());
+	    	document.execCommand("insertText", false, text);
+	    	$('.richtext-html').val('');
+	    }
+	}	
 	
-	,waitforpastedata:function(elem, savedcontent) {
-		var  scope = this;
-	    if (elem.childNodes && elem.childNodes.length > 0) {
-	        this.processpaste(savedcontent);
-	    }
-	    else {
-	        that = {e: elem,s: savedcontent}
-	        that.callself = function () {
-	        	scope.waitforpastedata(that.e, that.s)
-	        }
-	        setTimeout(that.callself,20);
-	    }
-	}
-
-	,processpaste:function(savedcontent) {
-		document.execCommand('insertHTML',false, savedcontent);
-	}*/
-
 	,getCurrentRange:function () {
 		var sel = window.getSelection();
 		if (sel.getRangeAt && sel.rangeCount) {
