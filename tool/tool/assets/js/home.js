@@ -580,6 +580,8 @@ divi.appBase = divi.extend(divi.base, {
 	         var attach = this.childExists();
 	         if(!attach && attachCb){
 	        	 $.extend(prs,{succcb:this.drawOnSuccess,context:this});
+	         }else{
+	        	 $.extend(prs,{skipLoader:true}); 
 	         }
 	         book.persist(prs);
 	         if(attach){
@@ -630,7 +632,11 @@ divi.appBase = divi.extend(divi.base, {
 		var url = this.prepareFilePath(this,url);
 		var file = new Blob([jsxml.toXml(dom)]);
 		file.name = scope.fileName;
-		scope.persist({url:url,data:[file]});
+		var parms  = {url:url,data:[file]};
+		if(attachCb){
+			$.extend(parms,{succcb:this.drawOnSuccess,skipLoader:true});
+		}
+		scope.persist(parms);
 		var ops = {url:url,data:files};
 		if(attachCb){
 			$.extend(ops,{succcb:this.drawOnSuccess});
@@ -834,11 +840,12 @@ divi.appBase = divi.extend(divi.base, {
 			instance.showContent(popupDiv,false,edit);
 			var mydialog = popupDiv.superDialog();
 			var newButtons = {};
-			var tabi = instance.formPanel.fieldCount;
+			var tabi = 1;
+			if(instance.formPanel){
+				tabi = instance.formPanel.fieldCount;
+			}
 			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
 			mydialog.superDialog("option", "buttons", newButtons);
-			
-			
 		}
 	}
 	
@@ -981,6 +988,8 @@ divi.appBase = divi.extend(divi.base, {
 	,persist:function(fileOps){
 		fileOps = fileOps || {};
 		var url = fileOps.url;
+		var skipLoader = fileOps.hasOwnProperty("skipLoader") ? fileOps.skipLoader : false;
+		$.showLoader();
 		context = fileOps.context || this;
 		var callback = fileOps.succcb;
 		var formData = new FormData();
@@ -999,16 +1008,19 @@ divi.appBase = divi.extend(divi.base, {
 			 xhr = new XMLHttpRequest();
 		     xhr.open('POST', url, true);
 		     xhr.send(formData);
+			if(!skipLoader){
+				$.hideLoader();
+			}
 		}
 		 xhr.onreadystatechange=function(){
         	if (xhr.readyState==4 && xhr.status==200){
     			if(callback){
     				callback.call(context,xhr.responseText);
+    				$.hideLoader();
     			}
         	}
     		return;
         }
-		 
 		return xhr;
 	}
 });
@@ -3184,6 +3196,11 @@ divi.torf = divi.extend(divi.question,{
 
 	,updateChildDom:function(ansDom){
 		ansDom.find('input').attr('name',this.getFieldValue('id'));
+	}
+	
+	,attachpostContent1:function(appendTo,showToggle){
+		divi.question.prototype.attachpostContent.call(this,appendTo,showToggle);
+		appendTo.find('div.'+this.optionsKey).addClass('hidden');
 	}
 });
 
