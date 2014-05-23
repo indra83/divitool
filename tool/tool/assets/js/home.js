@@ -843,6 +843,8 @@ divi.appBase = divi.extend(divi.base, {
 			var tabi = 1;
 			if(instance.formPanel){
 				tabi = instance.formPanel.fieldCount;
+			}else if(instance.fieldCount){
+				tabi = instance.fieldCount+1;
 			}
 			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
 			mydialog.superDialog("option", "buttons", newButtons);
@@ -908,6 +910,7 @@ divi.appBase = divi.extend(divi.base, {
 			$(this.parent.parent.sel).closest(".ui-dialog").css('display','block');
 		}
 		$.Dialog.close();
+		$.hideLoader();
 	}
 	
 	,loadFile:function(url,ops,fileName){
@@ -967,7 +970,6 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,attachEditorContent:function(sel,editors){
-		
 		if(sel){
 			for(var edt in editors){
 				if(editors.hasOwnProperty(edt)){
@@ -1994,7 +1996,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 
-	,addElem:function(event,val,jTarget,key){
+	,addElem:function(val,jTarget,key){
 		var backUpKey;
 		if(key == "info" || key == "alert" || key == "other"){
 			backUpKey ="box_"+key;
@@ -2013,6 +2015,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 	,deletefn:function(event,val,jTarget){
+		$.showLoader();
 		this.show('Delete');
 	}
 	
@@ -2023,6 +2026,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		var book = this.retrieveBook();
 		book.draw();
 		book.home.updateBcrumb(book);
+		$.hideLoader();
 	}
 	
 	,beforeDelete:function(event){
@@ -2266,6 +2270,7 @@ divi.topic = divi.extend(divi.bookBase,{
 		var parent = $('.contextmenu');
 		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
+		this.elements = [];
 	}
 	
 	,launchElem:function(elem,key){
@@ -2378,6 +2383,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
 		this.questIds = [];
+		this.elements = [];
 	}
 
 	,getValues:function(){
@@ -2494,6 +2500,7 @@ divi.question = divi.extend(divi.element,{
 	maxansCnt:undefined,
 	answers:[],
 	popWdith:'80%',
+	fieldCount:undefined,
 	doms:{},
 	elems:[],
 	optionsKey:'options',
@@ -2517,6 +2524,7 @@ divi.question = divi.extend(divi.element,{
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.question.superclass.constructor.call(this);
+		this.fieldCount = 1;
 		this.elems = [];
 	}
 	
@@ -2674,7 +2682,7 @@ divi.question = divi.extend(divi.element,{
 		var htmlValue = this.getFieldValue('data');
 		appendTo.find(this.editableDiv).remove();
 		this.editors = {};
-		var editorDom = this.prepareEditableDom({cls:this.mainEditorCls},this.editors,htmlValue,true);
+		var editorDom = this.prepareEditableDom({cls:this.mainEditorCls,tabIndex:this.fieldCount,autofocus:true},this.editors,htmlValue,true);
 		this.editorKey = editorDom.id;
 		this.createEditor({editors:this.editors,sel:appendTo,attachtbar:true});
 	}
@@ -2904,6 +2912,13 @@ divi.answer = divi.extend(divi.element,{
 		return this.parent.getEquationsLoc();
 	}
 	
+	,setFieldCount:function(fieldCount){
+		this.parent.fieldCount = fieldCount;
+	}
+	
+	,getFieldCount:function(){
+		return this.parent.fieldCount;
+	}
 	
 	,getSaveEquationsHtmlLoc:function(){
 		return this.parent.getSaveEquationsHtmlLoc();
@@ -2955,17 +2970,19 @@ divi.answer = divi.extend(divi.element,{
 	
 	,draw:function(append){
 		var values = this.getValues();
+		var fieldCount = this.getFieldCount();
 		var isAnswer = this.getFieldValue("isAnswer");
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var inptDflts = $.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control'},this.evtDflts); 
+		var inptDflts = $.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control',tabIndex:++fieldCount},this.evtDflts); 
 		if(isAnswer == "true"){
 			$.extend(inptDflts,{'checked':true});
 		}
 		var elem = this.doms[this.divs.check] || divi.domBase.create(inptDflts,parDom.dom);
 		$(elem.dom).attr('id',elem.id);
-		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer"},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
+		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer",tabIndex:++fieldCount},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
 		this.editorKey = answerDom.id;
 		$(parDom.dom).append(answerDom.dom);
+		this.setFieldCount(fieldCount);
 	}
 });
 
@@ -3013,8 +3030,9 @@ divi.torfAns = divi.extend(divi.answer,{
 	,draw:function(append,index){
 		var values = this.getValues();
 		var isAnswer = this.getFieldValue("isAnswer");
+		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var inptDflts = $.extend({tag:'input',type:"radio",name:'r3','data-transform':'input-control'},this.evtDflts); 
+		var inptDflts = $.extend({tag:'input',type:"radio",name:'r3','data-transform':'input-control',tabIndex:fieldCount++},this.evtDflts); 
 		if(isAnswer == "true"){
 			$.extend(inptDflts,{'checked':true});
 		}
@@ -3025,9 +3043,10 @@ divi.torfAns = divi.extend(divi.answer,{
 			text = this.falseText;
 		}
 		this.setValueForKey('data',text);
-		var answerDom = this.doms[this.divs.elem] = divi.domBase.create({tag:'div',scope:this,value:text},append)
+		var answerDom = this.doms[this.divs.elem] = divi.domBase.create({tag:'div',scope:this,value:text,tabIndex:fieldCount++},append)
 		this.editorKey = elem.id;
 		$(parDom.dom).append(answerDom.dom);
+		this.setFieldCount(fieldCount);
 	}
 	
 });
@@ -3053,10 +3072,12 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 
 	,draw:function(append,index){
 		var values = this.getValues();
-		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer"},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
+		var fieldCount = this.getFieldCount();
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this,tabIndex:fieldCount++},append);
+		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
 		this.editorKey = answerDom.id;
 		$(parDom.dom).append(answerDom.dom);
+		this.setFieldCount(fieldCount);
 	}
 	
 });
@@ -3076,10 +3097,12 @@ divi.labelingAns = divi.extend(divi.answer,{
 
 	,draw:function(append,index){
 		var values = this.getValues();
+		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var imageField = divi.form.imagefield({desc: "Image File",isRequired: true,larger: true,name: "src",scope: this,type: "imagefield"});
+		var imageField = divi.form.imagefield({desc: "Image File",isRequired: true,larger: true,name: "src",scope: this,type: "imagefield",tabIndex:fieldCount++});
 		this.dom[this.divs.text] = imageField.doms[this.inputdom];
 		imageField.draw({},parDom.dom);
+		this.setFieldCount(fieldCount);
 	}
 	
 	,addAddValues:function(dom,childdom,values,parent){
@@ -3158,15 +3181,16 @@ divi.matchAns = divi.extend(divi.answer,{
 
 	,draw:function(append,index){
 		var values = this.getValues();
+		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var leftdom = this.doms[this.divs.left] = this.prepareEditableDom($.extend({cls:"answer place-left"},this.evtDflts),this.parent.editors,this.getFieldValue('left'));
-		var rightdom = this.doms[this.divs.right] = this.prepareEditableDom($.extend({cls:"answer place-right"},this.evtDflts),this.parent.editors,this.getFieldValue('right'));
+		var leftdom = this.doms[this.divs.left] = this.prepareEditableDom($.extend({cls:"answer place-left",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('left'));
+		var rightdom = this.doms[this.divs.right] = this.prepareEditableDom($.extend({cls:"answer place-right",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('right'));
 		this.leftKey = leftdom.id;
 		this.rightKey = rightdom.id;
 		$(parDom.dom).append(leftdom.dom);
 		$(parDom.dom).append(rightdom.dom);
+		this.setFieldCount(fieldCount);
 	}
-	
 	
 });
 
@@ -3623,6 +3647,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		$.extend(this,cfg);
 		divi.indEditor.superclass.constructor.call(this);
 		this.ref = this.editor.attr('ref');
+		this.files = {};
 	}
 
 	,initialize:function(){// overriding the base initialize
@@ -4124,7 +4149,7 @@ divi.home =  divi.extend(divi.appBase,{
 	,addelement:function(cfg){
 		var scope = cfg.mapTo;
 		if(scope){
-			scope.addElem(scope,null,null,cfg.key);
+			scope.addElem(null,null,cfg.key);
 		}
 	}
 	

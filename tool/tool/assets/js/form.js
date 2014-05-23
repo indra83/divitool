@@ -2107,7 +2107,7 @@ divi.form.file = divi.extend(divi.baseField, {
 
 
 divi.form.videofield  = divi.extend(divi.form.file, {
-	validTypes:['video/mp4'],
+	validTypes:['video/mp4','video/webm'],
 	isFormField:true,
 	init:function(cfg){
 		$.extend(this,cfg);
@@ -2186,4 +2186,55 @@ divi.form.radio  = divi.extend(divi.baseField, {
 		divi.baseField.superclass.init.call(this);
 	}
 });
+
+
+(function($) {
+	$.showLoader = function(o) {
+		 if (o === null || o==undefined) {
+				o = {};
+		 }
+		 var element = o.element ? o.element : undefined;
+		 var imageOnly = o.imageOnly ? o.imageOnly : false;
+		 var text = o.text || "Loading";
+		 var currPage = window.location.href;
+			var image = './assets/images/loadingdots.gif';
+		 var settings = $.extend({			 					
+			  	message: "<label class='loading_text'>" + text + "</label><img src='"+image+"' class='loading_dots'/>",
+			  	css: { backgroundColor: 'transparent', border:'none', color:'#FFF'}
+		 }, o );
+		 if(imageOnly){
+			 $.extend(settings,{message:"<img src='./assets/images/blue.gif' class='loading_img' />"});
+		 }
+		 if(element){
+			 if(element instanceof jQuery){
+				 element.block(settings);
+			 }else{
+				 $(element).block(settings); 
+			 }
+		 }
+		 else{
+			 $.blockUI(settings);
+		 }
+		 return;
+	};
+
+	$.hideLoader = function(o) {
+		 if (o === null || o==undefined) {
+				o = {};
+		 }
+		 var element = o.element ? o.element : undefined;
+		 if(element){
+			 setTimeout(function() {
+			 $(element).unblock(); 
+			 },300);
+		 }
+		 else{
+			 setTimeout(function() {
+			 $.unblockUI();
+			 },300);
+		 }
+		 return;
+	};
+			
+}(jQuery));
 
