@@ -2264,6 +2264,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	comboKey:'topic',
 	
 	constructor : function (cfg) {
+		this.parent = undefined;
 		$.extend(this,cfg);
 		this.listeners[this.rclickKey] = {'click':[this.onCmClick]};
 		divi.topic.superclass.constructor.call(this);
@@ -2380,6 +2381,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	iconDefaults:{tag:'i','class':"icon-briefcase",prefix:'sidebar_'},
 	
 	constructor : function (cfg) {
+		this.parent = undefined;
 		$.extend(this,cfg);
 		divi.assessment.superclass.constructor.call(this);
 		this.questIds = [];
