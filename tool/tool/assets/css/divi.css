@@ -12925,3 +12925,7 @@ button.btn.btn-mini,input[type="submit"].btn.btn-mini{*padding-top:1px;*padding-
   line-height: 1.6rem;
   letter-spacing: 0.02em;
 }
+
+div.metro.window-overlay div.btnClass{
+	display:inline-block;
+}

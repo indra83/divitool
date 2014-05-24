@@ -894,7 +894,7 @@ divi.appBase = divi.extend(divi.base, {
 	,buttonClick:function(event){
 		var scope = this;
 		var target = divi.util.getTarget(event);
-		var text = target.innerHTML;
+		var text = target.innerText;
 		if(text == "Cancel"){
 			this.closeClick();
 		}else if(text == "Delete"){
@@ -2194,8 +2194,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 		var lookupKey = this.pluralize(this.table);
 		var children = this.parent.children[lookupKey];
 		if(children){
-			var index = this.sequence;
-			this.parent.children[lookupKey] = children.slice(index+1,children.length);
+			children.remove(this);
 		}
 		var doms = this.doms[this.divs['liDiv']];
 		var currDom = $(doms.dom);
@@ -3675,9 +3674,20 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 	}
 	
+	,updateInlineFiles:function(value,files){
+		var upfiles = {};
+		var val = $('<div>').append(value);
+		for(var eachFile in files){
+			if(!divi.util.isjQEmpty(val.find("[name='"+eachFile+"']"))){
+				upfiles[eachFile] = files[eachFile];
+			}
+		}
+		return upfiles;
+	}
+	
 	,saveinlineImages:function(rtnScope,value,callback,key){
 		var scope = this;
-		var files = scope.files;
+		var files = scope.files = this.updateInlineFiles(value,scope.files);
 		var cbScope = rtnScope;
         var filesList = [],currFile;
         var deferredArr = [];
