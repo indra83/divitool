@@ -699,6 +699,24 @@ div.editableDiv.answer {
 	display:inline;
 }
 
+.metro .matchDiv .ui-cancelRemove{
+	position: relative;
+	padding: 1px;
+	float: right;
+	height:auto;
+	margin: 0 0 0 0 ;
+	height:auto;
+}
+
+.metro .ui-cancelRemove{
+	position: absolute;
+	right: .3em;
+	top: 15%;
+	width: 20px;
+	margin: -10px 0 0 0;
+	padding: 1px;
+	height: 20px;
+}
 
 .metro .ui-dialog .ui-dialog-buttonpane{
 	padding:0px;

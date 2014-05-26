@@ -686,6 +686,13 @@ $.extend(divi.eventBase,{
 		}
 	}
 	
+	,destroy:function(ref){
+		var elem  = divi.domBase.fetchJSel(ref);
+		if(elem){
+			delete this.listeners[ref];
+		}
+	}
+	
 	,attachFieldListeners:function(){
 		var eachlistener,eachKey,eachLnFn;
 		for(var i=0;this.listeners &&  i< this.listeners.length; i++){

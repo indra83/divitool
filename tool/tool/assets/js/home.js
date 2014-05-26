@@ -310,6 +310,21 @@ divi.appBase = divi.extend(divi.base, {
 		return loader.promise();
 	}
 	
+	,destroydoms:function(elem){
+		elem = elem || this;
+		var crr,crref,doms = elem.divs;
+		for(var ech in doms){
+			if(doms.hasOwnProperty(ech)){
+				crr = elem.doms[doms[ech]];
+				if(crr && crr.id){
+					crref =  crr.id;
+					divi.eventBase.destroy(crref);
+					divi.domBase.destroy(crref);
+				}
+			}
+		}
+	}
+	
 	,loadCombos:function(book){
 		if(book){
 			this.setData({});
@@ -2087,19 +2102,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.cmDom = parDom;
 	}
 	
-	,destroydoms:function(){
-		var crr,crref,doms = this.divs;
-		for(var ech in doms){
-			if(doms.hasOwnProperty(ech)){
-				crr = this.doms[doms[ech]];
-				if(crr && crr.id){
-					crref =  crr.id;
-					divi.domBase.destroy(crref);
-				}
-			}
-		}
-	}
-		
+	
 });
 
 divi.book = divi.extend(divi.bookBase,{
@@ -2534,6 +2537,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 divi.question = divi.extend(divi.element,{
 	countKey:'elemCount',
 	ansCnt:1,
+	addClose:true,
 	maxansCnt:undefined,
 	answers:[],
 	popWdith:'80%',
@@ -2563,6 +2567,7 @@ divi.question = divi.extend(divi.element,{
 		divi.question.superclass.constructor.call(this);
 		this.fieldCount = 1;
 		this.elems = [];
+		this.doms = {};
 	}
 	
 	,initializeValues:function(){
@@ -2905,21 +2910,66 @@ divi.answer = divi.extend(divi.element,{
 	elemLisKey:'elemList',
 	ignoreFields:['id','isAnswer','thumb','references','data'],
 	listeners:{},
+	btnListeners:{},
 	evtDflts:{attachLis:true,events:['change','mouseout','keypress']},
 	doms:{},
-	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv'},
+	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv'},
 	idCount:1,
 	editor:undefined,
 	idPrefix:'ans',
 	editorKey:undefined,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
+		this.btnListeners = {};
 		divi.answer.superclass.constructor.call(this);
 		this.listeners = {};
+		this.doms = {};
+		this.btnListeners = {'click':[this.removeAns]};
 		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
 		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
 	
+	,removeAns:function(event,targetVal,target){
+		this.removeAnswerFromParent(this.getIndexForElem());
+	}
+	
+	,undrawAns:function(ans){
+		if(ans){
+			$(ans).remove();
+		}
+	}
+	
+	,retriveEditorDoms:function(){
+		return 	[this.doms[this.divs.elem]];
+	}
+	
+	,adjustIds1:function(index){
+		var elems = this.parent.elems;
+		for(var i = elems.length-1;i > index;i--){
+			currEdit = elems[i];
+			if(currEdit){
+				this.parent.editor.removeEditor(currEdit.id);
+			}
+		}
+	}
+	
+	,removeAnswerFromParent:function(index){
+		if(index > -1){
+			var elem = this.parent.elems[index];
+			var editorDoms = this.retriveEditorDoms();
+			var currEdit;
+			for(var i = 0;i < editorDoms.length;i++){
+				currEdit = editorDoms[i];
+				if(currEdit){
+					this.parent.editor.removeEditor(currEdit.id);
+				}
+			}
+			this.undrawAns(elem.doms[elem.divs.main].dom);
+			elem.destroydoms();
+			this.parent.elems.remove(elem);
+		}
+	}
+
 	,loadAnswer:function(answer){
 		this.populateValues(answer);
 	}
@@ -3005,6 +3055,11 @@ divi.answer = divi.extend(divi.element,{
 		this.setValueForKey(key,val);
 	}
 	
+	,prepareCloseButton:function(parDom,fieldCount){
+		var button = this.doms[this.divs.button] = divi.domBase.create({events:['click'],tag:'button','class':'ui-cancelRemove',scope:this,value:'<i class="icon-remove-circle"></i>',listeners:this.btnListeners,tabIndex:++fieldCount,attachLis:true},parDom.dom);
+		$(button.dom).attr('id',button.id);
+	}
+	
 	,draw:function(append){
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
@@ -3014,6 +3069,7 @@ divi.answer = divi.extend(divi.element,{
 		if(isAnswer == "true"){
 			$.extend(inptDflts,{'checked':true});
 		}
+		this.prepareCloseButton(parDom,fieldCount);
 		var elem = this.doms[this.divs.check] || divi.domBase.create(inptDflts,parDom.dom);
 		$(elem.dom).attr('id',elem.id);
 		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer",tabIndex:++fieldCount},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
@@ -3111,6 +3167,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this,tabIndex:fieldCount++},append);
+		this.prepareCloseButton(parDom,fieldCount);
 		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
 		this.editorKey = answerDom.id;
 		$(parDom.dom).append(answerDom.dom);
@@ -3188,6 +3245,9 @@ divi.matchAns = divi.extend(divi.answer,{
 			childdom.removeAttribute('src');
 		}
 	}
+	,retriveEditorDoms:function(){
+		return 	[this.doms[this.divs.left],this.doms[this.divs.right]];
+	}
 	
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
@@ -3220,6 +3280,7 @@ divi.matchAns = divi.extend(divi.answer,{
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		this.prepareCloseButton(parDom,fieldCount);
 		var leftdom = this.doms[this.divs.left] = this.prepareEditableDom($.extend({cls:"answer place-left",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('left'));
 		var rightdom = this.doms[this.divs.right] = this.prepareEditableDom($.extend({cls:"answer place-right",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('right'));
 		this.leftKey = leftdom.id;
@@ -3259,7 +3320,7 @@ divi.torf = divi.extend(divi.question,{
 		ansDom.find('input').attr('name',this.getFieldValue('id'));
 	}
 	
-	,attachpostContent1:function(appendTo,showToggle){
+	,attachpostContent:function(appendTo,showToggle){
 		divi.question.prototype.attachpostContent.call(this,appendTo,showToggle);
 		appendTo.find('div.'+this.optionsKey).addClass('hidden');
 	}
@@ -3421,7 +3482,15 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		divi.contentEditor.superclass.constructor.call(this);
 		this.initialize();
 	}
-
+	
+	,removeEditor:function(key){
+		var editor = this.getEditorsForKey(key);
+		if(editor){
+			editor.removeListeners();
+			delete this.getEditors()[key];
+		}
+	}
+	
 	,addEditors:function(editors){
 		this.editors = editors;
 		divi.listeners.attachElementListeners(this.initiateEditors(),this,null,this.listenerKey);
@@ -3444,6 +3513,20 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		var scope = event.data.scope;
 		var currEditor = jTarget.hasClass("."+this.editableDiv) ? jTarget : jTarget.closest("div."+this.editableDiv);
 		scope.activateToolBar(scope,currEditor.attr('id'));
+	}
+	
+	,deactivateToolBar:function(scope,refKey){
+		if(!scope.activeKey || scope.activeKey != refKey){
+			scope.removeActiveToolbar.call(scope);
+			scope.activeKey = refKey;
+			scope.activeEditor = scope.getEditorsForKey(refKey);
+			if(scope.activeEditor){
+				scope.activeEditor.activate();
+				scope.updateToolbar();
+				var toolbar = this.getSelector(this.btnToolbar);
+				$('div.'+this.dsbltoolbar).remove();
+			}
+		}
 	}
 	
 	,activateToolBar:function(scope,refKey){
