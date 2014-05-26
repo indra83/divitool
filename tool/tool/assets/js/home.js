@@ -566,26 +566,34 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 	
+	,saveBook:function(book,fileOps){
+		fileOps = fileOps || {};
+		book = book || this.retrieveBook(this)
+		if(book){
+			window.URL = window.webkitURL || window.URL;
+	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+	         var file = new Blob([JSON.stringify(book.stringify(true), undefined, 2)]);
+	         file.name = fileOps.fileName || this.masterFile;
+	         url = fileOps.url || this.savefileAction;
+	         var prs = {url:url,data:[file]};
+	         if(!fileOps.isChildexists && fileOps.attachCb){
+	        	 $.extend(prs,{succcb:this.drawOnSuccess,context:this});
+	         }else{
+	        	 $.extend(prs,{skipLoader:true,context:this}); 
+	         }
+			 book.persist(prs);
+		}
+	}
+	
 	,persistData:function(elem,url,fileName,fileops){
 		fileops = fileops || {};
 		var attachCb = true;
 		if(fileops.hasOwnProperty('attachCb')){ attachCb = fileops['attachCb'];}
 		 var book = elem || this.retrieveBook(this);
 		 if(book){
-			 window.URL = window.webkitURL || window.URL;
-	         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-	         var file = new Blob([JSON.stringify(book.stringify(true), undefined, 2)]);
-	         file.name = fileName || this.masterFile;
-	         url = url || this.savefileAction;
-	         var prs = {url:url,data:[file]};
-	         var attach = this.childExists();
-	         if(!attach && attachCb){
-	        	 $.extend(prs,{succcb:this.drawOnSuccess,context:this});
-	         }else{
-	        	 $.extend(prs,{skipLoader:true}); 
-	         }
-	         book.persist(prs);
-	         if(attach){
+			 var isChildexists = this.childExists();
+	         this.saveBook(book,{attachCb:attachCb,isChildexists:isChildexists,fileName:fileName,url:url});
+	         if(isChildexists){
 	        	 this.persistChild(attachCb);
 	         }
 		 }else{
@@ -635,12 +643,12 @@ divi.appBase = divi.extend(divi.base, {
 		file.name = scope.fileName;
 		var parms  = {url:url,data:[file]};
 		if(attachCb){
-			$.extend(parms,{succcb:this.drawOnSuccess,skipLoader:true});
+			$.extend(parms,{skipLoader:true});
 		}
 		scope.persist(parms);
 		var ops = {url:url,data:files};
 		if(attachCb){
-			$.extend(ops,{succcb:this.drawOnSuccess});
+			$.extend(ops,{succcb:this.drawOnSuccess,context:scope});
 		}
 		scope.persist(ops);
 	}
@@ -1189,7 +1197,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 
 	,persistData:function(){
 		  this.persistChild(true);
-		  divi.appBase.prototype.persistData.call(this.parent,null,null,null);
+		  this.saveBook.call(this.parent,null,{attachCb:false,isChildexists:false});
 	}
 	
 	,setValues:function(updated){
@@ -2378,6 +2386,12 @@ divi.assessment = divi.extend(divi.bookBase,{
 		// do nothing.
 	}
 	
+	,drawUpdate:function(){
+		if(this.isAssessment){
+			this.loadFile();
+		}
+	}
+	
 	,loadFile:function(url,fileName){
 		var scope = this;
 		var url = this.prepareFilePath(this,null,this.getFileAction);
@@ -2401,16 +2415,13 @@ divi.assessment = divi.extend(divi.bookBase,{
 	,persistData:function(elem,url){
 		divi.appBase.prototype.persistData.call(this);// save master.json
 		this.persistCurr();
-		divi.appBase.prototype.persistData.call(this.parent,null,null,null);
 	}
 	
 	,persistCurr:function(){
 		var url = this.prepareFilePath(this);
-		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile,{attachCb:false});// save
-																				// assessments.json
+		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile,{attachCb:false});// save assessments.json
 	}
 	
-
 	,stringify:function(){
 		var masterObj= {};
 		if(this.isAssessment){
@@ -2478,6 +2489,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 });
 
 divi.question = divi.extend(divi.element,{
+	countKey:'elemCount',
 	ansCnt:1,
 	maxansCnt:undefined,
 	answers:[],
@@ -2559,7 +2571,6 @@ divi.question = divi.extend(divi.element,{
 			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
 		}
 	}
-	
 
 	,loadQuestion:function(questionChild,self,answers){
 		this.populateValues(questionChild);
@@ -2803,6 +2814,7 @@ divi.question = divi.extend(divi.element,{
 				this.persistChildHtml(index+1);
 			}
 		}else{
+			this.addToCount();
 			this.parent.persistCurr();
 			this.persistElem();
 		}

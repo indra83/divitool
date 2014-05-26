@@ -31,7 +31,8 @@ divi.app.assessment = new divi.pageBase({
 		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true,focus:true},
 		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type"},
 		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
-		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true}];
+		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true},
+		         {name:"elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
 	}
 });
 
@@ -46,7 +47,7 @@ divi.app.chapter = new divi.pageBase({
 
 divi.app.question = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Question ID", "type": "numberfield","isRequired": true,isReadOnly:true},
+		 return [{name:"id", "desc": "Question ID", "type": "numberfield",isReadOnly:true},
 		         {name:"version", "desc": "Version", "type": "numberfield",value:'1',hidden:true},
 		         {name:"type", "desc": "ansType", "type": "textfield","isRequired": true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true},
@@ -56,7 +57,7 @@ divi.app.question = new divi.pageBase({
 
 divi.app.answer = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield",isReadOnly:true,hidden:true},
 		         {name:"isAnswer", "desc": "isCorrectAns", "type": "bool"},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
 	}
@@ -64,7 +65,7 @@ divi.app.answer = new divi.pageBase({
 
 divi.app.torfAns = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield",isReadOnly:true,hidden:true},
 		         {name:"isAnswer", "desc": "isCorrectAns", "type": "bool"},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
 	}
@@ -72,14 +73,14 @@ divi.app.torfAns = new divi.pageBase({
 
 divi.app.fill_blankAns = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield",isReadOnly:true,hidden:true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true}];
 	}
 });
 
 divi.app.labelingAns = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield",isReadOnly:true,hidden:true},
 		         {name:"image", "desc": "image", "type": "textfield","isRequired": true},
 		         {name:"labels", "desc": "labels", "type": "textfield","isRequired": true}];
 	}
@@ -87,7 +88,7 @@ divi.app.labelingAns = new divi.pageBase({
 
 divi.app.matchAns = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Answerid", "type": "numberfield","isRequired": true,isReadOnly:true,hidden:true},
+		 return [{name:"id", "desc": "Answerid", "type": "numberfield",isReadOnly:true,hidden:true},
 		         {name:"left", "desc": "Left", "type": "textfield","isRequired": true},
 		         {name:"right", "desc": "Left", "type": "textfield","isRequired": true}];
 	}
