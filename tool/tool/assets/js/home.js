@@ -403,6 +403,10 @@ divi.appBase = divi.extend(divi.base, {
 		return value;
 	}
 	
+	,modifyForm:function(form){
+		
+	}
+	
 	,setComboData:function(newObj){
 		if(this.comboKey){
 			var data = this.getData();
@@ -1327,6 +1331,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		if(this.isNew && this.formPanel){
 			this.formPanel.setValue('id', this.prepareId());
 		}
+		this.modifyForm(this.formPanel);
 		if(this.reference){
 			$('.tab-control').tabcontrol();
 		}
@@ -1926,6 +1931,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 		this.formPanel.draw(appendTo);
 		this.formPanel.setValues(this.getValues(edit));
+		this.modifyForm(this.formPanel);
 	}
 	
 	,clearForm:function(){
@@ -2310,6 +2316,12 @@ divi.topic = divi.extend(divi.bookBase,{
 		}
 	}
 	
+	,modifyForm:function(formPanel){
+		if(formPanel && !this.isNew){
+			formPanel.setFieldReadOnly('chapter');
+		}
+	}
+	
 	,drawUpdate:function(){
 		if(this.statediting){
 			this.statediting = false;
@@ -2393,6 +2405,12 @@ divi.assessment = divi.extend(divi.bookBase,{
 		var parent = $('.contextmenu');
 		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
+	}
+	
+	,modifyForm:function(formPanel){
+		if(formPanel && !this.isNew){
+			formPanel.setFieldReadOnly('chapter');
+		}
 	}
 	
 	,getValues:function(edit){
