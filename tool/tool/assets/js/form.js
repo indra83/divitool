@@ -749,6 +749,7 @@
 					return 'null';
 				}
 				var data = o.data;
+				var refId = o.refId || "";
 				var scope = o.scope || {};
 				var dataElement = o.tag;
 				var emptyOption = o.emptyOption ?  o.emptyOption : true;
@@ -769,7 +770,7 @@
 					return null;
 				}
 				
-				var prepareCombo = '<select data-placeholder="'+defaultText+'" class="chosen-select '+listener+' '+required+'" style="min-width:'+minWidth+'px"  name="'+name+'">';
+				var prepareCombo = '<select id="'+refId+'" data-placeholder="'+defaultText+'" class="chosen-select '+listener+' '+required+'" style="min-width:'+minWidth+'px"  name="'+name+'">';
 				if(emptyOption){
 					prepareCombo += '<option value=""></option>';
 				}
@@ -1510,7 +1511,12 @@ divi.formPanel = divi.extend(divi.panelBase,{
     		var comboData = scope.comboData;
     		if(element && element.type == "combofield") {
     			var handler = element.listener ? element.origListener : element.name;
-    			$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',data:comboData[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:this.scope.rendered,scope:element});
+    			var refDom = element.doms[element.inputdom];
+    			if(refDom){
+    				$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',refId:refDom.id,data:comboData[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:this.scope.rendered,scope:element});
+        			divi.eventBase.addListeners({events:element.events,scope:element,tag:'select',ref:refDom.id,listeners:element.listeners});
+    			}
+    			
     		}
     		else if(element && element.type=="datefield"){
 				  $("."+element.name+'_date').customDatePicker({format:"yyyy-mm-dd"});

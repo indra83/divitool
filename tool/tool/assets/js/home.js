@@ -216,6 +216,7 @@ divi.appBase = divi.extend(divi.base, {
 		this.initializeValues();
 	}
 	
+	
 	,initiliazeEditor:function(){
 		var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier', 
 		             'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
@@ -688,6 +689,18 @@ divi.appBase = divi.extend(divi.base, {
 		return count;
 	}
 	
+	,updateId:function(event,targetVal,target){
+		var scope = event.data.scope;
+		var form = scope.scope;
+		var parent = form.scope;
+		if(parent && form){
+			var values = {};
+			values[this.name] = targetVal;
+			parent.setParent(parent,values);
+			form.setValue('id',parent.prepareId());
+		}
+	}
+	
 	,addToCount:function(){
 		var cnt = this.parent.getFieldValue(this.countKey);
 		if(!cnt){
@@ -723,7 +736,6 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,submit:function(scope,form,event){
 		var values = this.prepareSubmitValues(scope,form);
-		this.setParent(scope,values);
 		if(scope.isNew){
 			var key = scope.table;
 			var lookupKey = this.pluralize(key);
@@ -2355,6 +2367,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	table:'assessment',
 	questIds:[],
 	assessFile:'assessments.json',
+	statediting:false,
 	isAssessment:true,
 	elements:[],
 	comboKey:'assessment',
@@ -2370,15 +2383,24 @@ divi.assessment = divi.extend(divi.bookBase,{
 	constructor : function (cfg) {
 		this.parent = undefined;
 		$.extend(this,cfg);
+		this.listeners[this.rclickKey] = {'click':[this.onCmClick]};
 		divi.assessment.superclass.constructor.call(this);
 		this.questIds = [];
 		this.elements = [];
+		var parent = $('.contextmenu');
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.createContextMenu(this.cmItems);
 	}
-
-	,getValues:function(){
+	
+	,getValues:function(edit){
 		var values = {};
 		$.extend(values,this.values);
-		delete values.chapter;
+		if(!edit){
+			delete values.chapter;
+		}else{
+			this.statediting = true;
+			$.extend(values,{chapter:this.parent.getFieldValue('id')});
+		}
 		return values;
 	}
 	
@@ -2387,9 +2409,30 @@ divi.assessment = divi.extend(divi.bookBase,{
 	}
 	
 	,drawUpdate:function(){
-		if(this.isAssessment){
+		if(this.statediting){
+			this.statediting = false;
+			var valueDom = this.doms[this.divs['aDiv']];
+			if(valueDom && valueDom.dom){
+				var values = this.getValues();
+				$(valueDom.dom).html('');
+				iconDiv = this.doms[this.divs['iconDiv']] = divi.domBase.create( $.extend(this.iconDefaults,{scope:this}),valueDom.dom);
+				valueDom.dom.innerHTML += values['name'];
+			}
+		}else if(this.isAssessment){
 			this.loadFile();
 		}
+	}
+	
+	,beforeDelete:function(event,val,jTarget){
+		var lookupKey = this.pluralize(this.table);
+		var children = this.parent.children[lookupKey];
+		if(children){
+			children.remove(this);
+		}
+		var doms = this.doms[this.divs['liDiv']];
+		var currDom = $(doms.dom);
+		currDom.remove();
+		this.destroydoms();
 	}
 	
 	,loadFile:function(url,fileName){
