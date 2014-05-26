@@ -8,7 +8,8 @@ divi.app.book = new divi.pageBase({
 		 	    {name:"overview", "desc": "overview", "type": "textfield",hidden:true},
 		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true},
 		 	    {name:"bookId", "desc": "Book Version", "type": "numberfield",hidden:true},
-		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true}
+		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true},
+		         {name:"count", "desc": "count", "type": "numberfield",hidden:true}
 		 	  ];
 	}
 });
@@ -18,7 +19,8 @@ divi.app.topic = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter"},
 		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true,isReadOnly:true},
-		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true,focus:true}];
+		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true,focus:true},
+		         {name:"elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
 	}
 });
 
@@ -36,7 +38,8 @@ divi.app.assessment = new divi.pageBase({
 divi.app.chapter = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true,isReadOnly:true},
-		         {name:"name", "desc": "Name", "type": "textfield","isRequired": true}];
+		         {name:"name", "desc": "Name", "type": "textfield","isRequired": true},
+		         {name:"count", "desc": "count", "type": "numberfield",hidden:true}];
 	}
 });
 
