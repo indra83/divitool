@@ -175,7 +175,7 @@ $.extend(divi.listeners,{
 
 divi.appBase = divi.extend(divi.base, {
     title: '',
-    countKey:'count',
+    countKey:'_count',
     padMax:3,
     editKey:'editElem',
     editableDiv:'editableDiv',
@@ -1073,7 +1073,7 @@ divi.appBase = divi.extend(divi.base, {
 });
 
 divi.elementbase = divi.extend(divi.appBase,{
-	countKey:'elemCount',
+	countKey:'_elemCount',
 	table:'',
 	preview:'prev',
 	elemTable:'eachHeader',
@@ -1176,7 +1176,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		for(var index = 0;index < attributes.length;index++){
 			var key = attributes[index];
-			values[key.nodeName] = key.nodeValue;
+			values[key.nodeName] = key.value;
 		}
 		return refNode;
 	}
@@ -1303,8 +1303,12 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,setParent:function(scope,values){
 	}
 
+	,padCount:function(){
+		return divi.util.pad(this.getCount(),this.padMax);
+	}
+	
 	,prepareId:function(){
-		var id = this.idPrefix+divi.util.pad(this.getCount(),this.padMax);
+		var id = this.idPrefix+this.padCount();
 		return id;
 	}
 
@@ -1856,17 +1860,26 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.home.updateSelected(this);
 		} 
 		if(this.table == 'chapter'){
+			var lidom = this.getLiDom();
 			d.preventDefault();
 			d.stopPropagation();
 			var a = this,b =jTarget.parent().children('ul.slidedown-menu');
+			b.closest('li.stick').parent().find('li').removeClass('selected');
             "block" != b.css("display") || b.hasClass("keep-open") ? ($(".slidedown-menu").each(function (d, e) {
                 b.parents(".slidedown-menu").is(e) || ($(e).hasClass("keep-open") ||
                     "block" != $(e).css("display")) || a._close(e)
-            }), a._open(b)) : a._close(b)
+            }), a._open(b,lidom.dom)) : a._close(b)
 		}
 	}
 	
-	,_open: function (a) {
+	,getLiDom:function(){
+		return this.doms[this.divs['liDiv']];
+		
+	}
+	,_open: function (a,dom) {
+		if(dom){
+			$(dom).addClass('selected');
+		}
         switch (this.ddEffect) {
         case "fade":
             a.fadeIn("fast");
@@ -2121,7 +2134,7 @@ divi.book = divi.extend(divi.bookBase,{
 	prefix:'book',
 	table:'book',
 	childrenKeys:['chapters'],
-	navDflts:{tag:'nav','class':'sidebar light'},
+	navDflts:{tag:'nav','class':'sidebar divi medium'},
 	ulDflts:{tag:'ul'},
 	divs:{'navDiv':'navDiv','ulDiv':'ul'},
 	constructor : function (cfg) {
@@ -2292,7 +2305,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
-	iconDefaults:{tag:'i','class':"icon-tree-view",prefix:'sidebar_'},
+	iconDefaults:{tag:'i','class':"icon-yelp",prefix:'sidebar_'},
 	comboKey:'topic',
 	
 	constructor : function (cfg) {
@@ -2393,7 +2406,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
-	iconDefaults:{tag:'i','class':"icon-briefcase",prefix:'sidebar_'},
+	iconDefaults:{tag:'i','class':"icon-snowflake",prefix:'sidebar_'},
 	
 	constructor : function (cfg) {
 		this.parent = undefined;
@@ -2553,7 +2566,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 });
 
 divi.question = divi.extend(divi.element,{
-	countKey:'elemCount',
+	countKey:'_elemCount',
 	ansCnt:1,
 	addClose:true,
 	maxansCnt:undefined,
@@ -2567,18 +2580,18 @@ divi.question = divi.extend(divi.element,{
 	isQuestion:true,
 	editorKey:undefined,
 	mainEditorCls:"question",
-	divs:{'rating':'rating'},
+	divs:{'rating':'rating','points':'points'},
 	fileName:'question.xml',
 	editors:{},
 	answerKey:'answer',
 // /noreference:true,
-	ignoreFields:['data','references','id','version','type'],
+	ignoreFields:['data','references','id','version','type','_elemCount','points'],
 	table:'question',
 	htmlValKey:'data',
 	idCount:1,
 	prssIndex:-1,
 	editor:undefined,
-	idPrefix:'ques', 
+	idPrefix:'Q', 
 	
 	constructor : function (cfg) {
 		$.extend(this,cfg);
@@ -2586,6 +2599,10 @@ divi.question = divi.extend(divi.element,{
 		this.fieldCount = 1;
 		this.elems = [];
 		this.doms = {};
+	}
+	
+	,padCount:function(){
+		return this.getCount();
 	}
 	
 	,initializeValues:function(){
@@ -2793,9 +2810,16 @@ divi.question = divi.extend(divi.element,{
 			appendElem =  appendElem.find('.contentElem');
 			appendElem.append('<div>Difficulty Level</div>');
 			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
+			var ptsField = new divi.form.numberfield({name:"points",value:this.getFieldValue('points'),defaultCss:'formfield points',"desc": "points",scope:this,listeners:{'change':[this.onpointsChange]}});
+			divi.domBase.append(appendElem,ptsField.dom);
 			var aCls = this.checkMax() ? 'disabled' : '';
 			appendElem.append('<div class="'+this.optionsKey+'"><a class="'+aCls+'">+Add More Options</a></div>');
 		}
+	}
+	
+	,onpointsChange:function(event,targetVal,target){
+		var scope = event.data.scope.scope;
+		scope.setValueForKey('points',targetVal);
 	}
 	
 	,attachpostContent:function(appendTo,showToggle){
@@ -2893,7 +2917,7 @@ divi.question = divi.extend(divi.element,{
 			var elemId,eachElem;
 			var elements = scope.elems;
 			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type')+'"/>');
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+scope.getFieldValue('points')+'"/>');
 			this.getPersistValues(dom,null,false,'html');
 			
 			var ops = dom.createElement(this.optionsKey);
@@ -2922,6 +2946,7 @@ divi.question = divi.extend(divi.element,{
 divi.answer = divi.extend(divi.element,{
 	ansCnt:2,
 	maxansCnt:2,
+	idPrefix:'A',
 	table:'answer',
 	htmlValKey:'data',
 	noreference:true,
@@ -2934,7 +2959,6 @@ divi.answer = divi.extend(divi.element,{
 	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv'},
 	idCount:1,
 	editor:undefined,
-	idPrefix:'ans',
 	editorKey:undefined,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
@@ -2949,6 +2973,10 @@ divi.answer = divi.extend(divi.element,{
 	
 	,removeAns:function(event,targetVal,target){
 		this.removeAnswerFromParent(this.getIndexForElem());
+	}
+	
+	,padCount:function(){
+		return this.getCount();
 	}
 	
 	,undrawAns:function(ans){
@@ -3100,16 +3128,12 @@ divi.answer = divi.extend(divi.element,{
 divi.torfAns = divi.extend(divi.answer,{
 	trueText:'True',
 	falseText:'False',
-	idPrefix:'torfAns',
 	htmlValKey:undefined,
 	ignoreFields:['id','isAnswer'],
 	table:'torfAns',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.answer.superclass.constructor.call(this);
-		this.listeners = {};
-		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
-		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
 
 	,addSplValues:function(dom,child,values,parent){
@@ -3163,39 +3187,50 @@ divi.torfAns = divi.extend(divi.answer,{
 });
 
 divi.fill_blankAns = divi.extend(divi.answer,{
-	idPrefix:'fobAns',
 	ignoreFields:['id','data'],
 	table:'fill_blankAns',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
+		this.doms = {};
 		divi.fill_blankAns.superclass.constructor.call(this);
-		this.listeners = {};
-		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
-		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
-
+	
+	,changeListener:function(event,val,jTarget,type,target){
+		this.setValueForKey(this.htmlValKey,val);
+	}
+	
 	,addAddValues:function(dom,childdom,values,parent){
 		if(childdom){
 			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('id');
 			childdom.removeAttribute('src');
 		}
 	}
 
+	,addSplValues:function(dom,child,values,parent){
+		child.textContent = values[this.htmlValKey];
+	}
+	
+	,loadValues:function(currNode,values){
+		values[this.htmlValKey] = currNode.textContent;
+		return null;
+	}
+	
 	,draw:function(append,index){
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this,tabIndex:fieldCount++},append);
 		this.prepareCloseButton(parDom,fieldCount);
-		var answerDom = this.doms[this.divs.elem] = this.prepareEditableDom($.extend({cls:"answer",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue(this.htmlValKey));
-		this.editorKey = answerDom.id;
-		$(parDom.dom).append(answerDom.dom);
+		var inptDflts = $.extend({tag:'textarea','class':"answer",'data-transform':'input-control',tabIndex:fieldCount++,value:this.getFieldValue('data')},this.evtDflts);
+		var elem = this.doms[this.divs.elem] || divi.domBase.create(inptDflts,parDom.dom);
+		$(elem.dom).attr('id',elem.id);
+		$(parDom.dom).append(elem.dom);
 		this.setFieldCount(fieldCount);
 	}
 	
 });
 
 divi.labelingAns = divi.extend(divi.answer,{
-	idPrefix:'labelingAns',
 	ignoreFields:['id','data','right','left','left,right'],
 	divs:{'text':'text','upload':'upload'},
 	table:'labelingAns',
@@ -3242,7 +3277,6 @@ divi.labelingAns = divi.extend(divi.answer,{
 });
 
 divi.matchAns = divi.extend(divi.answer,{
-	idPrefix:'matchAns',
 	ignoreFields:['id','data','right','left','left,right'],
 	table:'matchAns',
 	leftKey:'left',
@@ -3314,7 +3348,6 @@ divi.matchAns = divi.extend(divi.answer,{
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
 	table:'mcq',
-	idPrefix:'mcq',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.mcq.superclass.constructor.call(this);
@@ -3326,7 +3359,6 @@ divi.torf = divi.extend(divi.question,{
 	type:'torf',
 	table:'torf',
 	answerKey:'torfAns',
-	idPrefix:'torf',
 	ansCnt:2,
 	maxansCnt:2,
 	constructor: function (cfg) {
@@ -3349,7 +3381,8 @@ divi.fill_blank = divi.extend(divi.question,{
 	type:'fill_blank',
 	table:'fill_blank',
 	answerKey:'fill_blankAns',
-	idPrefix:'fob',
+	optionsKey:'blanks',
+	optionKey:'blank',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.fill_blank.superclass.constructor.call(this);
@@ -3379,7 +3412,6 @@ divi.match = divi.extend(divi.question,{
 	optionsKey:'matches',
 	optionKey:'match',
 	answerKey:'matchAns',
-	idPrefix:'mtc',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.match.superclass.constructor.call(this);
@@ -3449,7 +3481,6 @@ divi.labeling = divi.extend(divi.question,{
 	table:'labeling',
 	mainEditorCls:'question matchthefol',
 	answerKey:'labelingAns',
-	idPrefix:'lbl',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.labeling.superclass.constructor.call(this);

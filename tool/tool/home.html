@@ -1,59 +1,77 @@
 <html>
    <head>
       <title>Divi Editor</title>
-	  <link rel="stylesheet" href="assets/css/Normalize.css">
-	  <link rel="stylesheet" href="assets/css/style.css">
-      <link rel="stylesheet" href="assets/css/metro-bootstrap.css" media="screen">
-      <link href="assets/css/equation-embed.css" rel="stylesheet" media="screen">
-      <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
+      <link rel="stylesheet" href="assets/css/Normalize.css">
+      <link rel="stylesheet" href="assets/css/style.css">
+      <link rel="stylesheet" href="assets/css/metro-bootstrap.css"
+         media="screen">
+      <link href="assets/css/equation-embed.css" rel="stylesheet"
+         media="screen">
+      <link href="assets/css/ui-lightness/jquery-ui-1.10.3.custom.css"
+         rel="stylesheet" media="screen">
       <link rel="stylesheet" href="assets/css/divi.css" media="screen">
    </head>
    <body class="metro">
-      <div class="container1">
-	      <div class="homeheader">
-	         <div class="logo">
-	            <img src="./assets/images/logo.png"/>
+      <div class="container">
+         <div class="topborder  bg-diviblue">
+            <div class="place-right fg-white on-left-more">
+               <small>Book Version :<span class="bookversion"></span> Book
+               Order :<span class="bookorderNo"></span></small>
+            </div>
+         </div>
+         <div class="homeheader">
+            <div class="logo">
+               <img src="./assets/images/logo.png" />
+            </div>
+            <div class="bookdiv bg-divigray">
+               <div class="vmiddle">
+                  <span class="bookname text-book fg-divigray"></span><span
+                     class="place-right on-left"><i class="icon-pencil"></i></span>
+               </div>
+            </div>
+         </div>
+         <div class="titlePreview">
+            <div class="leftsec">
+               <div class="maintitle imageSection extralarge">
+                  <span><i class="icon-arrow-down-4"></i>Book Progress</span>
+               </div>
+            </div>
+            <div class="rightsec imageSection">
+               <button class="image-button bg-ltbrown fg-divigray large  xlarge image-left maintitle capsOn rounded addchapter">chapter<i class="icon-plus-2 bg-drkbrown fg-white lftrounded"></i></button>
+               <button class="image-button bg-ltbrown fg-divigray large  xlarge image-left maintitle capsOn rounded disabled  addtopic">topic<i class="icon-plus-2 bg-drkbrown fg-white lftrounded"></i></button>
+               <button class="image-button bg-ltbrown fg-divigray large  xlarge image-left maintitle capsOn rounded disabled addassessment">assessment<i class="icon-plus-2 bg-drkbrown fg-white lftrounded"></i></button>
+               <button class="image-button bg-diviplGray fg-divigray large  xlarge image-left maintitle capsOn rounded">How it Works<i class="icon-play-alt bg-diviplGray fg-white lftrounded"></i></button>
+            </div>
+         </div>
+         <div class="bookcontent">
+             <div class="leftsec lftsidebar">
+               <div class="main fg-white bg-diviblue titlePreview xlarge clickable capsOn">
+                  <span class="vmiddle"><i class="icon-book on-left"></i>Book Cover<span class="place-right on-left"><i class="icon-pencil"></i></span></span>
+               </div>
+               <div class="main fg-white bg-drkbrown titlePreview xlarge capsOn">
+                  <span class="vmiddle"><i class="icon-lines on-left"></i>chapters</span>
+               </div>
+	      	   <div class="treepreview"></div>
 	         </div>
-	         <div class="titles"><label>Book Name :</label><span class="bookname"></span></div>
-	         <div class="titles"><label> Book Version :</label><span class="bookversion"></span></div>
-	         <div class="titles"><label>Book Order :</label><span class="bookorderNo"></span></div>
-	      </div>
-	     
-	      <div class="bookcontent">
-	      	<div class="bookPreview">
-	      		<div class="maintitle titlePreview imageSection large txBold capsOn bg-white"><span>Book Progress</span></div>
-	      		<div class="maintitle titlePreview imageSection button success large txBold capsOn"><span>Book Cover</span></div>
-	      		<div class="maintitle titlePreview imageSection button success large capsOn"><span>chapters Progress</span></div>
-	      		<div class="treepreview"></div>
-	         </div>
-	         <div class="contentEditor inline">
-	      		<div class="titlePreview imageSection">
-	      			<ul class="addButtons">
-	      				<li>select actions</li>
-	      				<li><button class="button info large maintitle capsOn addchapter">chapter</button></li>
-	      				<li><button class="button info large maintitle disabled capsOn addtopic">topic</button></li>
-	      				<li><button class="button info large maintitle disabled capsOn addassessment" >assessment</button></li>
-	      			</ul>
-	      		</div>
-	      		 <div class="imageSection buttonsList">
-                    <nav class="horizontal-menu compact topicbtns">
+	         <div class="rightsec inline">
+	      		 <div class="buttonsList bg-diviplblue">
+	      		 	<nav class="horizontal-menu compact topicbtns">
                         <ul>
-                            <li><a href="#"><button class="shortcut link disabled addvideo"><i class="icon-play"></i>Video</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addaudio"><i class="icon-mic"></i>Audio</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addimage"><i class="icon-image"></i>Image</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addhtml"><i class="icon-html5"></i>Html</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addheading"><i class="icon-css3"></i>Heading</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addsubtopic"><i class="icon-hash"></i>Sub Topic</button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addimageset"><i class="icon-camera-3"></i>Image Set</button></a></li>
+							<li><a href="#"><button class="shortcut link disabled addhtml"><i class="icon-type"></i>Text</button></a></li>
+                            <li><a href="#"><button class="shortcut link disabled addimage"><i class="icon-pictures"></i>Image</button></a></li>
+                            <li><a href="#"><button class="shortcut link addvideo disabled"><i class="icon-play-alt"></i>Video</button></a></li>
+                            <li><a href="#"><button class="shortcut link disabled addaudio"><i class="icon-volume"></i>Audio</button></a></li>
                             <li>
-                                <a class="dropdown-toggle" href="#"><button class="shortcut link"><i class="icon-box"></i>Box</button></a>
+                                <a class="dropdown-toggle" href="#"><button class="shortcut link"><i class="icon-checkbox-unchecked"></i>Box</button></a>
                                 <ul class="dropdown-menu" data-role="dropdown">
                                     <li><button class="button-set primary addinfo disabled"><i class="icon-github"></i></button></li>
                                     <li><button class="button-set primary addalert disabled"><i class="icon-box-add"></i></button></li>
                                     <li><button class="button-set primary addother disabled"><i class="icon-github"></i></button></li>
                                 </ul>
                             </li>
-                            
+                            <li><a href="#"><button class="shortcut link disabled addheading"><i class="icon-css3"></i>Heading</button></a></li>
+                            <li><a href="#"><button class="shortcut link disabled addsubtopic"><i class="icon-hash"></i>Sub Topic</button></a></li>
+                            <li><a href="#"><button class="shortcut link disabled addimageset"><i class="icon-copy"></i>Slides</button></a></li>
                         </ul>
                     </nav>
                     <nav class="horizontal-menu compact assessbtns hidden">
@@ -62,17 +80,26 @@
                             <li><a href="#"><button class="shortcut link disabled addtorf"><i class="icon-checkmark"></i>True/False</button></a></li>
                             <li><a href="#"><button class="shortcut link disabled addfill_blank"><i class="icon-minus-2"></i>Fill in Blanks</button></a></li>
                             <li><a href="#"><button class="shortcut link disabled addmatch"><i class=" icon-compass"></i>Match the Following</button></a></li>
-                            <!-- <li><a href="#"><button class="shortcut link disabled addlabeling"><i class="icon-lab"></i>Label the Figure</button></a></li> -->
+                            <li><a href="#"><button class="shortcut link disabled addlabeling"><i class="icon-lab"></i>Label the Figure</button></a></li>
                         </ul>
                     </nav>
+                    <span class="pvwBtns">
+		               <button class="image-button bg-palebrown fg-divigray large  medium image-left maintitle rounded">Preview<i class="icon-eye-2 bg-drkbrown fg-white lftrounded"></i></button>
+		               <button class="image-button bg-ltbrown fg-divigray large  medium image-left maintitle rounded disabled">Add Sub Topic<i class=" icon-paragraph-justify bg-drkbrown fg-white lftrounded"></i></button>
+		            </span>
                 </div>
                 
-	      		<div class="editContent imageSection dottedLine">
-	      			<div class="titleHolder hidden">
-	      				<span><i>you are editing topic '<span class="fg-blue topicTit"></span>' in Chapter '<span class="fg-blue chapTit"></span>'</i></span>
+	      		<div class="buttonsSection dottedLine">
+	      			<div class="editContent">
+		      			<div class="titleHolder hidden">
+		      				<span>you are editing topic '<span class="fg-blue topicTit"></span>' in Chapter '<span class="fg-blue chapTit"></span>'</span>
+		      			</div>
+		      			<div class="assessHolder hidden">
+		      				<span>you are editing assessment '<span class="fg-blue assessTit"></span>' in Chapter '<span class="fg-blue chapTit"></span>'</span>
+		      			</div>
 	      			</div>
-	      			<div class="assessHolder hidden">
-	      				<span><i>you are editing assessment '<span class="fg-blue assessTit"></span>' in Chapter '<span class="fg-blue chapTit"></span>'</i></span>
+	      			<div class="rearrange">
+	      				<span>Rearrange <i class=" icon-arrow-down fg-green"></i><i class=" icon-arrow-up fg-green"></i></span>
 	      			</div>
 	      		</div>
 	      		<div class="imageSection contentPreview">
@@ -90,30 +117,25 @@
 	      			
 	      		</div>
 	         </div>
-	      </div>
-	      <!-- <div class="footer">About Us   |  Contact Us   
-	            <div class="footer1">
-	               Copyright Divi Education,2014 
-	            </div>
-	      </div> -->
+         </div>
       </div>
       <div class="popup hidden"></div>
       <div class="dialog-html hidden"></div>
       <textarea class="richtext-html hidden">
       </textarea>
-      
-    <div class="contextmenu hidden" unselectable="on"></div>
-	<script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
-	<script src="assets/js/jquery.js"></script>
-	<script src="assets/js/chosen.jquery.js"></script>
-	<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
-	<script src="assets/js/metro.min.js"></script>
-	<script src="assets/js/core.js"></script>
-	<script src="assets/js/jsxml.js"></script>
-	<script src="assets/js/form.js"></script>
-	<script src="assets/js/headers.js"></script>
-	<script src="assets/js/home.js"></script>
-	<script src="assets/js/eq_editor.js"></script>
-	<script src="assets/js/jquery.blockUI.js"></script>
-	 </body>
+      <div class="contextmenu hidden" unselectable="on"></div>
+      <script type="text/javascript" src="assets/js/tinymce/tinymce.min.js"></script>
+      <script src="assets/js/jquery.js"></script>
+      <script src="assets/js/chosen.jquery.js"></script>
+      <script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
+      <script src="assets/js/metro.min.js"></script>
+      <script src="assets/js/core.js"></script>
+      <script src="assets/js/jsxml.js"></script>
+      <script src="assets/js/form.js"></script>
+      <script src="assets/js/headers.js"></script>
+      <script src="assets/js/home.js"></script>
+      <script src="assets/js/eq_editor.js"></script>
+      <script src="assets/js/jquery.blockUI.js"></script>
+   </body>
 </html>
+     

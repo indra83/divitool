@@ -6,10 +6,10 @@ divi.app.book = new divi.pageBase({
 		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield","isRequired": true},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
 		 	    {name:"overview", "desc": "overview", "type": "textfield",hidden:true},
-		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true},
+		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true,value:'1.0'},
 		 	    {name:"bookId", "desc": "Book Version", "type": "numberfield",hidden:true},
-		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true},
-		         {name:"count", "desc": "count", "type": "numberfield",hidden:true}
+		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true,value:'1.0'},
+		         {name:"_count", "desc": "count", "type": "numberfield",hidden:true}
 		 	  ];
 	}
 });
@@ -20,7 +20,7 @@ divi.app.topic = new divi.pageBase({
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter",listeners:{'change':divi.appBase.prototype.updateId}},
 		         {name:"id", "desc": "Topic ID", "type": "numberfield","isRequired": true,isReadOnly:true},
 		         {name:"name", "desc": "Topic Name", "type": "textfield","isRequired": true,focus:true},
-		         {name:"elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
+		         {name:"_elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
 	}
 });
 
@@ -32,7 +32,7 @@ divi.app.assessment = new divi.pageBase({
 		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type"},
 		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
 		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true},
-		         {name:"elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
+		         {name:"_elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
 	}
 });
 
@@ -40,7 +40,7 @@ divi.app.chapter = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [{name:"id", "desc": "Chapter ID", "type": "numberfield","isRequired": true,isReadOnly:true},
 		         {name:"name", "desc": "Name", "type": "textfield","isRequired": true},
-		         {name:"count", "desc": "count", "type": "numberfield",hidden:true}];
+		         {name:"_count", "desc": "count", "type": "numberfield",hidden:true}];
 	}
 });
 
@@ -51,7 +51,8 @@ divi.app.question = new divi.pageBase({
 		         {name:"version", "desc": "Version", "type": "numberfield",value:'1',hidden:true},
 		         {name:"type", "desc": "ansType", "type": "textfield","isRequired": true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true},
-		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"}];
+		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
+		         {name:"points", "desc": "points", "type": "numberfield"}];
 	}
 });
 

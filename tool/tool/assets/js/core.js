@@ -852,7 +852,7 @@ divi.util = {
 	}
 	
 	,isEmpty : function(v){
-	    return v === null || v === undefined || v == "" || v.trim() == "";
+	    return v === null || v === undefined || v == "" || ($.isFunction(v.trim) && v.trim() == "");
 	}
 
 	,callSections:function(multiForm,sections,callBack,options){
@@ -1394,6 +1394,9 @@ divi.baseField  = divi.extend(divi.panelBase, {
 		dflts = $.extend({},this.defaults,{disabled:this.isReadOnly,scope:this,listeners:this.listeners});
 		if(this.attachIndex){
 			$.extend(dflts,{tabIndex:this.tabIndex});
+		}
+		if(this.value){
+			$.extend(dflts,{value:this.value});
 		}
 		inputdom = divi.domBase.create(dflts,parent);
 		this.doms[this.inputdom] = inputdom;

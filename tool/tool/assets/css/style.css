@@ -30,8 +30,12 @@ div.preview.question div{
 }
 
 .homeheader {
-	background-color: #DfDfDf;
-	height: 7%;
+	background-image:url("./../../assets/images/header.png");
+	background-repeat:repeat-x;
+	height: 10%;
+}
+.buttonsSection{
+	height: 5%;
 }
 
 .titles{
@@ -49,17 +53,22 @@ div.preview.question div{
 	display:inline-block;
 }
 
-.homeheader div.logo{
-	width:20%;
-}
-
 .homeheader div.titles.bookname{
 	width:45%;
 	vertical-align:middle;
 }
 
+div.topborder{
+	height:2%;
+	width:100%;
+}
+div.bookdiv{
+	width: 30%;
+	height: 50%;
+	position: relative;
+	top: 30%;
+}
 .bookcontent{
-	margin-top:0.25%;
 	height:73%;
 	vertical-align:top;
 }
@@ -77,24 +86,31 @@ div.preview.question div{
 	text-transform:uppercase;
 }
 
-.maintitle span{
-	vertical-align: middle;
-}
-.maintitle span:before{
-	content:url("./../../assets/images/Picture4.png");
+.imageSection{
+	padding-left:7%;
 }
 
-.imageSection{
-	margin-bottom:5px;
-	width:100%;
+.imageSection button{
+	margin:0 25px;
 }
 
 .titlePreview{
-	height:7%;
+	height:6.5%;
 }
-
 .buttonsList{
 	height:13%;
+}
+
+div.buttonsList nav{
+	width:60%;
+	float: left;	
+}
+
+div.buttonsList .pvwBtns{
+	width:30%;
+	float:right;
+	top: 15%;
+	position: relative;	
 }
 
 .contentPreview{
@@ -197,7 +213,12 @@ div.preview.question div{
 
 
 .editContent{
-	height:5%;
+	width:90%;
+	float:left;
+}
+.rearrange{
+	width:10%;
+	float:right;
 }
 
 .dottedLine{
@@ -208,21 +229,38 @@ div.preview.question div{
 	font-weight: bold;
 }
 
+div.answerDiv textarea.answer{
+	width: 96%;
+}
+
 .bookContent div.inline{
 	display: inline-block;
 	
 }
-.bookcontent .bookPreview{
+.leftsec{
 	width:21%;
-	border-right:solid 2px gray;
 	float: left;
 }
 
-.bookcontent .contentEditor{
-	width:77.75%;
+.bookcontent .lftsidebar .xlarge i{
+	padding-left:19px;
+}
+
+.bookcontent .lftsidebar div.main{
+	width:100%;
+	margin:1px 0px;
+}
+.bookcontent .lftsidebar div.main.xlarge{
+	height:9%;
+	cursor: pointer;
+}
+.bookcontent .lftsidebar div.main.clickable:hover{
+	background-color: #00aff0 !important;
+}
+
+.rightsec{
+	width:78.5%;
 	float:right;
-	margin-left:1%;
-	margin-top:-1%;
 }
 
 .bookcontent ul.addButtons{
@@ -725,5 +763,119 @@ div.editableDiv.answer {
 	padding: 0px 5px;
 } 
 
+.metro nav.compact .shortcut {
+  font-size: 14px;
+  font-family:'Open Sans Light';
+  padding: 2px 5px;
+}
+
+
+.metro nav.compact .shortcut.link {
+  border-right: 1px #2e92cf solid;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-top: 0px;
+  text-decoration: none !important;
+}
+.metro nav.compact .shortcut.link:hover {
+   border-bottom-width: 2px;
+}
+
+.metro nav.compact ul{
+	margin:0px;
+	padding-left:0px;
+}
+
+
+.metro .sidebar.divi li.selected  a {
+  background-color: #E7F4FA ;
+}
+.metro .sidebar.divi li.selected{
+  border-right: 1px solid #E7F4FA ;
+}
+
+.metro .sidebar.divi li.selected  ul {
+  background-color: #E7F4FA ;
+}
+
+.metro .sidebar.divi {
+  background-color: #F3F3F3;
+  border: 1px #eaeaea solid;
+}
+.metro .sidebar.divi li{
+  border-right:0px;
+  color:#686868;
+}
+
+.metro .sidebar.divi li.active {
+   background-color: #E7F4FA;
+}
+.metro .sidebar.divi li.title {
+  color: #686868;
+}
+.metro .sidebar.divi li a {
+  color: #686868;
+  background-color: #F3F3F3;
+}
+
+.metro .sidebar.divi > ul li a{
+	padding: 5px 20px;
+	min-height:5.5%;
+}
+
+.metro .sidebar.divi li.stick a{
+  text-transform: uppercase;
+}
+
+.metro .sidebar.divi .slidedown-menu li a{
+  text-transform: none;
+  padding: 4px 32px !important;
+  font-size: 12px !important;
+  line-height: 13pt !important;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0.25999999046325684px
+}
+
+
+.metro .sidebar.divi li a:hover {
+  background-color: #00aff0;
+}
+.metro .sidebar.divi li ul {
+  background-color: #F3F3F3;
+  border: 1px transparent solid;
+}
+.metro .sidebar.divi li .divider {
+  background-color: #eeeeee;
+}
+.metro .sidebar.divi li .divider:hover {
+  background-color: #eeeeee;
+}
+.metro .sidebar.divi li.disabled a {
+  background-color: #ffffff;
+  cursor: default;
+  color: #999999;
+}
+.metro .sidebar.divi li.active a {
+  background-color: #1ba1e2;
+  color: #686868;
+}
+
+.metro div.formfield.points{
+	width: 40%;
+}
+
+.metro div.formfield.points label.labelStyle {
+	width: 40px;
+}
+
+.metro div.formfield.points .input-control.text .btn-clear{
+	right:0px;
+	left:30px;
+}
+
+.metro div.formfield.points div.input-control input {
+	width: 50px;
+}
 
 .modal_close { position: absolute; top: 12px; right: 12px; display: block; width: 14px; height: 14px; background: url(../img/modal_close.png); z-index: 2; }

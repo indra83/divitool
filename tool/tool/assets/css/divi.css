@@ -139,7 +139,7 @@ mark {
  */
 
 small {
-  font-size: 80%;
+  font-size: 70%;
 }
 
 /**
@@ -620,6 +620,9 @@ a {
 }
 .metro .text-right {
   text-align: right;
+}
+.metro .text-book{
+	font-size: 13px;
 }
 .metro .text-center {
   text-align: center;
@@ -1369,13 +1372,13 @@ a {
 .metro div,
 .metro span,
 .metro p {
-  font-family: 'Segoe UI_', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: 'Open Sans Light';
   font-weight: normal;
   font-style: normal;
 }
 .metro p {
   margin: 0 0 7pt;
-  font-family: 'Segoe UI_', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: 'Open Sans Light';
   font-weight: normal;
   font-style: normal;
   color: #000000;
@@ -1458,13 +1461,12 @@ a {
 .metro ol {
   margin-left: 5px;
   padding-left: 15px;
-  font-family: 'Segoe UI_', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: 'Open Sans';
   font-weight: normal;
   font-style: normal;
   color: #000000;
-  font-size: 11pt;
-  line-height: 15pt;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  line-height: 13pt;
 }
 .metro ul li,
 .metro ol li {
@@ -2223,6 +2225,18 @@ a {
   color: #ffffff !important;
   border-color: transparent;
 }
+.metro .extralarge {
+  padding: 5px 19px;
+  font-size: 22px;
+}
+.metro .xlarge {
+  font-size: 19px;
+}
+.metro .medium{
+  font-size: 15px;
+}
+
+
 .metro button.large {
   padding: 11px 19px;
   font-size: 17.5px;
@@ -3706,8 +3720,15 @@ a {
   background-color: #ffffff;
   border: 1px #eaeaea solid;
 }
-.metro img.rounded {
-  border-radius: 10px;
+.metro img.rounded,.metro button.rounded {
+  border-radius: 5px;
+}
+.metro i.lftrounded{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius:5px;
+}
+.metro .image-button.large i{
+ padding-top:10px;
 }
 .metro img.cycle {
   border-radius: 50%;
@@ -6230,18 +6251,16 @@ a {
 .metro .sidebar > ul ul li a {
   display: block;
   text-decoration: none;
-  font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
-  font-weight: 300;
+  font-family:'Open Sans ';
   color: #000000;
   letter-spacing: 0.00em;
-  font-size: 2.5rem;
-  line-height: 2.5rem;
+  font-size: 13px;
+  line-height: 13pt;
   letter-spacing: 0.01em;
   color: rgba(0, 0, 0, 0.6);
-  line-height: 2.2rem;
-  font-size: 2.2rem;
   color: inherit;
 }
+  
 .metro .sidebar > ul ul li.title {
   font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
@@ -10221,6 +10240,37 @@ a {
 .metro .bg-lime {
   background-color: #a4c400 !important;
 }
+.metro .bg-diviblue{
+	background-color: #0087C4 !important;
+}
+
+.metro .bg-diviplGray{
+	background-color: #A8A8A8 !important;
+}
+
+.metro .bg-diviblack{
+	background-color: #626262 !important;
+}
+.metro .bg-divigray{
+	background-color: #F3F3F3 !important;
+}
+
+.metro .bg-ltbrown{
+	background-color: #EBA723 !important;
+}
+
+.metro .bg-drkbrown{
+	background-color: #AB8B19 !important;
+}
+.metro .bg-palebrown{
+	background-color: #F0D36D !important;
+}
+
+.metro .vmiddle{
+	position:relative;
+	top: 25%;
+	width:100%;
+}
 .metro .bg-green {
   background-color: #60a917 !important;
 }
@@ -10279,6 +10329,9 @@ a {
   background-color: #87794e !important;
 }
 .metro .bg-gray {
+  background-color: #555555 !important;
+}
+.metro .bg-lightgray {
   background-color: #555555 !important;
 }
 .metro .bg-dark {
@@ -10371,8 +10424,16 @@ a {
 .metro .bg-blue {
   background-color: #00aff0 !important;
 }
+.metro .bg-diviplblue{
+	background-color: #E7F4FA !important;
+}
+
 .metro .fg-black {
   color: #000000 !important;
+}
+
+.metro .fg-divigray {
+  color: #686868 !important;
 }
 .metro .fg-white {
   color: #ffffff !important;
