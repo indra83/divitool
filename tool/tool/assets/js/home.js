@@ -809,7 +809,7 @@ divi.appBase = divi.extend(divi.base, {
 					value = values[eachElem];
 					value = this.prepareResourcePath(value,this.imageLocExact,this.getHtmlLoc());
 					value = this.prepareResourcePath(value,this.equationLocExact,this.getEquationsLoc());
-					values[this.htmlValKey] = value;
+					values[eachElem] = value;
 				}
 			}
 		}
@@ -2752,9 +2752,6 @@ divi.question = divi.extend(divi.element,{
 	}
 	
 	,attachpreContent:function(appendTo){
-		if(this.isNew){
-			this.setValueForKey('id',this.prepareId());
-		}
 		var htmlValue = this.getFieldValue('data');
 		appendTo.find(this.editableDiv).remove();
 		this.editors = {};
@@ -2871,6 +2868,7 @@ divi.question = divi.extend(divi.element,{
 	
 	,persistChild:function(){
 		var editor = this.editor;
+		this.updateCount();
 		if(editor){
 			var first = editor.getEditorsForKey(this.editorKey);
 			if(first){
@@ -2881,6 +2879,14 @@ divi.question = divi.extend(divi.element,{
 		}
 	}
 
+	,updateCount:function(){
+		//create new id before submit
+		if(this.isNew){
+			this.setValueForKey('id',this.prepareId());
+		}
+		this.addToCount();
+	}
+	
 	,prepareFilePath:function(scope,url,action){
 		var url = divi.appBase.prototype.prepareFilePath.call(this,this,url,action);
 		url += "/"+this.getFieldValue('id');
@@ -2904,7 +2910,6 @@ divi.question = divi.extend(divi.element,{
 				this.persistChildHtml(index+1);
 			}
 		}else{
-			this.addToCount();
 			this.parent.persistCurr();
 			this.persistElem();
 		}

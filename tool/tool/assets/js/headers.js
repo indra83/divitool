@@ -47,7 +47,7 @@ divi.app.chapter = new divi.pageBase({
 
 divi.app.question = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"id", "desc": "Question ID", "type": "numberfield",isReadOnly:true},
+		 return [{name:"id", "desc": "Question ID", "type": "numberfield"},
 		         {name:"version", "desc": "Version", "type": "numberfield",value:'1',hidden:true},
 		         {name:"type", "desc": "ansType", "type": "textfield","isRequired": true},
 		         {name:"data", "desc": "data", "type": "textfield","isRequired": true},
