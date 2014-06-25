@@ -288,7 +288,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		this.setTagsData(tagsData);
 		if($.isEmptyObject(this.getData()['tags'])){
-			this.setData({'tags':this.getTagsData},true);
+			this.setData({'tags':this.getTagsData()},true);
 		}
 	}
      
@@ -752,6 +752,8 @@ divi.appBase = divi.extend(divi.base, {
 		var cnt = this.parent.getFieldValue(this.countKey);
 		if(!cnt){
 			cnt = 0;
+		}else{
+			cnt = parseInt(cnt);
 		}
 		if(cnt >= 0){
 			this.setCount(cnt+1);
@@ -1213,7 +1215,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,populateValues:function(currNode){
 		values = {};
 		var refNode = this.loadValues(currNode,values);
-		this.prepareLoadValues(currNode,values);
+		values = this.prepareLoadValues(currNode,values);
 		this.setValues(values);
 		if(this.reference && refNode){
 			this.reference.populateValues(refNode);
@@ -1317,14 +1319,6 @@ divi.elementbase = divi.extend(divi.appBase,{
 		if(parent && !attachParent){
 			parent.appendChild(child);
 		}else if(this.reference){
-			if(this.tagging){
-				this.tagging.getPersistValues(dom,child);
-				if(attachParent){
-					parent.appendChild(child);
-				}else{
-					dom.documentElement.appendChild(child);
-				}
-			}
 			this.reference.getPersistValues(dom,child);
 			if(attachParent){
 				parent.appendChild(child);
@@ -2729,8 +2723,8 @@ divi.assessment = divi.extend(divi.bookBase,{
 				xmlDoc = $.parseXML(xml);
 				var quesChild = xmlDoc.firstChild;
 				if(quesChild){
-					var self = quesChild.children[0];
-					var answers = quesChild.children[1].children;
+					var self = quesChild.children[1];
+					var answers = quesChild.children[2].children;
 					selected.elemes = [];// resetting the elems
 					var type = $(quesChild).attr('type');
 					if(divi[type]){
@@ -2802,7 +2796,7 @@ divi.question = divi.extend(divi.element,{
 				return;
 			}
 			this.tagging.populateValues(tagsNode);
-			this.tagging.setValueForKey('points',this.getFieldValue('points'));
+			this.tagging.setValueForKey('points',values['points']);
 			delete values['points'];
 			delete values['tags'];
 		}
@@ -2918,8 +2912,9 @@ divi.question = divi.extend(divi.element,{
 			this.initilizeChild(scope.parent,lookupKey);
 			scope.parent.addChild(scope.parent,lookupKey,scope);
 		}
+		var values = this.prepareSubmitValues(scope,form);
 		if(form){
-			scope.update(form);
+			scope.update(form,values);
 		}
 		divi.home.prototype.cancelDailog(event);
 	}
@@ -2931,7 +2926,7 @@ divi.question = divi.extend(divi.element,{
 
 	,validateForm:function(){
 		var elem,isValidForm = this.validate();
-		for(var i=0;i< this.elems.length;i++){
+		for(var i=0;i< this.elems.length;i++){	
 			elem = this.elems[i];
 			if(elem){
 				isValidForm = isValidForm*elem.validate();
@@ -3109,8 +3104,10 @@ divi.question = divi.extend(divi.element,{
 			var elements = scope.elems;
 			var files = [];
 			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+scope.tagging.getFieldValue('points')+'"/>');
+			if(this.tagging){
+				this.tagging.getPersistValues(dom,null);
+			}
 			this.getPersistValues(dom,null,false,'html');
-			
 			var ops = dom.createElement(this.optionsKey);
 			dom.documentElement.appendChild(ops);
 			var masterObj = {};
