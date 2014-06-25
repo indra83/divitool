@@ -754,6 +754,7 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,submit:function(scope,form,event){
+		$.showLoader();
 		var values = this.prepareSubmitValues(scope,form);
 		if(scope.isNew){
 			var key = scope.table;
@@ -1036,7 +1037,6 @@ divi.appBase = divi.extend(divi.base, {
 		fileOps = fileOps || {};
 		var url = fileOps.url;
 		var skipLoader = fileOps.hasOwnProperty("skipLoader") ? fileOps.skipLoader : false;
-		$.showLoader();
 		context = fileOps.context || this;
 		var callback = fileOps.succcb;
 		var formData = new FormData();
@@ -1078,7 +1078,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	preview:'prev',
 	elemTable:'eachHeader',
 	ignoreFields:['id','src','thumb','references'],
-	referenceFields:['source','name','url','license'],
+	referenceFields:['source','name','url','license','blooms','difficulty','languageLevel'],
 	tpl:undefined,
 	elemTpl:undefined,
 	listeners:{},
@@ -1166,9 +1166,10 @@ divi.elementbase = divi.extend(divi.appBase,{
 		var refNode;
 		var children = currNode.children;
 		var attributes = currNode.attributes;
+		var refNodeCheck = "references";
 		for(var index = 0;index < children.length;index++){
 			var key = children[index];
-			if(key.tagName == "references"){
+			if(key.tagName == refNodeCheck){
 				refNode = key;
 			}else{
 				values[key.tagName] = key.textContent;
@@ -1243,7 +1244,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 					}
 				}
 			}
-			var values = this.modifyValues(values);
+			var values = this.modifyValues(values,updated);
 			$.extend(this.values,values);
 		}
 		if(this.reference){
@@ -1288,6 +1289,14 @@ divi.elementbase = divi.extend(divi.appBase,{
 		if(parent && !attachParent){
 			parent.appendChild(child);
 		}else if(this.reference){
+			if(this.tagging){
+				this.tagging.getPersistValues(dom,child);
+				if(attachParent){
+					parent.appendChild(child);
+				}else{
+					dom.documentElement.appendChild(child);
+				}
+			}
 			this.reference.getPersistValues(dom,child);
 			if(attachParent){
 				parent.appendChild(child);
@@ -1322,7 +1331,15 @@ divi.elementbase = divi.extend(divi.appBase,{
 	
 	,showContent:function(appendTo,showToggle,index){
 		var appendElem = $(appendTo);
-		if(this.reference){
+		if(this.reference && this.tagging){
+			index = index || 1;
+			var index2 = (100-index),index3 = (50-index);
+			appendElem.append($.tmpl(this.tabsKey,{i1:index,i2:index2,i3:index3}));
+			appendElem = appendElem.find('._page_'+index);
+			this.attachpreContent(appendElem, showToggle);
+			this.prepareForm.call(this.reference,appendElem.parent().find('._page_'+index2),showToggle);
+			this.prepareForm.call(this.tagging,appendElem.parent().find('._page_'+index3),showToggle);
+		}else if(this.reference){
 			index = index || 1;
 			var index2 = (100-index);
 			appendElem.append($.tmpl(this.tabsKey,{i1:index,i2:index2}));
@@ -1369,6 +1386,134 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 });
 
+divi.tags = divi.extend(divi.elementbase,{
+	table:'tags',
+	isTagging:true,
+	evtDflts:{attachLis:true,events:['change']},
+	ignoreFields:['blooms','difficulty','languageLevel','points','tags'],
+	divs:{'diff':'diff','points':'points','level':'level','blooms':'blooms','tags':'tags'},
+	bloomsValues:['Remember','Understand','Apply','Analyze/Evaluate'],
+	doms:{},
+	blooms:{},
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		this.doms = {};
+		this.blooms = {};
+		divi.tags.superclass.constructor.call(this);
+	}
+	
+	,prepareLoadValues:function(currNode,values){
+		if(values.hasOwnProperty('tag')){
+			var nodeList = currNode.children,tagsValue = [],key;
+			for(var index = 0;index < nodeList.length;index++){
+				key = nodeList[index];
+				tagsValue.push(key.getAttribute("id"));
+			}
+			values['tags'] = tagsValue;
+			delete values['tag'];
+		}
+		return values;
+	}
+	
+	,modifyValues:function(values,updated){
+		values =  updated;
+		return values;
+	}
+	
+	,prepareForm:function(appendElem){
+		appendElem.append('<div class="thirddiv"></div>');
+		var thirddiv = appendElem.find(".thirddiv");
+		inptDflts = {tag:'div',scope:this,name:'tags','class':'combofield tagsDD'};
+		thirddiv.append("<label>Related Topics: </label>");
+		elem = this.doms[this.divs.tags] || divi.domBase.create(inptDflts,thirddiv);
+		$(elem.dom).attr('id',elem.id);
+		var selElem = {name:"license","listener": "tags",events:['change'],scope:this,listeners:{'change':[this.ontagsChange]},isMultiple:true};
+		divi.formPanel.prototype.invokeComboListener.call(this,elem.dom,selElem,this.getData(),elem)
+		$(elem.dom.firstChild).val(this.getFieldValue('tags')).trigger('chosen:updated');
+		
+		appendElem.append('<div class="firstdiv"></div>');
+		var firstDiv = appendElem.find(".firstdiv");
+		var diffDom = $('<div class="elemDom"></div>');
+		diffDom.append('<label>Difficulty Level: </label>');
+		firstDiv.append(diffDom);
+		
+		dom =  this.doms[this.divs.diff] = divi.domBase.create({tag:'div','class':'diff rating',scope:this},diffDom);
+		var ptsField = new divi.form.numberfield({name:"points",value:(this.getFieldValue('points') || 1),defaultCss:'formfield points',"desc": "Points",scope:this,listeners:{'change':[this.onpointsChange]}});
+		divi.domBase.append(firstDiv,ptsField.dom);
+		
+		var leveldom = $('<div class="elemDom"></div>');
+		leveldom.append('<label>Language Level: </label>');
+		firstDiv.append(leveldom);
+		dom =  this.doms[this.divs.level] = divi.domBase.create({tag:'div','class':'level rating',scope:this},leveldom);
+		
+		appendElem.append('<div class="seconddiv"></div>');
+		var seconddiv = appendElem.find(".seconddiv");
+		var bloomsdom = $('<div class="bloomsdiv"><label>Blooms: </label></div>');
+		var inptDflts = $.extend({tag:'input',type:"radio",scope:this,name:'blooms','data-transform':'input-control',listeners:{'change':[this.onbloomsChange]}},this.evtDflts);
+		var eachEntry,currdflts,elem;
+		var bloomsVal = this.getFieldValue('blooms');
+		for(var entry in this.bloomsValues){
+			if(this.bloomsValues.hasOwnProperty(entry)){
+				currdflts = {};
+				delete inptDflts.ref;
+				$.extend(currdflts,inptDflts);
+				eachEntry = this.bloomsValues[entry];
+				$.extend(currdflts,{'ref':eachEntry});
+				if(bloomsVal == eachEntry){
+					$.extend(currdflts,{'checked':'checked'});
+				}
+				elem = this.blooms[eachEntry] || divi.domBase.create(currdflts,bloomsdom);
+				$(elem.dom).attr('id',elem.id);
+				bloomsdom.append('<label>'+eachEntry+'</label>');
+			}
+		}
+		seconddiv.append(bloomsdom);
+	}
+	
+	,ontagsChange:function(event,targetVal,target){
+		var scope = event.data.scope.scope;
+		scope.setValueForKey('tags',targetVal);
+	}
+	
+	,updateRating:function(value,fieldname){
+		var values = this.getValues();
+		values[fieldname] = value;
+		this.setValues(values);
+	}
+	
+	,onpointsChange:function(event,targetVal,target){
+		var scope = event.data.scope.scope;
+		scope.setValueForKey('points',targetVal);
+	}
+	
+	,onbloomsChange:function(event,targetVal,target){
+		var scope = event.data.scope;
+		scope.setValueForKey('blooms',target.attr('ref'));
+	}
+	
+	,prepareParentDom:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.setAttribute('blooms', values['blooms']);
+			childdom.setAttribute('difficulty', values['difficulty']);
+			childdom.setAttribute('languageLevel', values['languageLevel']);
+		}
+	}
+	
+	,addSplValues:function(dom,child,values,parent){
+		var tags = values['tags'];
+		if(tags){
+			for(var eachSplt in tags){
+				if(tags.hasOwnProperty(eachSplt) && tags[eachSplt]){
+					data = dom.createElement('tag');
+		            data.setAttribute("id",tags[eachSplt]);
+		            child.appendChild(data);
+				}
+			}
+		}
+	}
+
+});
+
 divi.references = divi.extend(divi.elementbase,{
 	table:'references',
 	isReference:true,
@@ -1387,12 +1532,18 @@ divi.references = divi.extend(divi.elementbase,{
 
 divi.element = divi.extend(divi.elementbase,{
 	table:'',
+	notagging:true,
 	reference:undefined,
+	tagging:undefined,
 	tpl:undefined,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.element.superclass.constructor.call(this);
-		if(!this.noreference){
+		if(!this.noreference && !this.notagging){
+			this.reference = new divi.references({parent:this});
+			$.template(this.tabsKey,divi.tpl.alltabs);
+			this.tagging = new divi.tags({parent:this});
+		}else if(!this.noreference){
 			this.reference = new divi.references({parent:this});
 			$.template(this.tabsKey,divi.tpl.tabs);
 		}
@@ -2566,6 +2717,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 });
 
 divi.question = divi.extend(divi.element,{
+	notagging:false,
 	countKey:'_elemCount',
 	ansCnt:1,
 	addClose:true,
@@ -2580,12 +2732,12 @@ divi.question = divi.extend(divi.element,{
 	isQuestion:true,
 	editorKey:undefined,
 	mainEditorCls:"question",
-	divs:{'rating':'rating','points':'points'},
+	divs:{},
 	fileName:'question.xml',
 	editors:{},
 	answerKey:'answer',
 // /noreference:true,
-	ignoreFields:['data','references','id','version','type','_elemCount','points'],
+	ignoreFields:['data','references','id','version','type','_elemCount','points','tags'],
 	table:'question',
 	htmlValKey:'data',
 	idCount:1,
@@ -2610,6 +2762,23 @@ divi.question = divi.extend(divi.element,{
 		this.values['type'] = this.type;
 	}
 	
+	,prepareLoadValues:function(currNode,values){
+		if(values.hasOwnProperty('tags')){
+			var nodeList = currNode.getElementsByTagName ('tags');
+			var tagsNode;
+			if(nodeList.length > 0){
+				tagsNode = nodeList[0];
+			}
+			if(!tagsNode){
+				return;
+			}
+			this.tagging.populateValues(tagsNode);
+			this.tagging.setValueForKey('points',this.getFieldValue('points'));
+			delete values['points'];
+			delete values['tags'];
+		}
+		return values;
+	}
 	
 	,drawChildren:function(){
 		var currSSel =$('<div>');
@@ -2713,6 +2882,7 @@ divi.question = divi.extend(divi.element,{
 	}
 	
 	,submit:function(scope,form,event){
+		$.showLoader();
 		if(scope.isNew){
 			var key = divi.question.prototype.table;
 			var lookupKey = this.pluralize(key);
@@ -2803,20 +2973,12 @@ divi.question = divi.extend(divi.element,{
 	,prepareForm:function(appendElem,showToggle){
 		if(this.isReference){
 			divi.elementbase.prototype.prepareForm.call(this,appendElem,showToggle);
+		}else if(this.isTagging){
+			divi.tags.prototype.prepareForm.call(this,appendElem);
 		}else{
-			appendElem =  appendElem.find('.contentElem');
-			appendElem.append('<div>Difficulty Level</div>');
-			dom =  this.doms[this.divs.rating] = divi.domBase.create({tag:'div','class':'rating',scope:this},appendElem);
-			var ptsField = new divi.form.numberfield({name:"points",value:this.getFieldValue('points'),defaultCss:'formfield points',"desc": "points",scope:this,listeners:{'change':[this.onpointsChange]}});
-			divi.domBase.append(appendElem,ptsField.dom);
 			var aCls = this.checkMax() ? 'disabled' : '';
 			appendElem.append('<div class="'+this.optionsKey+'"><a class="'+aCls+'">+Add More Options</a></div>');
 		}
-	}
-	
-	,onpointsChange:function(event,targetVal,target){
-		var scope = event.data.scope.scope;
-		scope.setValueForKey('points',targetVal);
 	}
 	
 	,attachpostContent:function(appendTo,showToggle){
@@ -2828,17 +2990,12 @@ divi.question = divi.extend(divi.element,{
 		return (this.maxansCnt && this.elems.length >= this.maxansCnt); 
 	}
 	
-	,updateRating:function(value){
-		var values = this.getValues();
-		values['difficulty'] = value;
-		this.setValues(values);
-	}
-	
 	,initiateRating:function(){
-		var scope = this;
-		difficulty = this.getFieldValue('difficulty') || 0;
-		$(".rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:difficulty,
-				click: function(value, rating){rating.rate(value);scope.updateRating(value);}});
+		var scope = this.tagging;
+		$(".diff.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('difficulty') || 0),
+				click: function(value, rating){rating.rate(value);scope.updateRating(value,'difficulty');}});
+		$(".level.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('languageLevel') || 0),
+			click: function(value, rating){rating.rate(value);scope.updateRating(value,'languageLevel');}});
 	}
 
 	,addAnswer:function(input,child){
@@ -2922,7 +3079,7 @@ divi.question = divi.extend(divi.element,{
 			var elemId,eachElem;
 			var elements = scope.elems;
 			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+scope.getFieldValue('points')+'"/>');
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+scope.tagging.getFieldValue('points')+'"/>');
 			this.getPersistValues(dom,null,false,'html');
 			
 			var ops = dom.createElement(this.optionsKey);
@@ -2959,6 +3116,7 @@ divi.answer = divi.extend(divi.element,{
 	ignoreFields:['id','isAnswer','thumb','references','data'],
 	listeners:{},
 	btnListeners:{},
+	listernsAttchd:false,
 	evtDflts:{attachLis:true,events:['change','mouseout','keypress']},
 	doms:{},
 	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv'},
@@ -2967,10 +3125,11 @@ divi.answer = divi.extend(divi.element,{
 	editorKey:undefined,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		this.btnListeners = {};
 		divi.answer.superclass.constructor.call(this);
-		this.listeners = {};
-		this.doms = {};
+		this.btnListeners = {};this.listeners = {};this.doms = {};
+	}
+	
+	,attachfieldListeners:function(){
 		this.btnListeners = {'click':[this.removeAns]};
 		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
 		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
@@ -3111,7 +3270,15 @@ divi.answer = divi.extend(divi.element,{
 		$(button.dom).attr('id',button.id);
 	}
 	
+	,checkAndAttachLis:function(){
+		if(!this.listernsAttchd){
+			this.listernsAttchd = true;
+			this.attachfieldListeners();
+		}
+	}
+	
 	,draw:function(append){
+		this.checkAndAttachLis();
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var isAnswer = this.getFieldValue("isAnswer");
@@ -3168,6 +3335,7 @@ divi.torfAns = divi.extend(divi.answer,{
 	}
 
 	,draw:function(append,index){
+		this.checkAndAttachLis();
 		var values = this.getValues();
 		var isAnswer = this.getFieldValue("isAnswer");
 		var fieldCount = this.getFieldCount();
@@ -3197,6 +3365,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		this.doms = {};
+		this.listeners = {};
 		divi.fill_blankAns.superclass.constructor.call(this);
 	}
 	
@@ -3222,6 +3391,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	}
 	
 	,draw:function(append,index){
+		this.checkAndAttachLis();
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this,tabIndex:fieldCount++},append);
@@ -3241,10 +3411,8 @@ divi.labelingAns = divi.extend(divi.answer,{
 	table:'labelingAns',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		divi.labelingAns.superclass.constructor.call(this);
 		this.listeners = {};
-		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
-		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
+		divi.labelingAns.superclass.constructor.call(this);
 	}
 
 	,draw:function(append,index){
@@ -3290,10 +3458,8 @@ divi.matchAns = divi.extend(divi.answer,{
 	divs:{'left':'left','right':'right','main':'main'},
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		divi.matchAns.superclass.constructor.call(this);
+		divi.matchAns.superclass.constructor.call(this);	
 		this.listeners = {};
-		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
-		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
 
 	,addAddValues:function(dom,childdom,values,parent){
@@ -3334,6 +3500,7 @@ divi.matchAns = divi.extend(divi.answer,{
 	}
 
 	,draw:function(append,index){
+		this.checkAndAttachLis();
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);

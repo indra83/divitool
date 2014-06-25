@@ -278,6 +278,25 @@ div.answerDiv textarea.answer{
 	display:none;
 }
 
+.metro .thirddiv .chosen-container{
+	width:0px;
+	min-width:80%;
+	min-height: 20px;
+	text-align: left;
+}
+
+.metro .tab-control .frames .frame.tabs.tagging{
+	min-height:300px;
+}
+
+.metro .tab-control .frames .frame.tabs.tagging label{
+	font-size:13px;
+}
+
+.metro .tab-control .frames .frame.tabs.tagging div.thirddiv,.metro .tab-control .frames .frame.tabs.tagging div.seconddiv,.metro .tab-control .frames .frame.tabs.tagging div.firstdiv{
+	height:70px;
+}
+
 .input-control .chosen-container{
 	width:0px;
 	min-width:300px;
@@ -862,11 +881,11 @@ div.editableDiv.answer {
 }
 
 .metro div.formfield.points{
-	width: 40%;
+	width: 18%;
 }
 
 .metro div.formfield.points label.labelStyle {
-	width: 40px;
+	width: 46px;
 }
 
 .metro div.formfield.points .input-control.text .btn-clear{
@@ -876,6 +895,19 @@ div.editableDiv.answer {
 
 .metro div.formfield.points div.input-control input {
 	width: 50px;
+}
+
+.metro .tab-control .frames .firstdiv div{
+	display:inline-block;
+	vertical-align: top;
+}
+
+.metro .tab-control .frames .firstdiv div.elemDom{
+	width: 30%;
+}
+
+.metro div.bloomsdiv label{
+	margin-right:30px;
 }
 
 .modal_close { position: absolute; top: 12px; right: 12px; display: block; width: 14px; height: 14px; background: url(../img/modal_close.png); z-index: 2; }

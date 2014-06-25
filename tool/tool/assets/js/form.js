@@ -1501,7 +1501,11 @@ divi.formPanel = divi.extend(divi.panelBase,{
 				}
 			}
 		}
-		
+	}
+	
+	,invokeComboListener:function(refDom,element,data,form){
+		$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',refId:refDom.id,data:data[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:form.rendered,scope:element,isMultiple:element.isMultiple});
+		divi.eventBase.addListeners({events:element.events,scope:element,tag:'select',ref:refDom.id,listeners:element.listeners});
 	}
 	
 	,afterFormRender: function(){
@@ -1512,11 +1516,10 @@ divi.formPanel = divi.extend(divi.panelBase,{
     		if(element && element.type == "combofield") {
     			var handler = element.listener ? element.origListener : element.name;
     			var refDom = element.doms[element.inputdom];
-    			if(refDom){
-    				$.prepareCombo({defaultText : 'Select a Value',tag : element.listener+'DD',refId:refDom.id,data:comboData[element.name],name : element.name,listener:element.listener, minWidth:"176",rendered:this.scope.rendered,scope:element});
-        			divi.eventBase.addListeners({events:element.events,scope:element,tag:'select',ref:refDom.id,listeners:element.listeners});
+    			var form = this.scope;
+    			if(refDom && form){
+    				form.invokeComboListener(refDom,element,comboData,form);
     			}
-    			
     		}
     		else if(element && element.type=="datefield"){
 				  $("."+element.name+'_date').customDatePicker({format:"yyyy-mm-dd"});
