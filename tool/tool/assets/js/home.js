@@ -191,6 +191,7 @@ divi.appBase = divi.extend(divi.base, {
 	comboMaster:{},
 	listenerKey:'editor',
 	tabsKey:'tabs',
+	tagsData:{},
 	htmlValKey:undefined,
 	getFileAction:'/getfiles',
 	toolbarCls:'.toolbarCls',
@@ -208,6 +209,7 @@ divi.appBase = divi.extend(divi.base, {
     	$.extend(this, cfg);
     	this.data = {};
     	this.values = {};
+    	this.tagsData = {};
     	divi.appBase.superclass.constructor.call(this);
         this.startup();
     }
@@ -272,6 +274,23 @@ divi.appBase = divi.extend(divi.base, {
 		  	{description:"GNU Free License",id:"GNU Free License"}];
 		this.setData({'license':licenseData},true);
 	}
+	
+	,readTags:function(data){
+		var tags_json = {};
+		var tagsData = [];
+		if(data){
+			tags_json = JSON.parse(data);
+			for(var eachEntry in tags_json){
+				if(tags_json.hasOwnProperty(eachEntry)){
+					tagsData.push({id:tags_json[eachEntry]['id'],description:tags_json[eachEntry]['name']});
+				}
+			}
+		}
+		this.setTagsData(tagsData);
+		if($.isEmptyObject(this.getData()['tags'])){
+			this.setData({'tags':this.getTagsData},true);
+		}
+	}
      
 	,assessTypeData:function(){
 		var typeData = [{description:"Test",id:"test"},
@@ -333,6 +352,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.boxInfoData();
 			this.difficultData();
 			this.assessTypeData();
+			this.setData({'tags':this.getTagsData()},true);
 		}
 	}
 	
@@ -387,6 +407,14 @@ divi.appBase = divi.extend(divi.base, {
 	,getData:function(){
 		return divi.appBase.prototype.data;
 	}
+	
+	,setTagsData:function(values){
+		divi.appBase.prototype.tagsData = values;
+	}
+	
+	,getTagsData:function(){
+		return divi.appBase.prototype.tagsData;
+	}	
 	
 	,getComboMaster:function(){
 		return divi.appBase.prototype.comboMaster;
@@ -1427,7 +1455,7 @@ divi.tags = divi.extend(divi.elementbase,{
 		thirddiv.append("<label>Related Topics: </label>");
 		elem = this.doms[this.divs.tags] || divi.domBase.create(inptDflts,thirddiv);
 		$(elem.dom).attr('id',elem.id);
-		var selElem = {name:"license","listener": "tags",events:['change'],scope:this,listeners:{'change':[this.ontagsChange]},isMultiple:true};
+		var selElem = {name:"tags","listener": "tags",events:['change'],scope:this,listeners:{'change':[this.ontagsChange]},isMultiple:true};
 		divi.formPanel.prototype.invokeComboListener.call(this,elem.dom,selElem,this.getData(),elem)
 		$(elem.dom.firstChild).val(this.getFieldValue('tags')).trigger('chosen:updated');
 		
@@ -1967,6 +1995,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	idPrefix:undefined,
 	idCount:undefined,
 	masterFile:'master.json',
+	tagFile:'tags.json',
 	events:['click','contextmenu'],
 	treeKey:'tree',
 	cmSelector:undefined,
@@ -4478,9 +4507,17 @@ divi.home =  divi.extend(divi.appBase,{
 		}
 	}
 	
+	,tagsreadFail:function(r){
+		if(r.status == "404"){
+		}else{
+			alert("Unable to read the book. Please contact administrator");
+		}
+	}
+	
 	,loadBook:function(){
 		var scope = this;
 		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
+		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.tagFile)}).done(function (data) {scope.readTags(data);}).fail(function (data) {scope.tagsreadFail(data);});
 	}
 	
 	,defaultListeners:function(){
