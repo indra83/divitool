@@ -597,6 +597,7 @@ divi.appBase = divi.extend(divi.base, {
 			}
 			this.attachEditorContent(sel,editors);
 			var params = this.prepareEditorParams(editors);
+			$.extend(params,{parent:this});
 			if(!this.editor){
 				this.editor = new divi.contentEditor(params);
 			}else{
@@ -1515,9 +1516,9 @@ divi.tags = divi.extend(divi.elementbase,{
 	
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
-			childdom.setAttribute('blooms', values['blooms']);
-			childdom.setAttribute('difficulty', values['difficulty']);
-			childdom.setAttribute('languageLevel', values['languageLevel']);
+			childdom.setAttribute('blooms', values['blooms'] || 0);
+			childdom.setAttribute('difficulty', values['difficulty'] || "Remember");
+			childdom.setAttribute('languageLevel', values['languageLevel'] || 0);
 		}
 	}
 	
@@ -2767,7 +2768,7 @@ divi.question = divi.extend(divi.element,{
 	editors:{},
 	answerKey:'answer',
 // /noreference:true,
-	ignoreFields:['data','references','id','version','type','_elemCount','points','tags'],
+	ignoreFields:['data','references','id','version','type','_elemCount','points','tags','license','source','name','url'],
 	table:'question',
 	htmlValKey:'data',
 	idCount:1,
@@ -3110,7 +3111,7 @@ divi.question = divi.extend(divi.element,{
 			var elemId,eachElem;
 			var elements = scope.elems;
 			var files = [];
-			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+scope.tagging.getFieldValue('points')+'"/>');
+			var dom = jsxml.fromString('<?xml version="1.0" encoding="UTF-8"?><question version="1" id="' + scope.getFieldValue('id')+ '" type = "'+scope.getFieldValue('type') + '" _elemCount = "'+scope.getFieldValue('_elemCount') + '" points = "'+(scope.tagging.getFieldValue('points') || 1)+'"/>');
 			if(this.tagging){
 				this.tagging.getPersistValues(dom,null);
 			}
@@ -3150,7 +3151,7 @@ divi.answer = divi.extend(divi.element,{
 	listeners:{},
 	btnListeners:{},
 	listernsAttchd:false,
-	evtDflts:{attachLis:true,events:['change','mouseout','keypress']},
+	evtDflts:{attachLis:true,events:['change','mouseout','keypress','click']},
 	doms:{},
 	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv'},
 	idCount:1,
@@ -3164,7 +3165,7 @@ divi.answer = divi.extend(divi.element,{
 	
 	,attachfieldListeners:function(){
 		this.btnListeners = {'click':[this.removeAns]};
-		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener]};
+		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener],'click':[this.changeListener]};
 		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
 	
@@ -3395,6 +3396,7 @@ divi.torfAns = divi.extend(divi.answer,{
 divi.fill_blankAns = divi.extend(divi.answer,{
 	ignoreFields:['id','data'],
 	table:'fill_blankAns',
+	toolbarDisabled:false,
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		this.doms = {};
@@ -3404,6 +3406,16 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	
 	,changeListener:function(event,val,jTarget,type,target){
 		this.setValueForKey(this.htmlValKey,val);
+		this.disableToolbar(event);
+	}
+
+	,disableToolbar:function(event){
+		if(event.type =="click"){
+			var baseEditor = this.parent.editor;
+			if(baseEditor){
+				baseEditor.disableToolbar();
+			}
+		}
 	}
 	
 	,addAddValues:function(dom,childdom,values,parent){
@@ -3700,8 +3712,10 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	activeKey:undefined,
 	toolbar:undefined,
 	activeEditor:undefined,
+	toolbarDisabled:false,
 	events:'click',
 	value:'',
+	parent:undefined,
 	filesList:{},
 	sel:undefined,
 	listeners:{},
@@ -3784,7 +3798,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	}
 	
 	,activateToolBar:function(scope,refKey){
-		if(!scope.activeKey || scope.activeKey != refKey){
+		if(!scope.activeKey || scope.activeKey != refKey || this.toolbarDisabled){
 			scope.removeActiveToolbar.call(scope);
 			scope.activeKey = refKey;
 			scope.activeEditor = scope.getEditorsForKey(refKey);
@@ -3838,6 +3852,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,disableToolbar:function(){
 		var toolbar = this.getSelector(this.btnToolbar);
 		toolbar.prepend("<div class='"+this.dsbltoolbar+"'></div>");
+		this.toolbarDisabled = true;
 	}
 	
 	,startup:function(){
