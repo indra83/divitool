@@ -1,15 +1,16 @@
 divi.namespace("divi.app");
 divi.app.book = new divi.pageBase({
 	 fieldconfig:function(){
-		 return [{name:"license", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},
-		        {name:"name", "desc": "Author Name/Organization Name", "type": "textfield","isRequired": true},
-		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield","isRequired": true},
+		 return [/*{name:"license", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},*/
+		        {name:"name", "desc": "Author Name/Organization Name", "type": "textfield"},
+		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield"},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
 		 	    {name:"overview", "desc": "overview", "type": "textfield",hidden:true},
-		 	    {name:"version", "desc": "Book Version", "type": "numberfield",hidden:true,value:'1.0'},
-		 	    {name:"bookId", "desc": "Book Version", "type": "numberfield",hidden:true},
-		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",hidden:true,value:'1.0'},
-		         {name:"_count", "desc": "count", "type": "numberfield",hidden:true}
+		 	    {name:"version", "desc": "Book Version", "type": "numberfield",value:'1'},
+		 	    {name:"bookId", "desc": "Book Id", "type": "numberfield","isRequired": true},
+		 	    {name:"courseId", "desc": "Course Id", "type": "numberfield","isRequired": true},
+		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",value:'1',"isRequired": true},
+		        {name:"_count", "desc": "count", "type": "numberfield",hidden:true}
 		 	  ];
 	}
 });
@@ -29,8 +30,8 @@ divi.app.assessment = new divi.pageBase({
 		 return [{name:"chapter", "desc": "Chapter", "type": "combofield","isRequired": true,"listener":"chapter",listeners:{'change':divi.appBase.prototype.updateId}},
 		         {name:"id", "desc": "Assessment ID", "type": "numberfield","isRequired": true,isReadOnly:true},
 		         {name:"name", "desc": "Assessment Name", "type": "textfield","isRequired": true,focus:true},
-		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type"},
-		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty"},
+		         {name:"type", "desc": "Type",  "type": "combofield","listener": "type","isRequired": true,value:"quiz"},
+		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty",value:"easy"},
 		         {name:"time", "desc": "Time (in minutes)", "type": "numberfield","isRequired": true},
 		         {name:"_elemCount", "desc": "elemCount", "type": "numberfield",hidden:true}];
 	}

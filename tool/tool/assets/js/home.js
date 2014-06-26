@@ -2381,6 +2381,13 @@ divi.book = divi.extend(divi.bookBase,{
 		}
 	}
 	
+	,modifyForm:function(formPanel){
+		if(formPanel){
+			formPanel.setReadOnly();
+		}
+	}
+	
+	
 	,prepareSideBar:function(parent){
 		var navDiv,ulDiv;
 		navDiv = this.doms[this.divs['navDiv']] = divi.domBase.create(this.navDflts,parent);
@@ -4373,6 +4380,7 @@ divi.home =  divi.extend(divi.appBase,{
 	parent:undefined,
 	selected:undefined,
 	book:undefined,
+	firstLoad:true,
 	editors:1,
 	callback:undefined,
 	editContent:'.titleHolder',
@@ -4513,8 +4521,16 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,loadBook:function(){
 		var scope = this;
-		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
-		$.ajax({url: divi.core.prepareUrl(this.getFileAction,this.book.tagFile)}).done(function (data) {scope.readTags(data);}).fail(function (data) {scope.tagsreadFail(data);});
+		var timest = (new Date()).getTime();
+		var masterFile = this.book.masterFile;
+		var tagFile = this.book.tagFile;
+		if(this.firstLoad){
+			masterFile += "?time="+timest;
+			tagFile += "?time="+timest;
+			this.firstLoad = false;
+		}	
+		$.ajax({url: divi.core.prepareUrl(this.getFileAction,masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
+		$.ajax({url: divi.core.prepareUrl(this.getFileAction,tagFile)}).done(function (data) {scope.readTags(data);}).fail(function (data) {scope.tagsreadFail(data);});
 	}
 	
 	,defaultListeners:function(){
