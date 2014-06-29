@@ -1004,7 +1004,7 @@ divi.appBase = divi.extend(divi.base, {
 	}
 	
 	,readFile:function(data){
-		var topicChild = data.firstChild;
+		var topicChild = data? data.firstChild : undefined;
 		if(topicChild){
 			var selected = this;
 			var parentCont = this.getSelector(this.contentPreview);
@@ -1580,7 +1580,7 @@ divi.element = divi.extend(divi.elementbase,{
 	
 	,addMoreClick:function(e){
 		var scope = e.data.scope;
-		scope.attachElement(scope.appendElem, scope.showToggle,scope.elems.length+1);
+		scope.attachElement(scope.appendElem, scope.showToggle,scope.elems.length+1,null,true);
 	}
 	
 	,attachCloseLis:function(elem,imageElem){
@@ -1898,6 +1898,14 @@ divi.imageset = divi.extend(divi.element,{
 				elem.getPersistValues(dom,child,true,'item');
 			}
 		}
+		var children = child.children,childDom;
+		for(var index = 0;index < children.length;index++){
+			var key = children[index];
+			childDom = $(key);
+			childDom.removeAttr('allowfullscreen');
+			childDom.removeAttr('showborder');
+			childDom.find('title').remove();
+		}
 	}
 	
 	,prepareSubmitValues:function(scope,form){
@@ -1957,10 +1965,14 @@ divi.imageset = divi.extend(divi.element,{
 		elem.showContent(parentDom,showToggle,index+1);
 		elem.formPanel.setValue('id', elem.guid());
 		elem.formPanel.hideField('id');
+		elem.formPanel.hideField('title');
+		elem.formPanel.relaxRequired('title');
+		elem.formPanel.hideField('allowFullscreen');
+		elem.formPanel.relaxRequired('allowFullscreen');
+		elem.formPanel.hideField('showBorder');
+		elem.formPanel.relaxRequired('showBorder');
 		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
 	}
-	
-	
 	
 });
 
