@@ -1701,6 +1701,7 @@ divi.html = divi.extend(divi.element,{
 	table:'html',
 	htmlValKey:'data',
 	idCount:1,
+	supressFields:['boxType','boxTitle'],
 	editor:undefined,
 	idPrefix:'html',
 	constructor: function (cfg) {
@@ -1761,6 +1762,14 @@ divi.html = divi.extend(divi.element,{
             cdata = dom.createCDATASection(unescape(dataF));
             data.appendChild(cdata);
             child.appendChild(data);
+		}
+		
+		var children = child.children;
+		for(var index = 0;index < children.length;index++){
+			var key = children[index];
+			if(this.supressFields.contains(key.nodeName) && !key.textContent){
+				//child.children.splice();
+			}
 		}
 	}
 	
@@ -4199,6 +4208,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	}
 	
 	,cleanHTML:function(input) {
+		  var input = this.cleanStyles(input);
 		  // 1. remove line breaks / Mso classes
 		  var stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g; 
 		  var output = input.replace(stringStripper, ' ');
@@ -4221,16 +4231,29 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		    output = output.replace(tagStripper, '');
 		  }
 		  // 5. remove attributes ' style="..."'
-		  var badAttributes = ['style', 'start'];
+		  var badAttributes = ['start'];
 		  for (var i=0; i< badAttributes.length; i++) {
-			 if('style' == badAttributes[i]){
-				 var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?(text-align))"','gi');
-			 }else{
-				 var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?)"','gi');
-			 }
-		    output = output.replace(attributeStripper, '');
+			  var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?)"','gi');
+			  output = output.replace(attributeStripper, '');
 		  }
 		  return output;
+	}
+	
+	,cleanStyles:function(output){
+		var elemDom = $('<div>').append(output);
+		var elems = elemDom.find("[style]");
+		var eachElem;
+		elems.each(function() {
+			eachElem = $(this);
+			if(eachElem.css('text-align')){
+				var key = eachElem.css('text-align');
+				eachElem.removeAttr('style');
+				eachElem.css('text-align',key);
+			}else{
+				eachElem.removeAttr('style');
+			}
+		});
+		return elemDom.html();
 	}
 	
 	,updateInlineFiles:function(value,files){
