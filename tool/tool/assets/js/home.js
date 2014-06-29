@@ -597,7 +597,6 @@ divi.appBase = divi.extend(divi.base, {
 			}
 			this.attachEditorContent(sel,editors);
 			var params = this.prepareEditorParams(editors);
-			$.extend(params,{parent:this});
 			if(!this.editor){
 				this.editor = new divi.contentEditor(params);
 			}else{
@@ -3715,7 +3714,6 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	toolbarDisabled:false,
 	events:'click',
 	value:'',
-	parent:undefined,
 	filesList:{},
 	sel:undefined,
 	listeners:{},
@@ -3749,6 +3747,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		$.extend(this,cfg);
 		divi.contentEditor.superclass.constructor.call(this);
 		this.initialize();
+		//document.execCommand('useCSS', false, false);
 	}
 	
 	,removeEditor:function(key){
@@ -3814,10 +3813,147 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	,execCommand:function (commandWithArgs, valueArg) {
 		var commandArr = commandWithArgs.split(' '),command = commandArr.shift(),args = commandArr.join(' ') + (valueArg || '');
 		document.execCommand(command, 0, args);
+		//this.getSelectionHtml();
 		var par = this.parent ? this.parent : this;
 		par.updateToolbar();
 	}
 	
+	/*,getSelectionHtml:function() {
+	    var html = "";
+	    if (typeof window.getSelection != "undefined") {
+	        var sel = window.getSelection();
+	        if (sel.rangeCount) {
+	            var container = document.createElement("div");
+	            for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+	                container.appendChild(sel.getRangeAt(i).cloneContents());
+	                sel.getRangeAt(i).deleteContents(true);
+	            }
+	            html = container.innerHTML;
+	        }
+	    } else if (typeof document.selection != "undefined") {
+	        if (document.selection.type == "Text") {
+	            html = document.selection.createRange().htmlText;
+	        }
+	    }
+	   this.replaceSelectionWithHtml(this.cleanHTML(html));
+	}*/
+	
+	// removes MS Office generated guff
+	
+	
+	/*,replaceSelectionWithHtml:function(html) {
+	    var range, html;
+	    if (window.getSelection && window.getSelection().getRangeAt) {
+	        range = window.getSelection().getRangeAt(0);
+	        range.deleteContents(true);
+	       var div = document.createElement("div");
+	        div.innerHTML = html;
+	        var frag = document.createDocumentFragment(), child;
+	        while ( (child = div.firstChild) ) {
+	            frag.appendChild(child);
+	        }
+	        range.insertNode(frag);
+	    } else if (document.selection && document.selection.createRange) {
+	        range = document.selection.createRange();
+	        html = (node.nodeType == 3) ? node.data : node.outerHTML;
+	        range.pasteHTML(html);
+	    }
+	}
+	*/
+	,restoreSelection:function () {
+		var scope = this;
+		var selection = window.getSelection();
+		if(scope.editor){
+			var selectedRange = scope.selectedRange;
+			if (selectedRange) {
+				try {
+					selection.removeAllRanges();
+				} catch (ex) {
+					document.body.createTextRange().select();
+					document.selection.empty();
+				}
+	
+				selection.addRange(selectedRange);
+			}
+		}
+	}
+	
+	
+	
+	/*,getSel: function () {
+	     var e = window;
+	     return e.getSelection ? e.getSelection() : e.document.selection
+	}
+	
+	,getRoot: function () {
+	      var e = this,dom;
+	      if(this.activeKey){
+	    	  var first = editor.getEditorsForKey(this.editorKey);
+	    	  dom = first.editor;
+	      }
+	      return dom;
+	}
+	
+	,processSel:function(){
+		 var t, n,x = this;
+		 t = x.getParent(this.getNode(), "ol,ul"), t && (n = t.parentNode, /^(H[1-6]|P|ADDRESS|PRE)$/.test(n.nodeName) && (b(), x.split(n, t), C()))
+	}
+	  
+	,getNode:function(){
+		var t = this,
+        n = t.getRng(),
+        r, i = n.startContainer,
+        o = n.endContainer,
+        a = n.startOffset,
+        s = n.endOffset;
+		return n ? n.setStart ? (r = n.commonAncestorContainer, !n.collapsed && (i == o && 2 > s - a && i.hasChildNodes() && (r = i.childNodes[a]), 3 === i.nodeType && 3 === o.nodeType && (i = i.length === a ? e(i.nextSibling, !0) : i.parentNode, o = 0 === s ? e(o.previousSibling, !1) : o.parentNode, i && i === o)) ? i : r && 3 == r.nodeType ? r.parentNode : r) : n.item ? n.item(0) : n.parentElement() : t.getRoot()
+	}
+	
+	 ,getParent: function (e, t, n) {
+	     return this.getParents(e, t, n, !1)
+	 }
+	 
+	 ,get: function (e) {
+         var t;
+         return e && this.doc && "string" == typeof e && (t = e, e = this.doc.getElementById(e), e && e.id !== t) ? this.doc.getElementsByName(t)[1] : e
+     }
+	 
+  	 ,getParents: function (e, n, r, i) {
+	      var o = this,t,
+	          a, s = [];
+	      for (e = o.get(e), i = i === t, r = r || ("BODY" != o.getRoot().nodeName ? o.getRoot().parentNode : null), d(n, "string") && (a = n, n = "*" === n ? function (e) {
+	          return 1 == e.nodeType
+	      } : function (e) {
+	          return o.is(e, a)
+	      }); e && e != r && e.nodeType && 9 !== e.nodeType;) {
+	          if (!n || n(e)) {
+	              if (!i) return e;
+	              s.push(e)
+	          }
+	          e = e.parentNode
+	      }
+	      return i ? s : null
+	  }
+	 
+	,getRng: function (e) {
+       var t = this,n, r, i, o = window.document,a;
+       if (!e && t.lastFocusBookmark) {
+           var s = t.lastFocusBookmark;
+           return s.startContainer ? (r = o.createRange(), r.setStart(s.startContainer, s.startOffset), r.setEnd(s.endContainer, s.endOffset)) : r = s, r
+       }
+     //  if (e && t.tridentSel) return t.tridentSel.getRangeAt(0);
+       try {
+           (n = t.getSel()) && (r = n.rangeCount > 0 ? n.getRangeAt(0) : n.createRange ? n.createRange() : o.createRange())
+       } catch (l) {}
+       if (r && r.setStart) {
+           try {
+               a = o.selection.createRange()
+           } catch (l) {}
+           a && a.item && (i = a.item(0), r = o.createRange(), r.setStartBefore(i), r.setEndAfter(i))
+       }
+       return r || (r = o.createRange ? o.createRange() : o.body.createTextRange()), r.setStart && 9 === r.startContainer.nodeType && r.collapsed && (i = t.getRoot(), r.setStart(i, 0), r.setEnd(i, 0)), t.selectedRange && t.explicitRange && (0 === r.compareBoundaryPoints(r.START_TO_START, t.selectedRange) && 0 === r.compareBoundaryPoints(r.END_TO_END, t.selectedRange) ? r = t.explicitRange : (t.selectedRange = null, t.explicitRange = null)), r
+   }
+	*/
 	,resetToolBar:function () {
 		if (this.activeToolbarClass) {
 			var scope = this;
@@ -4058,8 +4194,43 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	,getValue:function(rtnScope,callback,key){
 		var val = "";
 		if(this.editor){
-			this.saveinlineImages(rtnScope,this.editor.html(),callback,key);
+			this.saveinlineImages(rtnScope,this.cleanHTML(this.editor.html()),callback,key);
 		}
+	}
+	
+	,cleanHTML:function(input) {
+		  // 1. remove line breaks / Mso classes
+		  var stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g; 
+		  var output = input.replace(stringStripper, ' ');
+		  // 2. strip Word generated HTML comments
+		  var commentSripper = new RegExp('<!--(.*?)-->','g');
+		  var output = output.replace(commentSripper, '');
+		  var tagStripper = new RegExp('<(/)*(meta|link|span|\\?xml:|st1:|o:|font)(.*?)>','gi');
+		  // 3. remove tags leave content if any
+		  output = output.replace(tagStripper, '');
+		  // 4. Remove everything in between and including tags '<style(.)style(.)>'
+		  var badTags = ['style', 'script','applet','embed','noframes','noscript'];
+		  
+		  for (var i=0; i< badTags.length; i++) {
+		    tagStripper = new RegExp('<'+badTags[i]+'.*?'+badTags[i]+'(.*?)>', 'gi');
+		    output = output.replace(tagStripper, '');
+		  }
+		  var emptytags = ['blockquote', 'b','i','strong','s','u'];
+		  for (var i=0; i< emptytags.length; i++) {
+		    tagStripper = new RegExp('<'+emptytags[i]+'></'+emptytags[i]+'>', 'gi');
+		    output = output.replace(tagStripper, '');
+		  }
+		  // 5. remove attributes ' style="..."'
+		  var badAttributes = ['style', 'start'];
+		  for (var i=0; i< badAttributes.length; i++) {
+			 if('style' == badAttributes[i]){
+				 var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?(text-align))"','gi');
+			 }else{
+				 var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?)"','gi');
+			 }
+		    output = output.replace(attributeStripper, '');
+		  }
+		  return output;
 	}
 	
 	,updateInlineFiles:function(value,files){
@@ -4156,24 +4327,6 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    }
 	}
 	
-	,restoreSelection:function () {
-		var scope = this;
-		var selection = window.getSelection();
-		if(scope.editor){
-			var selectedRange = scope.selectedRange;
-			if (selectedRange) {
-				try {
-					selection.removeAllRanges();
-				} catch (ex) {
-					document.body.createTextRange().select();
-					document.selection.empty();
-				}
-	
-				selection.addRange(selectedRange);
-			}
-		}
-	}
-	
 	
 	,activate:function(){
 		if(this.editor){
@@ -4266,6 +4419,8 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.formula.destroy();
 		delete this.formula;
 	}
+	 
+	
 	
 	,updateFormula:function(html,range,oldDom){
 		if(html){

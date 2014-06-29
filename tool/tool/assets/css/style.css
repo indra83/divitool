@@ -906,6 +906,13 @@ div.editableDiv.answer {
 	width: 30%;
 }
 
+.metro .ui-dialog blockquote,.metro .bookcontent blockquote {
+  margin: 0 0 0 40px;
+  padding: 0;
+  border-left: 0;
+  padding-left: 10px;
+}
+
 .metro div.bloomsdiv label{
 	margin-right:30px;
 }
