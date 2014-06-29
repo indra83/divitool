@@ -2,11 +2,10 @@ divi.namespace("divi.app");
 divi.app.book = new divi.pageBase({
 	 fieldconfig:function(){
 		 return [/*{name:"license", "desc": "License", "type": "combofield","isRequired": true,"listener":"license"},*/
-		        {name:"name", "desc": "Author Name/Organization Name", "type": "textfield"},
-		 	    {name:"title", "desc": "Name/ Title/ Afflication", "type": "textfield"},
+		        {name:"name", "desc": "Book Name", "type": "textfield"},
 		 	    {name:"url","desc": "Website URL", "type": "textfield"},
 		 	    {name:"overview", "desc": "overview", "type": "textfield",hidden:true},
-		 	    {name:"version", "desc": "Book Version", "type": "numberfield",value:'1'},
+		 	    {name:"version", "desc": "Book Version", "type": "numberfield",value:'1',"isRequired": true},
 		 	    {name:"bookId", "desc": "Book Id", "type": "numberfield","isRequired": true},
 		 	    {name:"courseId", "desc": "Course Id", "type": "numberfield","isRequired": true},
 		 	    {name:"orderNo", "desc": "Book Order", "type": "numberfield",value:'1',"isRequired": true},
@@ -105,7 +104,7 @@ divi.app.references = new divi.pageBase({
 
 divi.app.tags = new divi.pageBase({
 	fieldconfig:function(){
-		 return [{name:"blooms", "desc": "Blooms", "type": "combofield"},
+		 return [{name:"blooms", "desc": "Blooms", "type": "radio"},
 		         {name:"difficulty", "desc": "Difficulty", "type": "combofield","listener": "difficulty",hidden:true},
 		         {name:"languageLevel", "desc": "Language Level", "type": "textfield"},
 		         {name:"points", "desc": "points", "type": "numberfield"}
@@ -117,8 +116,8 @@ divi.app.audio = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"src", "desc": "Audio File", "type": "audiofield","isRequired": true},
 		         {name:"id", "desc": "Audio ID", "type": "textfield","isRequired": true,isReadOnly:true},
-		         {name:"title", "desc": "Title", "type": "textfield"},
-		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true}];
+		         {name:"title", "desc": "Title", "type": "textfield","isRequired": true},
+		         {name:"description", "desc": "Description", "type": "textfield"}];
 	}
 });
 
@@ -141,8 +140,8 @@ divi.app.video = new divi.pageBase({
 		 return [{name:"src", "desc": "Video File", "type": "videofield","isRequired": true},
 		         {name:"thumb", "desc": "Thumbnail", "type": "imagefield","isRequired": true},
 		         {name:"id", "desc": "Video ID", "type": "textfield","isRequired": true,isReadOnly:true},
-		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
-		         {name:"title", "desc": "Title", "type": "textfield"}];
+		         {name:"title", "desc": "Title", "type": "textfield","isRequired": true},
+		         {name:"description", "desc": "Description", "type": "textfield"}];
 	}
 });
 
@@ -150,8 +149,8 @@ divi.app.image = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"src", "desc": "Image File", "type": "imagefield","isRequired": true},
 		         {name:"id", "desc": "Image ID", "type": "textfield","isRequired": true,isReadOnly:true},
-		         {name:"description", "desc": "Description", "type": "textfield","isRequired": true},
-		         {name:"title", "desc": "Title", "type": "textfield"},
+		         {name:"title", "desc": "Title", "type": "textfield","isRequired": true},
+		         {name:"description", "desc": "Description", "type": "textfield"},
 		         {name:"allowFullscreen","desc": "Allow FullScreen", "type": "bool"},
 		         {name:"showBorder","desc": "Show Border", "type": "bool"}];
 		 

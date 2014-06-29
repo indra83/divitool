@@ -1414,7 +1414,7 @@ divi.tags = divi.extend(divi.elementbase,{
 	evtDflts:{attachLis:true,events:['change']},
 	ignoreFields:['blooms','difficulty','languageLevel','points','tags'],
 	divs:{'diff':'diff','points':'points','level':'level','blooms':'blooms','tags':'tags'},
-	bloomsValues:['Remember','Understand','Apply','Analyze/Evaluate'],
+	bloomsValues:['None','Knowledge','Understanding','Application','Hots'],
 	doms:{},
 	blooms:{},
 	constructor: function (cfg) {
@@ -1473,7 +1473,7 @@ divi.tags = divi.extend(divi.elementbase,{
 		var bloomsdom = $('<div class="bloomsdiv"><label>Blooms: </label></div>');
 		var inptDflts = $.extend({tag:'input',type:"radio",scope:this,name:'blooms','data-transform':'input-control',listeners:{'change':[this.onbloomsChange]}},this.evtDflts);
 		var eachEntry,currdflts,elem;
-		var bloomsVal = this.getFieldValue('blooms');
+		var bloomsVal = this.getFieldValue('blooms') || "NONE";
 		for(var entry in this.bloomsValues){
 			if(this.bloomsValues.hasOwnProperty(entry)){
 				currdflts = {};
@@ -1481,7 +1481,7 @@ divi.tags = divi.extend(divi.elementbase,{
 				$.extend(currdflts,inptDflts);
 				eachEntry = this.bloomsValues[entry];
 				$.extend(currdflts,{'ref':eachEntry});
-				if(bloomsVal == eachEntry){
+				if(bloomsVal == eachEntry.toUpperCase()){
 					$.extend(currdflts,{'checked':'checked'});
 				}
 				elem = this.blooms[eachEntry] || divi.domBase.create(currdflts,bloomsdom);
@@ -1515,9 +1515,10 @@ divi.tags = divi.extend(divi.elementbase,{
 	
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
-			childdom.setAttribute('blooms', values['blooms'] || 0);
-			childdom.setAttribute('difficulty', values['difficulty'] || "Remember");
-			childdom.setAttribute('languageLevel', values['languageLevel'] || 0);
+			var bloomsVal = values['blooms'] || "None";
+			childdom.setAttribute('blooms',bloomsVal.toUpperCase());
+			childdom.setAttribute('difficulty', values['difficulty'] || 1);
+			childdom.setAttribute('languageLevel', values['languageLevel'] || 1);
 		}
 	}
 	
@@ -1965,7 +1966,7 @@ divi.imageset = divi.extend(divi.element,{
 
 divi.image = divi.extend(divi.element,{
 	tag:'img',
-	ignoreFields:['id','src','title','allowFullscreen','showBorder'],
+	ignoreFields:['id','src','allowFullscreen','showBorder'],
 	table:'image',
 	idCount:1,
 	idPrefix:'img',
@@ -3032,9 +3033,9 @@ divi.question = divi.extend(divi.element,{
 	
 	,initiateRating:function(){
 		var scope = this.tagging;
-		$(".diff.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('difficulty') || 0),
+		$(".diff.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('difficulty') || 1),
 				click: function(value, rating){rating.rate(value);scope.updateRating(value,'difficulty');}});
-		$(".level.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('languageLevel') || 0),
+		$(".level.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('languageLevel') || 1),
 			click: function(value, rating){rating.rate(value);scope.updateRating(value,'languageLevel');}});
 	}
 
