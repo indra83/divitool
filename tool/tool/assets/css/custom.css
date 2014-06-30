@@ -1,0 +1,87 @@
+.metro .image-button.image-left {
+  padding-right: 12px;
+  padding-left: 35px;
+ color:rgb(133,96,31)!important;
+
+
+
+}
+.main.fg-white.bg-drkbrown.titlePreview.xlarge.capsOn{
+  background-color: rgb(191,134,40)!important;
+}
+
+.metro .image-button.image-left.bg-diviplGray.fg-divigray{
+
+	color:#fff!important;
+}
+
+.main.fg-white.bg-drkbrown.titlePreview.xlarge.capsOn {
+background-color: rgb(191,134,40)!important;
+}
+
+.metro .vmiddle {
+position: relative;
+top: 25%;
+width: 100%;
+color: #fff;
+}
+
+.metro div, .metro span, .metro p {
+font-family: 'Open Sans Light';
+font-weight: normal;
+font-style: normal;
+color: rgb(142,142,142);
+
+}
+
+.metro .maintitle.imageSection.extralarge{
+padding-top:10px;
+
+padding-bottom:10px;}
+.metro .bookdiv.bg-divigray .vmiddle{padding-left:10px;}
+
+.metro nav.compact .shortcut.link {
+border-right: 1px #2e92cf solid;
+border-left: 0px;
+border-bottom: 0px;
+border-top: 0px;
+
+
+height:75px;
+
+text-decoration: none !important;
+}
+
+.metro .bg-diviplblue {
+background-color: #E7F4FA !important;
+height: 75px;
+padding: 0px!important;
+}
+
+.metro .buttonsSection.dottedLine{height:30px ;line-height:30px;}
+
+.metro .imageSection.contentPreview{padding:10px;text-align:center;line-height:20px;}
+
+.metro .imageSection.bookoverview.imageSection{padding:0px;text-align:left;line-height:50px;}
+.metro .imageSection.bookoverview{padding:0px;text-align:left;line-height:50px;}
+
+.metro .btnBkOverview.button.success.large.capsOn{margin-left:260px;}
+
+
+
+.metro .sidebar.divi li.selected {
+border-right: 5px solid rgb(203,234,249);
+
+
+}
+
+.metro .sidebar.divi .slidedown-menu li a{background-color:tranparent;}
+.metro .sidebar.divi .slidedown-menu li.selected a:hover{background-color:rgb(218,231,236);}
+
+
+
+.metro .titleHolder{padding-left:10px;}
+.metro .previewElem{min-height:20%;}
+.metro ul.dropdown-menu li button.button-set{ height:35px;font-size:20px; background-color:rgb(218,231,236);padding:0px;color:rgb(52,37,193)}
+.metro ul.dropdown-menu [class*="icon-"]{ height:35px;font-size:20px; background-color:rgb(218,231,236);padding:0px;color:rgb(52,37,193)}
+.metro .container .titlePreview .rightsec.imageSection{height:50px; padding-top: 5px;padding-bottom: 5px;}
