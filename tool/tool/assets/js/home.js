@@ -2760,7 +2760,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 				xml = currData[questIds[eachKey]];
 				xmlDoc = $.parseXML(xml);
 				var quesChild = xmlDoc.firstChild;
-				if(quesChild){
+				if(quesChild && quesChild.children.length > 2){
 					var self = quesChild.children[1];
 					var answers = quesChild.children[2].children;
 					selected.elemes = [];// resetting the elems
@@ -4577,7 +4577,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 			}
 		}
 		if(toProcess){
-			var content = '<img src="%s"  text="%y""/>';
+			var content = '<img src="%s"  text="%y"/>';
 			content = content.replace('%s', val);
 			content = content.replace('%y', textVal);
 		}
