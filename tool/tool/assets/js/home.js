@@ -85,7 +85,7 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 	EQUATION_ENGINE = http + 'latex.codecogs.com';
 	FAVORITE_ENGINE = http + 'latex.codecogs.com/json';
 	EDITOR_SRC = http + 'latex.codecogs.com';
-	EMBED_ENGINE = 'formulaEditor1.html';
+	EMBED_ENGINE = 'formulaEditor.html';
 	EDIT_ENGINE = http + 'www.codecogs.com/eqnedit.php';
 	EDITOR_SW_FLASH = http
 			+ 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0';
