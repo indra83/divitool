@@ -2338,6 +2338,15 @@ divi.book = divi.extend(divi.bookBase,{
 		divi.book.superclass.constructor.call(this);
 	}
 	
+	,init:function(){
+		divi.bookBase.prototype.init.call(this);
+		this.preview();
+	}
+	
+	,preview:function(){
+		this.getSelector(this.contentPreview).empty().html(divi.tpl.book);
+	}
+
 	,getSaveHtmlLoc:function(){
 		return this.prepareBookPath(this,null,null,this.imageLoc);
 	}
@@ -4741,6 +4750,7 @@ divi.home =  divi.extend(divi.appBase,{
 	
 	,defaultListeners:function(){
 		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
+		        {tag:'.bkcover',listType:'click',mapTo:this.book,listenerFn:'drawitem'},
 		        {tag:'.btnBkOverview',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.bookEdit',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.addchapter',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
@@ -4761,6 +4771,12 @@ divi.home =  divi.extend(divi.appBase,{
 		}
 	}
 	
+	,drawitem:function(lstnCfg){
+		if(lstnCfg && lstnCfg.mapTo){
+			lstnCfg.mapTo.preview();
+			lstnCfg.mapTo.draw();
+		}
+	}
 	
 	,prepareFormUp:function(lstnCfg){
 		this.launchPopUp(lstnCfg.mapTo);
