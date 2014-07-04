@@ -4720,6 +4720,7 @@ divi.home =  divi.extend(divi.appBase,{
 			
 		}else{
 			this.getSelector(this.editContent).addClass('hidden');
+			this.getSelector(this.assessHolder).addClass('hidden');
 		}
 	}
 	
