@@ -203,7 +203,7 @@ divi.appBase = divi.extend(divi.base, {
 	imageLoc:"/htmlimages/",
 	data:{},
 	values:{},
-	dlgDflts:{shadow: true,overlay: false,icon: '',width: '100%',height:'100%',padding: 10,sysButtons: {btnClose: true}},
+	dlgDflts:{shadow: true,overlay: false,icon: '',width: '100%',height:'100%',padding: 10,sysButtons: {btnClose: true},overlayClickClose:false},
 	
     constructor: function (cfg) {
     	$.extend(this, cfg);
@@ -1290,7 +1290,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,enableEditList:function(scope){
 		var insideElem = scope.find('div.insideElem');
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
-		var deleteBtn = scope.find('button.ui-cancelRemove');
+		var deleteBtn = scope.find('button.ui-cancel');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
 	
@@ -2861,9 +2861,11 @@ divi.question = divi.extend(divi.element,{
 	}
 	
 	,enableEditList:function(scope){
-		var insideElem = scope.find('div.preview.question');
+		var insideElem = scope.find('div').filter(function( index) {
+		    return this.className != 'prevBtns';
+		  });
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
-		var deleteBtn = scope.find('button.ui-cancelRemove');
+		var deleteBtn = scope.find('button.ui-cancel');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
 	

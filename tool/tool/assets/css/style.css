@@ -160,10 +160,6 @@ div.buttonsList .pvwBtns{
 	position: relative;
 	z-index: 99;
 }
-.metro div.previewElem .ui-cancelRemove:hover{
-	opacity: .8;
-	z-index: 100;
-}
 
 .metro .ui-dialog .previewImages{
 	overflow-y:auto; 
@@ -779,8 +775,18 @@ div.editableDiv.answer {
 	height: 20px;
 }
 
-.metro .previewElem .ui-cancelRemove{
-	margin-top: -30px;
+.metro .previewElem .prevBtns{
+	position: absolute;
+	right: .3em;
+	top: 1%;
+	padding: 1px;
+	height: 20px;
+	
+}
+
+.metro div.previewElem .prevBtns:hover{
+	opacity: .8;
+	z-index: 100;
 }
 
 .metro .ui-dialog .ui-dialog-buttonpane{
