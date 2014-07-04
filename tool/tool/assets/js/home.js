@@ -181,7 +181,7 @@ divi.appBase = divi.extend(divi.base, {
     editableDiv:'editableDiv',
     contentPreview:'.contentPreview',
     contents:{},
-    elems:['.deleteWin','.cancelWin'],
+    deleteElems:['.deleteWin','.cancelWin'],
     defaultImgExtension:'.png',
     cmKey:'.contextmenu',
     dlEvents:'click',
@@ -419,6 +419,20 @@ divi.appBase = divi.extend(divi.base, {
 	,getComboMaster:function(){
 		return divi.appBase.prototype.comboMaster;
 	}
+	
+	,getDeleteElems:function(){
+		return this.deleteElems;
+	}
+
+	,confirmDelete:function(event,scope,target,text){
+		
+	}
+
+	,deletefn:function(event,val,jTarget,previewKey){
+		$.showLoader();
+		this.show('Delete',previewKey);
+	}
+	
 	
 	,getComboMasterValue:function(comboKey,key){
 		var value,combo;
@@ -960,7 +974,10 @@ divi.appBase = divi.extend(divi.base, {
 	
 	,handleListeners:function(key){
 		this.listeners[key]=  {'click':[this.buttonClick]};
-		divi.listeners.attachElementListeners(this.elems,this,null,key,this.dlEvents);
+		var elems = this.getDeleteElems();
+		if(elems){
+			divi.listeners.attachElementListeners(this.getDeleteElems(),this,null,key,this.dlEvents);
+		}
 	}
 	
 	,destroy:function(){
@@ -1106,6 +1123,8 @@ divi.elementbase = divi.extend(divi.appBase,{
 	countKey:'_elemCount',
 	table:'',
 	preview:'prev',
+	deleteKey:'deletekey',
+	deleteElem:'.ui-cancelRemove',
 	elemTable:'eachHeader',
 	ignoreFields:['id','src','thumb','references'],
 	referenceFields:['source','name','url','license','blooms','difficulty','languageLevel'],
@@ -1119,6 +1138,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		this.initElemTpl();
 		this.listeners[this.editKey] = {};
 		this.listeners[this.editKey]=  {'click':[this.editElemClick]};
+		this.listeners[this.deleteKey]=  {'click':[this.deleteElemClick]};
 	}
 
 	,initElemTpl:function(){
@@ -1131,6 +1151,16 @@ divi.elementbase = divi.extend(divi.appBase,{
 			$.template(this.preview+this.table,divi.tpl.prev[this.table]);
 		}
 	}
+	
+	,getDeleteElems1:function(){
+		var elems = $(this.elemTpl).find(this.deleteElem);
+		var baseElem;
+		if(!divi.util.isjQEmpty(elems)){
+			baseElem = [elems[0]];
+		}
+		return baseElem;
+	}
+	
 
 	,initialTpl:function(){
 		var table = this.table;
@@ -1163,6 +1193,21 @@ divi.elementbase = divi.extend(divi.appBase,{
 		var parent = this.parent;
 		if(this.isTopic(parent) || parent.isAssessment){
 			parent.loadFile();
+		}
+	}
+	
+	,confirmDelete:function(event,scope,target,text){
+		this.beforeDelete(event);
+		this.parent.persistData(null,null,null,{attachCb:true});
+		this.getSelector(this.contentPreview).empty();
+		$.hideLoader();
+	}
+	
+
+	,beforeDelete:function(event,val,jTarget){
+		var children = this.parent.elements;
+		if(children){
+			children.remove(this);
 		}
 	}
 	
@@ -1236,8 +1281,17 @@ divi.elementbase = divi.extend(divi.appBase,{
 		scope.parent.launchElem(scope,scope.key);
 	}
 	
+	,deleteElemClick:function(event,val,jTarget){
+		var scope = event.data.scope;
+		var target = divi.util.getTarget(event);
+		this.deletefn(event,val,jTarget,"preview");
+	}
+	
 	,enableEditList:function(scope){
-		divi.listeners.attachElementListeners([scope],this,null,this.editKey,this.dlEvents);
+		var insideElem = scope.find('div.insideElem');
+		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
+		var deleteBtn = scope.find('button.ui-cancelRemove');
+		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
 	
 	,previewElement:function(values){
@@ -1994,7 +2048,8 @@ divi.image = divi.extend(divi.element,{
 			childdom.setAttribute('showBorder', values['showBorder']);
 		}
 	}
-
+	
+	
 	,previewElement:function(values,appendSel){
 		var tag = document.createElement(this.tag || this.table);
 		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
@@ -2268,10 +2323,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.launchPopUp(this,true);
 	}
 	
-	,deletefn:function(event,val,jTarget){
-		$.showLoader();
-		this.show('Delete');
-	}
 	
 	,confirmDelete:function(event,scope,target,text){
 		this.beforeDelete(event);
@@ -2284,7 +2335,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 	}
 	
 	,beforeDelete:function(event){
-		
 	}
 	
 	,read:function(input){
@@ -2343,8 +2393,16 @@ divi.book = divi.extend(divi.bookBase,{
 		this.preview();
 	}
 	
+	,bookListeners:function(){
+		return [{tag:'.btnBkOverview',listType:'click',mapTo:this,listenerFn:'showEditor'}];
+	}
+	
 	,preview:function(){
 		this.getSelector(this.contentPreview).empty().html(divi.tpl.book);
+		divi.listeners.attachListenersWS(this.bookListeners(),this.home);
+		this.home.enableTopEditBtns(this);
+		this.home.updateBcrumb(this);
+		
 	}
 
 	,getSaveHtmlLoc:function(){
@@ -2669,18 +2727,6 @@ divi.assessment = divi.extend(divi.bookBase,{
 		}
 	}
 	
-	,beforeDelete:function(event,val,jTarget){
-		var lookupKey = this.pluralize(this.table);
-		var children = this.parent.children[lookupKey];
-		if(children){
-			children.remove(this);
-		}
-		var doms = this.doms[this.divs['liDiv']];
-		var currDom = $(doms.dom);
-		currDom.remove();
-		this.destroydoms();
-	}
-	
 	,loadFile:function(url,fileName){
 		var scope = this;
 		var url = this.prepareFilePath(this,null,this.getFileAction);
@@ -2814,6 +2860,22 @@ divi.question = divi.extend(divi.element,{
 		this.doms = {};
 	}
 	
+	,enableEditList:function(scope){
+		var insideElem = scope.find('div.preview.question');
+		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
+		var deleteBtn = scope.find('button.ui-cancelRemove');
+		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
+	}
+	
+
+	,beforeDelete:function(event,val,jTarget){
+		var lookupKey = divi.assessment.prototype.childrenKeys[0];
+		var children = this.parent.children[lookupKey];
+		if(children){
+			children.remove(this);
+		}
+	}
+	
 	,padCount:function(){
 		return this.getCount();
 	}
@@ -2822,6 +2884,7 @@ divi.question = divi.extend(divi.element,{
 		divi.appBase.prototype.initializeValues.call(this);
 		this.values['type'] = this.type;
 	}
+	
 	
 	,prepareLoadValues:function(currNode,values){
 		if(values.hasOwnProperty('tags')){
@@ -4751,7 +4814,6 @@ divi.home =  divi.extend(divi.appBase,{
 	,defaultListeners:function(){
 		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
 		        {tag:'.bkcover',listType:'click',mapTo:this.book,listenerFn:'drawitem'},
-		        {tag:'.btnBkOverview',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.bookEdit',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.addchapter',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
 		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
