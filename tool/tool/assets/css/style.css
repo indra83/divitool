@@ -149,15 +149,6 @@ div.buttonsList .pvwBtns{
 
 .metro div.previewElem:hover {
 	border:dotted 1px;
-	background:#bebebe !important;
-	opacity: .7;
-	-webkit-transform: scale(1.02,1.02);
-	-webkit-transition-timing-function: ease-out;
-	-webkit-transition-duration: 250ms;
-	-moz-transform: scale(1.02,1.02);
-	-moz-transition-timing-function: ease-out;
-	-moz-transition-duration: 250ms;
-	position: relative;
 	z-index: 99;
 }
 
@@ -781,18 +772,20 @@ div.editableDiv.answer {
 	top: 1%;
 	padding: 1px;
 	height: 20px;
+	margin:0px;
 	
 }
 
 .metro div.previewElem .prevBtns button{
 	border:0px;
-	opacity: 1;
 	z-index: 150;
+	margin:0sccpx;
 }
 
-
 .metro div.previewElem .prevBtns button:hover{
-	border:solid 1px;
+	margin:1px;
+	height:23px;
+	width:42px;
 }
 
 

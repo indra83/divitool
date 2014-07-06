@@ -953,7 +953,7 @@ divi.appBase = divi.extend(divi.base, {
 		return children;
 	}
 	
-	,rearrange:function(scope,pushUp,pushDown){
+	,rearrange:function(scope,pushUp,pushDown,event,jTarget){
 		$.showLoader({text:'Re-arranging'});
 		var siblings = this.getSiblings(scope);
 		if(siblings){
@@ -965,6 +965,7 @@ divi.appBase = divi.extend(divi.base, {
 			siblings.splice(frind, 0, scope);
 			this.parent.persistData(null,null,null,{attachCb:true});
 			this.getSelector(this.contentPreview).empty();
+			jTarget.scrollintoview();
 		}
 		$.hideLoader();
 	}
@@ -972,8 +973,9 @@ divi.appBase = divi.extend(divi.base, {
 	,rearrangeElemClick:function(event,val,jTarget){
 		var scope = event.data.scope;
 		if(!jTarget.parent().hasClass('disabled')){
+			
 			var pushUp = jTarget.hasClass('icon-arrow-up') || jTarget.children().hasClass('icon-arrow-up');
-			this.rearrange(scope,pushUp,!pushUp);
+			this.rearrange(scope,pushUp,!pushUp,event,jTarget);
 		}
 	}
 	
@@ -1201,8 +1203,8 @@ divi.elementbase = divi.extend(divi.appBase,{
 		this.doms = {};
 		this.initialTpl();
 		this.initElemTpl();
-		this.listeners[this.editKey] = {};
-		this.listeners[this.editKey]=  {'click':[this.editElemClick]};
+		this.listeners[this.editKey] = {},this.listeners[this.deleteKey] = {};
+		this.listeners[this.editKey]=  {'click':[this.editElemClick]},
 		this.listeners[this.deleteKey]=  {'click':[this.deleteElemClick]};
 		this.listeners[this.rearrangeKey]=  {'click':[this.rearrangeElemClick]};
 	}
@@ -4681,6 +4683,10 @@ divi.formula = divi.extend(divi.contentEditor,{
 	,constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.formula.superclass.constructor.call(this);
+	}
+	
+	,getDeleteElems:function(){
+		return this.elems;
 	}
 	
 	,overlayDflts:function(dflts){
