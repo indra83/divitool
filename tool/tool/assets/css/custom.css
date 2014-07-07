@@ -180,3 +180,12 @@ background: none;
 
 max-height:250px!important;
 }
+
+.metro .prvw-btn-adjt{
+	float: right;
+	right: 9px;
+}
+
+.metro.fix-body{
+	position: fixed;
+}

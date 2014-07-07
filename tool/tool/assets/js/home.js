@@ -93,7 +93,7 @@ $.widget( "custom.superDialog", $.ui.dialog, {
 })();
 
 divi.listeners = function(){
-	
+
 };
 
 $.extend(divi.listeners,{
@@ -130,7 +130,7 @@ $.extend(divi.listeners,{
 									 eachListener.apply(scope,[event,target,jTarget]);
 								 }
 							 }
-						 } 
+						 }
 					}else{
 						event.preventDefault();
 						event.stopPropagation();
@@ -158,8 +158,8 @@ $.extend(divi.listeners,{
 			});
 		}
 	}
-	
-	
+
+
 	,removeListeners:function(elems,events){
 		var elem;
 		if(elems){
@@ -204,7 +204,7 @@ divi.appBase = divi.extend(divi.base, {
 	data:{},
 	values:{},
 	dlgDflts:{shadow: true,overlay: false,icon: '',width: '100%',height:'100%',padding: 10,sysButtons: {btnClose: true}},
-	
+
     constructor: function (cfg) {
     	$.extend(this, cfg);
     	this.data = {};
@@ -217,10 +217,10 @@ divi.appBase = divi.extend(divi.base, {
 	,startup:function(){
 		this.initializeValues();
 	}
-	
-	
+
+
 	,initiliazeEditor:function(){
-		var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier', 
+		var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
 		             'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
 		             'Times New Roman', 'Verdana'],
          fontTarget = $('[title=Font]').siblings('.dropdown-menu');
@@ -230,9 +230,9 @@ divi.appBase = divi.extend(divi.base, {
      	$('.dropdown-menu input').click(function() {return false;})
  		    .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
          .keydown('esc', function () {this.value='';$(this).change();});
-     	
+
 	}
-	
+
 
 	,retrieveElem:function(melem,key){
 		var tryChap = melem || this;
@@ -240,7 +240,7 @@ divi.appBase = divi.extend(divi.base, {
 		return chap;
 	}
 
-	
+
 	,S4:function() {
 		return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 	}
@@ -248,7 +248,7 @@ divi.appBase = divi.extend(divi.base, {
 	,guid:function() {
 		return (this.S4() + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4()+ this.S4() + this.S4());
 	}
-	
+
 	,initializeValues:function(){
 		var table = divi.app[this.table];
 		var eachCfg;
@@ -262,7 +262,7 @@ divi.appBase = divi.extend(divi.base, {
 			}
 		}
 	}
-	
+
 	,licenseData:function(){
 		var licenseData = [{description:"CC Attribution (CC BY)",id:"CC Attribution (CC BY)"},
 		  	{description:"CC Attribution - Sharealike (CC BY-SA)",id:"CC Attribution - Sharealike (CC BY-SA)"},
@@ -274,7 +274,7 @@ divi.appBase = divi.extend(divi.base, {
 		  	{description:"GNU Free License",id:"GNU Free License"}];
 		this.setData({'license':licenseData},true);
 	}
-	
+
 	,readTags:function(data){
 		var tags_json = {};
 		var tagsData = [];
@@ -291,21 +291,21 @@ divi.appBase = divi.extend(divi.base, {
 			this.setData({'tags':this.getTagsData()},true);
 		}
 	}
-     
+
 	,assessTypeData:function(){
 		var typeData = [{description:"Test",id:"test"},
 		  	{description:"Assignment",id:"assignment"},
 		  	{description:"Quiz",id:"quiz"}];
 		this.setData({'type':typeData},true);
 	}
-	
+
 	,difficultData:function(){
 		var diffData = [{description:"Easy",id:"easy"},
 		  	{description:"Medium",id:"medium"},
 		  	{description:"Difficult",id:"difficult"}];
 		this.setData({'difficulty':diffData},true);
 	}
-	
+
 	,boxInfoData:function(){
 		var boxInfoData = [{description:"None",id:"none"},
 		  	{description:"Box Info",id:"box_info"},
@@ -313,11 +313,11 @@ divi.appBase = divi.extend(divi.base, {
 		  	{description:"Other",id:"other"}];
 		this.setData({'boxType':boxInfoData},true);
 	}
-	
+
 	,loadinitialCombos:function(){
 		this.stringify();// need this initialize combos.(masterObj);
 	}
-	
+
 	,readFileIntoDataUrl :function (fileInfo) {
 		var loader = $.Deferred(),fReader = new FileReader();
 		fReader.onload = function (e) {
@@ -328,7 +328,7 @@ divi.appBase = divi.extend(divi.base, {
 		fReader.readAsDataURL(fileInfo);
 		return loader.promise();
 	}
-	
+
 	,destroydoms:function(elem){
 		elem = elem || this;
 		var crr,crref,doms = elem.divs;
@@ -343,7 +343,7 @@ divi.appBase = divi.extend(divi.base, {
 			}
 		}
 	}
-	
+
 	,loadCombos:function(book){
 		if(book){
 			this.setData({});
@@ -355,7 +355,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.setData({'tags':this.getTagsData()},true);
 		}
 	}
-	
+
 	,cleanValues:function(values,key){
 		var key = this.htmlValKey;
 		if(key){
@@ -372,68 +372,68 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return values;
 	}
-	
+
 	,getValues:function(){
 		return this.values;
 	}
-	
+
 	,getFieldValue:function(key){
 		return this.values[key];
 	}
-	
+
 	,setComboMasterData:function(newObj){
 		if(this.comboKey){
 			var data = this.getComboMaster();
 			if(!data[this.comboKey]){
 				data[this.comboKey] = {};
-			} 
+			}
 			data[this.comboKey][newObj.id] = this;
 		}
 	}
-	
+
 	,setData:function(values,apend){
 		if(apend){
 			$.extend(divi.appBase.prototype.data,values);
 		}else{
-			divi.appBase.prototype.data = values;	
+			divi.appBase.prototype.data = values;
 		}
 	}
-	
-	
+
+
 	,setComboMaster:function(values){
 		divi.appBase.prototype.comboMaster = values;
 	}
-	
+
 	,getData:function(){
 		return divi.appBase.prototype.data;
 	}
-	
+
 	,setTagsData:function(values){
 		divi.appBase.prototype.tagsData = values;
 	}
-	
+
 	,getTagsData:function(){
 		return divi.appBase.prototype.tagsData;
-	}	
-	
+	}
+
 	,getComboMaster:function(){
 		return divi.appBase.prototype.comboMaster;
 	}
-	
+
 	,getDeleteElems:function(){
 		return this.deleteElems;
 	}
 
 	,confirmDelete:function(event,scope,target,text){
-		
+
 	}
 
 	,deletefn:function(event,val,jTarget,previewKey){
 		$.showLoader();
 		this.show('Delete',previewKey);
 	}
-	
-	
+
+
 	,getComboMasterValue:function(comboKey,key){
 		var value,combo;
 		if(key){
@@ -444,22 +444,22 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return value;
 	}
-	
+
 	,modifyForm:function(form){
-		
+
 	}
-	
+
 	,setComboData:function(newObj){
 		if(this.comboKey){
 			var data = this.getData();
 			if(!data[this.comboKey]){
 				data[this.comboKey] = [];
-			} 
+			}
 			var comboElem = {id:newObj.id,'description': newObj[this.descKey]};
 			data[this.comboKey].push(comboElem);
 		}
 	}
-	
+
 
 	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
 		var currKey;
@@ -469,7 +469,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.attachEachChild(callback,toClean,input,currKey,initialize,addParams,skipChildren);
 		}
 	}
-	
+
 	,attachEachChild:function(callback,toClean,input,currKey,initialize,addParams,skipChildren){
 		var eachChild;
 		if(initialize){
@@ -482,7 +482,7 @@ divi.appBase = divi.extend(divi.base, {
 			eachChild[callback].apply(eachChild,params);
 		}
 	}
-	
+
 	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
 		if(input){
 			if(isArray){
@@ -508,26 +508,26 @@ divi.appBase = divi.extend(divi.base, {
 			}
 		}
 	}
-	
-	
+
+
 	,pluralize:function(key){
 		if(key){
 			key = key+'s';
 		}
 		return key;
 	}
-	
+
 	,removechars:function(key){
 		if(key){
 			key = key.replace('.','').replace('#','');
 		}
 		return key;
 	}
-	
+
 	,retrievePopUpDiv:function(){
 		return this.getSelector(this.popupKey);
 	}
-	
+
 	,prepareRetrievePath:function (location,val, files,cbScope) {
 	    var dataQuery = $("<div/>").append(val);
 	    var matchedElem;
@@ -540,7 +540,7 @@ divi.appBase = divi.extend(divi.base, {
 	    }
 	    return dataQuery.clone().html();
 	}
-	
+
 
 	,prepareResourcePath:function (val,fromLoc,toLoc) {
 		if(val && fromLoc && toLoc){
@@ -548,24 +548,25 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return val;
 	}
-	
+
 	,cancelDailog:function(b,e){
+		$('.metro').removeClass('fix-body');
 		var jB = $(b);
 		var elem = (jB.hasClass('ui-dialog-content')) ? jB : jB.find("ui-dialog-content");
 		if(elem){
 			elem.superDialog("close");
 		}
 	}
-	
+
 	,closeCmMenu:function(){
 		this.getSelector(this.cmKey).hide();
 	}
-	
+
 	,blockcmMenu:function(cfg,event){
 		event.preventDefault();
 		event.stopPropagation();
 	}
-	
+
 	,getSelector:function(key){
 		var refKey = this.removechars(key);
 		if(!this.contents[refKey]){
@@ -573,7 +574,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return this.contents[refKey];
 	}
-	
+
 	,getEditorByIndex:function(editor,index){
 		var first;
 		if(editor){
@@ -583,7 +584,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return first;
 	}
-	
+
 	,launchEditor:function(instance,homeScope){
 		if(instance){
 			var sel = this.getSelector(this.htmlKey);
@@ -595,7 +596,7 @@ divi.appBase = divi.extend(divi.base, {
 			instance.createEditor.call(instance,{editors:editrs,sel:sel,attachtbar:true});
 		}
 	}
-	
+
 	,createEditor:function(ops){
 		ops = ops || {};
 		sel = ops.sel;
@@ -627,7 +628,7 @@ divi.appBase = divi.extend(divi.base, {
 			scope.cancelDailog(b,e);
 		}
 	}
-	
+
 	,saveBook:function(book,fileOps){
 		fileOps = fileOps || {};
 		book = book || this.retrieveBook(this)
@@ -641,12 +642,12 @@ divi.appBase = divi.extend(divi.base, {
 	         if(!fileOps.isChildexists && fileOps.attachCb){
 	        	 $.extend(prs,{succcb:this.drawOnSuccess,context:this});
 	         }else{
-	        	 $.extend(prs,{skipLoader:true,context:this}); 
+	        	 $.extend(prs,{skipLoader:true,context:this});
 	         }
 			 book.persist(prs);
 		}
 	}
-	
+
 	,persistData:function(elem,url,fileName,fileops){
 		fileops = fileops || {};
 		var attachCb = true;
@@ -662,7 +663,7 @@ divi.appBase = divi.extend(divi.base, {
 			 alert("Please Contact administrator. Could not save the changes");
 		 }
 	}
-	
+
 	,editorCBack:function(uidialog,b){
 		var scope = this;
 		var editor = scope.editor;
@@ -674,7 +675,7 @@ divi.appBase = divi.extend(divi.base, {
 			}
 		}
 	}
-	
+
 	,childExists:function(){
 		var scope = this.elements ? this : this.parent;
 		return scope && scope.fileName;
@@ -714,18 +715,18 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		scope.persist(ops);
 	}
-	
+
 	,isTopic:function(elem){
 		return (elem && elem.table == "topic");
 	}
-	
+
 	,prepareFilePath:function(scope,url,action){
 		url = url || "";
 		url = action || scope.savefileAction;
 		url = this.prepareInternalPath(scope, url, action);
 		return url;
 	}
-	
+
 
 	,prepareInternalPath:function(scope,url,action){
 		var topic = (scope.isTopic(scope) || scope.isAssessment) ? scope : scope.parent;
@@ -734,7 +735,7 @@ divi.appBase = divi.extend(divi.base, {
 		url += "/"+chapterId+"/"+elemId;
 		return url;
 	}
-	
+
 	,prepareBookPath:function(scope,url,action,addAction){
 		url = url || "";
 		url = action || scope.savefileAction;
@@ -743,13 +744,13 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return url;
 	}
-	
+
 	,getCount:function(){
 		var count = this.parent.getFieldValue(this.countKey);
 		count = !count? 1 : ++count;
 		return count;
 	}
-	
+
 	,updateId:function(event,targetVal,target){
 		var scope = event.data.scope;
 		var form = scope.scope;
@@ -761,7 +762,7 @@ divi.appBase = divi.extend(divi.base, {
 			form.setValue('id',parent.prepareId());
 		}
 	}
-	
+
 	,addToCount:function(){
 		var cnt = this.parent.getFieldValue(this.countKey);
 		if(!cnt){
@@ -779,7 +780,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.parent.setValueForKey(this.countKey,id);
 		}
 	}
-	
+
 	,validateForm:function(form){
 		var isValidForm = false;
 		if(form){
@@ -787,7 +788,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return isValidForm;
 	}
-	
+
 	,prepareSubmitValues:function(scope,form){
 		scope = scope || this;
 		var values = form.getValues({});
@@ -796,7 +797,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return values;
 	}
-	
+
 	,submit:function(scope,form,event){
 		$.showLoader();
 		var values = this.prepareSubmitValues(scope,form);
@@ -812,8 +813,9 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		divi.home.prototype.cancelDailog(event);
 	}
-	
+
 	,submitForm:function(b,e){
+		$('.metro').removeClass('fix-body');
 		var scope = this;
 		var isValidForm = true;
 		var form = scope.formPanel ? scope.formPanel : this;
@@ -824,26 +826,26 @@ divi.appBase = divi.extend(divi.base, {
 	    	}
 		}
 	}
-	
+
 	,setValues:function(updated){
 		if(updated){
 			var updated = this.modifyValues(updated);
 			$.extend(this.values,updated);
 		}
 	}
-	
+
 	,setValueForKey:function(key,value){
 		if(key){
 			this.values[key] = value;
 		}
 	}
-	
+
 	,setParent:function(scope,values){
 		var parent = this.getComboMasterValue(this.parent.comboKey,values[this.parent.comboKey]);
 		if(!parent){ parent = this.parent;}
 		scope.parent = parent;
 	}
-	
+
 	,modifyValues:function(values){
 		var key = this.htmlValKey;
 		if(key){
@@ -860,11 +862,11 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return values;
 	}
-	
+
 	,fetchUpdateValues:function(form,values){
 		return values;
 	}
-	
+
 	,update:function(form,values){
 		form = form || this;
 		values = values || form.values;
@@ -881,11 +883,11 @@ divi.appBase = divi.extend(divi.base, {
 			this.updated = false;
 		}
 	}
-	
+
 	,drawOnSuccess:function(r){
 		this.draw();
 	}
-	
+
 	,prepareCompleteId:function(){
 		var rtnId;
 		if(this.table == 'chapter'){
@@ -895,7 +897,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return !rtnId? '' : rtnId;
 	}
-	
+
 	,prepareId:function(){
 		var prefix = this.idPrefix;
 		var parentId = this.prepareCompleteId();
@@ -905,14 +907,14 @@ divi.appBase = divi.extend(divi.base, {
 		var id = this.idPrefix+parentId+divi.util.pad(this.getCount(),this.padMax);
 		return id;
 	}
-	
+
 	,prepareSideBar:function(book){
 		var parentCont = this.getSelector(this.previewSel);
 		parentCont.empty();
 		book.retrieveTree(parentCont);
 		this.prepareDropDown(parentCont);
 	}
-	
+
 	,prepareDropDown:function(parentCont){
 		 var elem = parentCont.find("[data-role=slidedown]");
 		 elem.each(function(idx, li) {
@@ -922,7 +924,7 @@ divi.appBase = divi.extend(divi.base, {
 	        });
 		});
 	}
-	
+
 	,launchPopUp:function(instance,edit){
 		if(instance){
 			instance.home.preparepopUp.call(instance.home,instance);
@@ -937,11 +939,12 @@ divi.appBase = divi.extend(divi.base, {
 			}else if(instance.fieldCount){
 				tabi = instance.fieldCount+1;
 			}
+			$('.metro').addClass('fix-body');
 			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
 			mydialog.superDialog("option", "buttons", newButtons);
 		}
 	}
-	
+
 	,show:function(key){
 		var scope = this;
 		var dflts = scope.dlgDflts;
@@ -950,7 +953,7 @@ divi.appBase = divi.extend(divi.base, {
 		$.extend(dflts,{onShow:function(e){scope.onShow(e,key);}});
 		$.Dialog(dflts);
 	}
-	
+
 	,launchElem:function(elem,key){
 		this.launchPopUp.call(elem,elem);
 		if(key){
@@ -958,7 +961,7 @@ divi.appBase = divi.extend(divi.base, {
 			elem.formPanel.hideField('boxType');
 		}
 	}
-	
+
 	,overlayDflts:function(dflts,key){
 		if(key == "Delete"){
 			$.extend(dflts,{title:'Delete Confirmation',width:'40%',height:'100px'});
@@ -971,7 +974,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.handleListeners(key);
 		}
 	}
-	
+
 	,handleListeners:function(key){
 		this.listeners[key]=  {'click':[this.buttonClick]};
 		var elems = this.getDeleteElems();
@@ -979,12 +982,12 @@ divi.appBase = divi.extend(divi.base, {
 			divi.listeners.attachElementListeners(this.getDeleteElems(),this,null,key,this.dlEvents);
 		}
 	}
-	
+
 	,destroy:function(){
 		divi.listeners.removeListeners(this.elems,this.events);
 		$('.window-overlay').remove();
 	}
-	
+
 	,buttonClick:function(event){
 		var scope = this;
 		var target = divi.util.getTarget(event);
@@ -998,7 +1001,7 @@ divi.appBase = divi.extend(divi.base, {
 			this.buttonClickOverlay(event,scope,target,text);
 		}
 	}
-	
+
 	,closeClick:function(){
 		if(this.parent.parent && this.parent.parent.sel){
 			$(this.parent.parent.sel).closest(".ui-dialog").css('display','block');
@@ -1006,7 +1009,7 @@ divi.appBase = divi.extend(divi.base, {
 		$.Dialog.close();
 		$.hideLoader();
 	}
-	
+
 	,loadFile:function(url,ops,fileName){
 		var scope = this;
 		var url = url || this.prepareFilePath(this,null,this.getFileAction);
@@ -1019,7 +1022,7 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		$.ajax({dataType: dataType,url:divi.core.prepareUrl(url,fileName),data:data}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
 	}
-	
+
 	,readFile:function(data){
 		var topicChild = data? data.firstChild : undefined;
 		if(topicChild){
@@ -1042,14 +1045,14 @@ divi.appBase = divi.extend(divi.base, {
 			this.activateElements();
 		}
 	}
-	
+
 	,activateElements:function(){
 		$('.carousel').carousel({auto: false,period: 3000,duration: 2000,height:'100%',markers: {type: "square",position:"bottom-center"}});
 	}
-	
+
 	,readFileFail:function(data){
 	}
-	
+
 	,prepareEditableDom:function(ops,editors,value,isQuestion){
 		ops = ops || {};
 		cls = ops.cls ? this.editableDiv+" "+ops.cls : this.editableDiv;
@@ -1061,25 +1064,25 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		return editorDom;
 	}
-	
+
 	,attachEditorContent:function(sel,editors){
 		if(sel){
 			for(var edt in editors){
 				if(editors.hasOwnProperty(edt)){
-					sel.append(editors[edt].editor);	
+					sel.append(editors[edt].editor);
 				}
 			}
 		}
 	}
-	
+
 	,prepareEditorParams:function(editors){
 		var params = {};
 		params['editors'] = editors;
 		$.extend(params,{toolbardomCls:'.toolbarCls',sel:sel});
 		return params;
 	}
-    
-	
+
+
 	,persist:function(fileOps){
 		fileOps = fileOps || {};
 		var url = fileOps.url;
@@ -1151,7 +1154,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			$.template(this.preview+this.table,divi.tpl.prev[this.table]);
 		}
 	}
-	
+
 	,getDeleteElems1:function(){
 		var elems = $(this.elemTpl).find(this.deleteElem);
 		var baseElem;
@@ -1160,7 +1163,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		return baseElem;
 	}
-	
+
 
 	,initialTpl:function(){
 		var table = this.table;
@@ -1171,7 +1174,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 	}
 	,initializeValues:function(){
 		var table = divi.app[this.table];
-		var eachCfg,condition;		
+		var eachCfg,condition;
 		if(table){
 			var fieldConfig = table.getFieldConfig();
 			for(var index in fieldConfig){
@@ -1188,21 +1191,21 @@ divi.elementbase = divi.extend(divi.appBase,{
 			this.reference.initializeValues();
 		}
 	}
-	
+
 	,draw:function(){
 		var parent = this.parent;
 		if(this.isTopic(parent) || parent.isAssessment){
 			parent.loadFile();
 		}
 	}
-	
+
 	,confirmDelete:function(event,scope,target,text){
 		this.beforeDelete(event);
 		this.parent.persistData(null,null,null,{attachCb:true});
 		this.getSelector(this.contentPreview).empty();
 		$.hideLoader();
 	}
-	
+
 
 	,beforeDelete:function(event,val,jTarget){
 		var children = this.parent.elements;
@@ -1210,8 +1213,8 @@ divi.elementbase = divi.extend(divi.appBase,{
 			children.remove(this);
 		}
 	}
-	
-	
+
+
 	,drawElement:function(){
 		var leftSel,rightSel,results,elemDom;
 		if(this.tpl){
@@ -1232,11 +1235,11 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		return leftSel;
 	}
-	
+
 	,prepareLoadValues:function(currNode,values){
 		return values;
 	}
-	
+
 	,loadValues:function(currNode,values){
 		var refNode;
 		var children = currNode.children;
@@ -1256,7 +1259,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		return refNode;
 	}
-	
+
 	,populateValues:function(currNode){
 		values = {};
 		var refNode = this.loadValues(currNode,values);
@@ -1266,7 +1269,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			this.reference.populateValues(refNode);
 		}
 	}
-	
+
 	,loadElement:function(currNode,appendSel){
 		this.populateValues(currNode);
 		var elemDom = $.tmpl(this.elemTable,{});
@@ -1274,26 +1277,26 @@ divi.elementbase = divi.extend(divi.appBase,{
 		appendSel.append(elemDom.append(dom));
 		this.enableEditList(elemDom);
 	}
-	
+
 	,editElemClick:function(event){
 		var scope = event.data.scope;
 		var target = divi.util.getTarget(event);
 		scope.parent.launchElem(scope,scope.key);
 	}
-	
+
 	,deleteElemClick:function(event,val,jTarget){
 		var scope = event.data.scope;
 		var target = divi.util.getTarget(event);
 		this.deletefn(event,val,jTarget,"preview");
 	}
-	
+
 	,enableEditList:function(scope){
 		var insideElem = scope.find('div.insideElem');
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
 		var deleteBtn = scope.find('button.ui-cancelRemove');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
-	
+
 	,previewElement:function(values){
 		var elem,vals = {},url = this.prepareFilePath(this.parent,null,this.getFileAction);
 		var filePath = url+'/'+values['src'];
@@ -1315,7 +1318,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 		  this.persistChild(true);
 		  this.saveBook.call(this.parent,null,{attachCb:false,isChildexists:false});
 	}
-	
+
 	,setValues:function(updated){
 		var condition;
 		if(updated){
@@ -1335,7 +1338,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			this.reference.setValues(updated);
 		}
 	}
-	
+
 	,prepareDomValues:function(dom,child,values,parent){
 		var key,val;
 		for(var eachValue in values){
@@ -1347,11 +1350,11 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}
 		this.addSplValues(dom, child, values, parent);
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
-		
+
 	}
-	
+
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
 			childdom.setAttribute('id', values['id']);
@@ -1360,11 +1363,11 @@ divi.elementbase = divi.extend(divi.appBase,{
 			this.addAddValues(dom,childdom,values,parent);
 		}
 	}
-	
+
 	,addAddValues:function(dom,childdom,values,parent){
-		
+
 	}
-	
+
 	,getPersistValues:function(dom,parent,attachParent,tag){
 		var child = dom.createElement(tag || this.table);
 		var values = this.getValues();
@@ -1382,29 +1385,29 @@ divi.elementbase = divi.extend(divi.appBase,{
 		}else{
 			dom.documentElement.appendChild(child);
 		}
-		
+
 	}
-	
+
 	,setParent:function(scope,values){
 	}
 
 	,padCount:function(){
 		return divi.util.pad(this.getCount(),this.padMax);
 	}
-	
+
 	,prepareId:function(){
 		var id = this.idPrefix+this.padCount();
 		return id;
 	}
 
 	,attachpreContent:function(appendTo,showToggle){
-		
+
 	}
-	
+
 	,attachpostContent:function(appendTo,showToggle){
-		
+
 	}
-	
+
 	,showContent:function(appendTo,showToggle,index){
 		var appendElem = $(appendTo);
 		if(this.reference && this.tagging){
@@ -1433,7 +1436,7 @@ divi.elementbase = divi.extend(divi.appBase,{
 			$('.tab-control').tabcontrol();
 		}
 	}
-	
+
 	,prepareForm:function(appendElem,showToggle,ref){
 		ref = ref || 'formPanel';
 		if(!this[ref]){
@@ -1446,14 +1449,14 @@ divi.elementbase = divi.extend(divi.appBase,{
 		this[ref].draw(appendElem);
 		this[ref].setValues(this.getValues());
 	}
-	
+
 	,initilizeChild:function(input){
 		input = input || this;
 		if(!input.elements){
 			input.elements = [];
 		}
 	}
-	
+
 	,addChild:function(input,key,child){
 		if(input.elements){
 			child.fileName = input.fileName || child.fileName;
@@ -1477,7 +1480,7 @@ divi.tags = divi.extend(divi.elementbase,{
 		this.blooms = {};
 		divi.tags.superclass.constructor.call(this);
 	}
-	
+
 	,prepareLoadValues:function(currNode,values){
 		if(values.hasOwnProperty('tag')){
 			var nodeList = currNode.children,tagsValue = [],key;
@@ -1490,12 +1493,12 @@ divi.tags = divi.extend(divi.elementbase,{
 		}
 		return values;
 	}
-	
+
 	,modifyValues:function(values,updated){
 		values =  updated;
 		return values;
 	}
-	
+
 	,prepareForm:function(appendElem){
 		appendElem.append('<div class="thirddiv"></div>');
 		var thirddiv = appendElem.find(".thirddiv");
@@ -1506,22 +1509,22 @@ divi.tags = divi.extend(divi.elementbase,{
 		var selElem = {name:"tags","listener": "tags",events:['change'],scope:this,listeners:{'change':[this.ontagsChange]},isMultiple:true};
 		divi.formPanel.prototype.invokeComboListener.call(this,elem.dom,selElem,this.getData(),elem)
 		$(elem.dom.firstChild).val(this.getFieldValue('tags')).trigger('chosen:updated');
-		
+
 		appendElem.append('<div class="firstdiv"></div>');
 		var firstDiv = appendElem.find(".firstdiv");
 		var diffDom = $('<div class="elemDom"></div>');
 		diffDom.append('<label>Difficulty Level: </label>');
 		firstDiv.append(diffDom);
-		
+
 		dom =  this.doms[this.divs.diff] = divi.domBase.create({tag:'div','class':'diff rating',scope:this},diffDom);
 		var ptsField = new divi.form.numberfield({name:"points",value:(this.getFieldValue('points') || 1),defaultCss:'formfield points',"desc": "Points",scope:this,listeners:{'change':[this.onpointsChange]}});
 		divi.domBase.append(firstDiv,ptsField.dom);
-		
+
 		var leveldom = $('<div class="elemDom"></div>');
 		leveldom.append('<label>Language Level: </label>');
 		firstDiv.append(leveldom);
 		dom =  this.doms[this.divs.level] = divi.domBase.create({tag:'div','class':'level rating',scope:this},leveldom);
-		
+
 		appendElem.append('<div class="seconddiv"></div>');
 		var seconddiv = appendElem.find(".seconddiv");
 		var bloomsdom = $('<div class="bloomsdiv"><label>Blooms: </label></div>');
@@ -1545,28 +1548,28 @@ divi.tags = divi.extend(divi.elementbase,{
 		}
 		seconddiv.append(bloomsdom);
 	}
-	
+
 	,ontagsChange:function(event,targetVal,target){
 		var scope = event.data.scope.scope;
 		scope.setValueForKey('tags',targetVal);
 	}
-	
+
 	,updateRating:function(value,fieldname){
 		var values = this.getValues();
 		values[fieldname] = value;
 		this.setValues(values);
 	}
-	
+
 	,onpointsChange:function(event,targetVal,target){
 		var scope = event.data.scope.scope;
 		scope.setValueForKey('points',targetVal);
 	}
-	
+
 	,onbloomsChange:function(event,targetVal,target){
 		var scope = event.data.scope;
 		scope.setValueForKey('blooms',target.attr('ref'));
 	}
-	
+
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
 			var bloomsVal = values['blooms'] || "None";
@@ -1575,7 +1578,7 @@ divi.tags = divi.extend(divi.elementbase,{
 			childdom.setAttribute('languageLevel', values['languageLevel'] || 1);
 		}
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		var tags = values['tags'];
 		if(tags){
@@ -1631,18 +1634,18 @@ divi.element = divi.extend(divi.elementbase,{
 			elem.on('click',null,{scope:this},this.addMoreClick)
 		}
 	}
-	
+
 	,addMoreClick:function(e){
 		var scope = e.data.scope;
 		scope.attachElement(scope.appendElem, scope.showToggle,scope.elems.length+1,null,true);
 	}
-	
+
 	,attachCloseLis:function(elem,imageElem){
 		if(elem){
 			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
 		}
 	}
-	
+
 	,onCloseImage:function(e){
 		var elem = e.data.scope;
 		var parent = e.data.parent;
@@ -1651,7 +1654,7 @@ divi.element = divi.extend(divi.elementbase,{
 		parent.elems.remove(elem);
 		divi.domBase.destroy(ref);
 	}
-	
+
 	,attachCloseLis:function(elem,imageElem){
 		if(elem){
 			elem.on('click',null,{scope:imageElem,parent:this},this.onCloseImage)
@@ -1698,7 +1701,7 @@ divi.heading3 = divi.extend(divi.element,{
 			this.addAddValues(dom,childdom);
 		}
 	}
-	
+
 	,prepareDomValues:function(dom,child,values,parent){
 		var key,val;
 		for(var eachValue in values){
@@ -1739,7 +1742,7 @@ divi.subtopic = divi.extend(divi.element,{
 			this.addAddValues(dom,childdom);
 		}
 	}
-	
+
 	,prepareDomValues:function(dom,child,values,parent){
 		var key,val;
 		for(var eachValue in values){
@@ -1768,17 +1771,17 @@ divi.html = divi.extend(divi.element,{
 		var url = this.prepareFilePath(this.parent,"",this.savefileAction);
 		return url+"/"+this.imageLoc;
 	}
-	
-	
+
+
 	,getEquationsLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
 		return url+"/"+this.equationLocExact;
 	}
-	
+
 	,getSaveEquationsHtmlLoc:function(){
 		return this.prepareFilePath(this.parent,"",this.saveformulaAction);
 	}
-	
+
 	,getHtmlLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
 		return url+"/"+this.imageLoc;
@@ -1800,14 +1803,14 @@ divi.html = divi.extend(divi.element,{
 		this.prepareEditableDom(null,editrs,htmlValue);
 		this.createEditor({editors:editrs,sel:appendTo,attachtbar:true});
 	}
-	
+
 	,attachpostContent:function(appendTo,showToggle){
 		this.formPanel.hideField('boxType');
 		this.formPanel.relaxRequired('boxType');
 		this.formPanel.hideField('boxTitle');
 		this.formPanel.relaxRequired('boxTitle');
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
 		var dataF = values[this.htmlValKey];
@@ -1818,7 +1821,7 @@ divi.html = divi.extend(divi.element,{
             data.appendChild(cdata);
             child.appendChild(data);
 		}
-		
+
 		var children = child.children;
 		for(var index = 0;index < children.length;index++){
 			var key = children[index];
@@ -1827,7 +1830,7 @@ divi.html = divi.extend(divi.element,{
 			}
 		}
 	}
-	
+
 	,persistChild:function(){
 		var editor = this.editor;
 		if(editor){
@@ -1839,7 +1842,7 @@ divi.html = divi.extend(divi.element,{
 			this.htmlcallBack();
 		}
 	}
-	
+
 	,htmlcallBack:function(val){
 		var scope = this;
 		var values = this.getValues();
@@ -1849,7 +1852,7 @@ divi.html = divi.extend(divi.element,{
 		this.setValues(values);
 		divi.appBase.prototype.persistChild.call(scope,true);
 	}
-	
+
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
 		}
@@ -1915,7 +1918,7 @@ divi.imageset = divi.extend(divi.element,{
 		appendSel.append(elemDom.append(dom));
 		this.enableEditList(elemDom);
 	}
-	
+
 	,drawElement:function(selector){
 		var currSel = $('<div class="insideElem"></div>');
 		var key,results,slideHtml=$('<div>'),imageDom,currSel = selector;
@@ -1961,7 +1964,7 @@ divi.imageset = divi.extend(divi.element,{
 			childDom.find('title').remove();
 		}
 	}
-	
+
 	,prepareSubmitValues:function(scope,form){
 		divi.appBase.prototype.prepareSubmitValues.call(this,scope,form);
 		var files = [];
@@ -2006,7 +2009,7 @@ divi.imageset = divi.extend(divi.element,{
 		}
 		this.attachMoreLis(appendTo.parent().find('.addmore'));
 	}
-	
+
 	,attachElement:function(appendTo,showToggle,index,elem,isNew){
 		elem = elem || new divi.image({parent:this,isNew:true,home:this.home});
 		if(isNew){
@@ -2027,7 +2030,7 @@ divi.imageset = divi.extend(divi.element,{
 		elem.formPanel.relaxRequired('showBorder');
 		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
 	}
-	
+
 });
 
 divi.image = divi.extend(divi.element,{
@@ -2048,8 +2051,8 @@ divi.image = divi.extend(divi.element,{
 			childdom.setAttribute('showBorder', values['showBorder']);
 		}
 	}
-	
-	
+
+
 	,previewElement:function(values,appendSel){
 		var tag = document.createElement(this.tag || this.table);
 		var url = this.prepareFilePath(this.parent,null,this.getFileAction);
@@ -2096,7 +2099,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 		divi.bookBase.superclass.constructor.call(this);
 		this.init();
 	}
-	
+
 	,retrieveTree:function(parent){
 		var book = this.retrieveBook();
 		var output;
@@ -2105,11 +2108,11 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 		return output;
 	}
-	
+
 	,sidebarClick:function(d,val,jTarget){
 		if(this.home){
 			this.home.updateSelected(this);
-		} 
+		}
 		if(this.table == 'chapter'){
 			var lidom = this.getLiDom();
 			d.preventDefault();
@@ -2122,10 +2125,10 @@ divi.bookBase = divi.extend(divi.appBase,{
             }), a._open(b,lidom.dom)) : a._close(b)
 		}
 	}
-	
+
 	,getLiDom:function(){
 		return this.doms[this.divs['liDiv']];
-		
+
 	}
 	,_open: function (a,dom) {
 		if(dom){
@@ -2155,7 +2158,7 @@ divi.bookBase = divi.extend(divi.appBase,{
             c.hide()
         }
     }
-	
+
 	,toggleContextMenu:function(event,val,jTarget){
 		event.preventDefault();
 		event.stopPropagation();
@@ -2164,7 +2167,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.getSelector(this.cmKey).hide().empty().append(this.cmDom.dom).css({top: event.pageY + "px", left: event.pageX + "px"}).show();
 		}
 	}
-	
+
 	,onCmClick:function(event,val,jTarget){
 		event.preventDefault();
 		event.stopPropagation();
@@ -2177,14 +2180,14 @@ divi.bookBase = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,init:function(){
 		this.listeners[this.defaultKey] = {'click':[this.sidebarClick],'contextmenu':this.toggleContextMenu};
 		this.children = {};
 		this.updated = true;
 		this.doms = {};
 	}
-	
+
 	,showContent:function(appendTo,showToggle,edit){
 		if(!this.formPanel){
 			this.formPanel = new divi.formPanel({data:this.table,scope:this,comboData:this.getData()});
@@ -2197,13 +2200,13 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.formPanel.setValues(this.getValues(edit));
 		this.modifyForm(this.formPanel);
 	}
-	
+
 	,clearForm:function(){
 		var form = this.formPanel;
 		if(form){
 			form.reset();
 			this.update();
-		}	
+		}
 	}
 	,draw:function(){
 		if(this.isNew && $.isEmptyObject(this.doms)){
@@ -2212,9 +2215,9 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.drawUpdate();
 		}
 	}
-	
+
 	,drawNew:function(){
-		var parDom = this.parent.doms[this.parent.divs['ulDiv']].dom;	
+		var parDom = this.parent.doms[this.parent.divs['ulDiv']].dom;
 		var currKey = this.pluralize(this.table);
 		var children = this.parent.children[currKey];
 		if(children){
@@ -2223,17 +2226,17 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.isNew = false;
 		}
 	}
-	
+
 	,drawUpdate:function(){
-		
+
 	}
-	
+
 	,load:function(data){
 		this.read(data);
 		this.loadinitialCombos(this);// need this initialize combos.
 		this.draw();
 	}
-	
+
 	,stringify:function(toClean){
 		var masterObj =  {};
 		var book = this.retrieveBook();
@@ -2241,18 +2244,18 @@ divi.bookBase = divi.extend(divi.appBase,{
 		book.prepareData(masterObj,toClean);
 		return masterObj;
 	}
-	
-	
+
+
 	,destinationUrl:function(){
-		
+
 	}
-	
+
 	,retrieveBook:function(mbook){
 		var tryBook = mbook || this;
 		var book = tryBook.isBook ? tryBook : this.retrieveBook(tryBook.parent);
 		return book;
 	}
-	
+
 	,initilizeChild:function(input,key,skipChild){
 		input = input || this;
 		if(key){
@@ -2263,19 +2266,19 @@ divi.bookBase = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,addChild:function(input,key,child){
 		var input = input  || this;
 		if(key && input.children[key]){
 			input.children[key].push(child);
 		}
 	}
-	
-	
+
+
 	,fetchCat:function(key){
 		return key ? key.substring(0, key.length - 1) : key;
 	}
-	
+
 	,readEachChild:function(children,currKey){
 		var eachChild;
 		this.initilizeChild(this,currKey)
@@ -2303,7 +2306,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			eachChild.formPanel.setValue('id', eachChild.prepareId());
 		}
 	}
-	
+
 
 	,addElem:function(val,jTarget,key){
 		var backUpKey;
@@ -2318,12 +2321,12 @@ divi.bookBase = divi.extend(divi.appBase,{
 		$.extend(eachElem,{key:key});
 		this.launchElem(eachElem, backUpKey);
 	}
-	
+
 	,edit:function(event,val,jTarget){
 		this.launchPopUp(this,true);
 	}
-	
-	
+
+
 	,confirmDelete:function(event,scope,target,text){
 		this.beforeDelete(event);
 		this.parent.persistData(null,null,null,{attachCb:true});
@@ -2333,10 +2336,10 @@ divi.bookBase = divi.extend(divi.appBase,{
 		book.home.updateBcrumb(book);
 		$.hideLoader();
 	}
-	
+
 	,beforeDelete:function(event){
 	}
-	
+
 	,read:function(input){
 		var currKey,backup = {},currElem;
 		for(var i=0;this.childrenKeys && i< this.childrenKeys.length;i++){
@@ -2351,7 +2354,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 			this.readEachChild(currElem,currKey);
 		}
 	}
-	
+
 	,createContextMenu:function(items){
 		var childDom,parDom = divi.domBase.create({tag:'div',scope:this,prefix:'sidebar_'});
 		if(items){
@@ -2366,8 +2369,8 @@ divi.bookBase = divi.extend(divi.appBase,{
 		}
 		this.cmDom = parDom;
 	}
-	
-	
+
+
 });
 
 divi.book = divi.extend(divi.bookBase,{
@@ -2387,39 +2390,39 @@ divi.book = divi.extend(divi.bookBase,{
 		$.extend(this,cfg);
 		divi.book.superclass.constructor.call(this);
 	}
-	
+
 	,init:function(){
 		divi.bookBase.prototype.init.call(this);
 		this.preview();
 	}
-	
+
 	,bookListeners:function(){
 		return [{tag:'.btnBkOverview',listType:'click',mapTo:this,listenerFn:'showEditor'}];
 	}
-	
+
 	,preview:function(){
 		this.getSelector(this.contentPreview).empty().html(divi.tpl.book);
 		divi.listeners.attachListenersWS(this.bookListeners(),this.home);
 		this.home.enableTopEditBtns(this);
 		this.home.updateBcrumb(this);
-		
+
 	}
 
 	,getSaveHtmlLoc:function(){
 		return this.prepareBookPath(this,null,null,this.imageLoc);
 	}
-	
+
 	,getSaveEquationsHtmlLoc:function(){
 		return "";
 	}
-	
+
 	,setParent:function(scope,values){
 	}
-	
+
 	,getEquationsLoc:function(){
 		return "";
 	}
-	
+
 	,getHtmlLoc:function(){
 		return this.prepareBookPath(this,null,this.getFileAction,this.imageLoc);
 	}
@@ -2453,14 +2456,14 @@ divi.book = divi.extend(divi.bookBase,{
 		}
 		scope.home.cancelDailog(uidialog);
 	}
-	
+
 	,htmlCallBack:function(saveVal){
 		var values = this.getValues();
 		values[this.htmlValKey] = saveVal;
 		this.setValues(values);
 		this.update(null,values);
 	}
-	
+
 	,draw:function(){
 		var values = this.getValues();
 		this.drawonScreen(values);
@@ -2469,14 +2472,14 @@ divi.book = divi.extend(divi.bookBase,{
 			this.showContent(this.prviwForm,true);
 		}
 	}
-	
+
 	,modifyForm:function(formPanel){
 		if(formPanel){
 			formPanel.setReadOnly();
 		}
 	}
-	
-	
+
+
 	,prepareSideBar:function(parent){
 		var navDiv,ulDiv;
 		navDiv = this.doms[this.divs['navDiv']] = divi.domBase.create(this.navDflts,parent);
@@ -2518,7 +2521,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 		this.destroydoms();
 		this.updateSequence(this.parent.children[lookupKey]);
 	}
-	
+
 	,updateSequence:function(children){
 		var currChild;
 		for(var i=0;i< children.length;i++){
@@ -2527,7 +2530,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 			currChild.draw();
 		}
 	}
-	
+
 	,drawUpdate:function(){
 		var valueDom = this.doms[this.divs['aDiv']];
 		if(valueDom && valueDom.dom){
@@ -2535,7 +2538,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 			$(valueDom.dom).html(this.prepareValue(values['name']));
 		}
 	}
-	
+
 	,prepareValue:function(val){
 		var rtn = "";
 		if(divi.util.isEmptyId(this.sequence)){
@@ -2577,7 +2580,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-yelp",prefix:'sidebar_'},
 	comboKey:'topic',
-	
+
 	constructor : function (cfg) {
 		this.parent = undefined;
 		$.extend(this,cfg);
@@ -2588,7 +2591,7 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.createContextMenu(this.cmItems);
 		this.elements = [];
 	}
-	
+
 	,launchElem:function(elem,key){
 		divi.appBase.prototype.launchElem.call(this,elem,key);
 		if(elem && elem.key == 'html' && !key){
@@ -2598,13 +2601,13 @@ divi.topic = divi.extend(divi.bookBase,{
 			elem.formPanel.relaxRequired('boxTitle');
 		}
 	}
-	
+
 	,modifyForm:function(formPanel){
 		if(formPanel && !this.isNew){
 			formPanel.setFieldReadOnly('chapter');
 		}
 	}
-	
+
 	,drawUpdate:function(){
 		if(this.statediting){
 			this.statediting = false;
@@ -2619,7 +2622,7 @@ divi.topic = divi.extend(divi.bookBase,{
 			this.loadFile();
 		}
 	}
-	
+
 	,beforeDelete:function(event,val,jTarget){
 		var lookupKey = this.pluralize(this.table);
 		var children = this.parent.children[lookupKey];
@@ -2631,7 +2634,7 @@ divi.topic = divi.extend(divi.bookBase,{
 		currDom.remove();
 		this.destroydoms();
 	}
-	
+
 	,getValues:function(edit){
 		var values = {};
 		$.extend(values,this.values);
@@ -2643,8 +2646,8 @@ divi.topic = divi.extend(divi.bookBase,{
 		}
 		return values;
 	}
-	
-	
+
+
 	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -2677,7 +2680,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-snowflake",prefix:'sidebar_'},
-	
+
 	constructor : function (cfg) {
 		this.parent = undefined;
 		$.extend(this,cfg);
@@ -2689,13 +2692,13 @@ divi.assessment = divi.extend(divi.bookBase,{
 		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
 	}
-	
+
 	,modifyForm:function(formPanel){
 		if(formPanel && !this.isNew){
 			formPanel.setFieldReadOnly('chapter');
 		}
 	}
-	
+
 	,getValues:function(edit){
 		var values = {};
 		$.extend(values,this.values);
@@ -2707,11 +2710,11 @@ divi.assessment = divi.extend(divi.bookBase,{
 		}
 		return values;
 	}
-	
+
 	,persistChild:function(){
 		// do nothing.
 	}
-	
+
 	,drawUpdate:function(){
 		if(this.statediting){
 			this.statediting = false;
@@ -2726,13 +2729,13 @@ divi.assessment = divi.extend(divi.bookBase,{
 			this.loadFile();
 		}
 	}
-	
+
 	,loadFile:function(url,fileName){
 		var scope = this;
 		var url = this.prepareFilePath(this,null,this.getFileAction);
 		$.ajax({dataType: "json",url:divi.core.prepareUrl(url,this.assessFile)}).done(function (data) {scope.readAssessmentFile(data);}).fail(function (data) {scope.readFileFail(data);});
 	}
-	
+
 	,readAssessmentFile:function(data){
 		this.children = {};
 		this.children[this.childrenKeys[0]] = [];
@@ -2746,17 +2749,17 @@ divi.assessment = divi.extend(divi.bookBase,{
 			}
 		}
 	}
-	
+
 	,persistData:function(elem,url){
 		divi.appBase.prototype.persistData.call(this);// save master.json
 		this.persistCurr();
 	}
-	
+
 	,persistCurr:function(){
 		var url = this.prepareFilePath(this);
 		divi.appBase.prototype.persistData.call(this,this,url,this.assessFile,{attachCb:false});// save assessments.json
 	}
-	
+
 	,stringify:function(){
 		var masterObj= {};
 		if(this.isAssessment){
@@ -2764,7 +2767,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		}
 		return masterObj;
 	}
-	
+
 	,prepareSideBar:function(parent,toClean,currKey,index){
 		var livDiv,values,dflts,aDiv,iconDiv;
 		this.sequence = this.index;
@@ -2775,13 +2778,13 @@ divi.assessment = divi.extend(divi.bookBase,{
 		values = this.getValues();
 		aDiv.dom.innerHTML += values['name'];
 	}
-	
+
 	,readEachChild:function(children,currKey){
 		var eachChild,rchild;
 		this.initilizeChild(this,currKey)
 		this.loadQuestions(children);
 	}
-	
+
 	,loadQuestions:function(children){// better approach.TBD.
 		var ids = "";
 		for(var i=0;children && children && i < children.length;i++){
@@ -2850,8 +2853,8 @@ divi.question = divi.extend(divi.element,{
 	idCount:1,
 	prssIndex:-1,
 	editor:undefined,
-	idPrefix:'Q', 
-	
+	idPrefix:'Q',
+
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.question.superclass.constructor.call(this);
@@ -2859,14 +2862,14 @@ divi.question = divi.extend(divi.element,{
 		this.elems = [];
 		this.doms = {};
 	}
-	
+
 	,enableEditList:function(scope){
 		var insideElem = scope.find('div.preview.question');
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
 		var deleteBtn = scope.find('button.ui-cancelRemove');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
-	
+
 
 	,beforeDelete:function(event,val,jTarget){
 		var lookupKey = divi.assessment.prototype.childrenKeys[0];
@@ -2875,17 +2878,17 @@ divi.question = divi.extend(divi.element,{
 			children.remove(this);
 		}
 	}
-	
+
 	,padCount:function(){
 		return this.getCount();
 	}
-	
+
 	,initializeValues:function(){
 		divi.appBase.prototype.initializeValues.call(this);
 		this.values['type'] = this.type;
 	}
-	
-	
+
+
 	,prepareLoadValues:function(currNode,values){
 		if(values.hasOwnProperty('tags')){
 			var nodeList = currNode.getElementsByTagName ('tags');
@@ -2903,7 +2906,7 @@ divi.question = divi.extend(divi.element,{
 		}
 		return values;
 	}
-	
+
 	,drawChildren:function(){
 		var currSSel =$('<div>');
 		var currAns,ansDom,answers = this.elems;
@@ -2920,16 +2923,16 @@ divi.question = divi.extend(divi.element,{
 		}
 		return currSSel;
 	}
-	
+
 	,updateChildDom:function(ansDom){
-		
+
 	}
 	,drawElement:function(){
 		var dom = $(divi.tpl.question);
 		dom.append(this.getFieldValue('data'));
 		return dom;
 	}
-	
+
 	,drawQuestion:function(){
 		var parentCont = this.getSelector(this.contentPreview);
 		var elemDom = $.tmpl(this.elemTable,{});
@@ -2962,7 +2965,7 @@ divi.question = divi.extend(divi.element,{
 			this.addAnswer(this,elem);
 		}
 	}
-	
+
 	,prepareData:function(input,toClean,currKey,index,isArray,skipChildren){
 		if(input){
 			if(isArray){
@@ -2978,33 +2981,33 @@ divi.question = divi.extend(divi.element,{
 			input.push(newObj);
 		}
 	}
-	
+
 	,read:function(input){
 		this.setValues(input);
 	}
-	
+
 	,getSaveHtmlLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.savefileAction);
 		return url+"/"+this.imageLoc;
 	}
-	
+
 	,getEquationsLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
 		return url+"/"+this.equationLocExact;
 	}
-	
-	
+
+
 	,getSaveEquationsHtmlLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.saveformulaAction);
 		return url;
-		
+
 	}
-	
+
 	,getHtmlLoc:function(){
 		var url = this.prepareFilePath(this.parent,"",this.getFileAction);
 		return url+"/"+this.imageLoc;
 	}
-	
+
 	,submit:function(scope,form,event){
 		$.showLoader();
 		if(scope.isNew){
@@ -3019,7 +3022,7 @@ divi.question = divi.extend(divi.element,{
 		}
 		divi.home.prototype.cancelDailog(event);
 	}
-	
+
 	,validate:function(){
 		var values = this.getValues();
 		return true;
@@ -3027,7 +3030,7 @@ divi.question = divi.extend(divi.element,{
 
 	,validateForm:function(){
 		var elem,isValidForm = this.validate();
-		for(var i=0;i< this.elems.length;i++){	
+		for(var i=0;i< this.elems.length;i++){
 			elem = this.elems[i];
 			if(elem){
 				isValidForm = isValidForm*elem.validate();
@@ -3045,7 +3048,7 @@ divi.question = divi.extend(divi.element,{
 		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
 		return elemDom;
 	}
-	
+
 	,attachpreContent:function(appendTo){
 		var htmlValue = this.getFieldValue('data');
 		appendTo.find(this.editableDiv).remove();
@@ -3054,7 +3057,7 @@ divi.question = divi.extend(divi.element,{
 		this.editorKey = editorDom.id;
 		this.createEditor({editors:this.editors,sel:appendTo,attachtbar:true});
 	}
-	
+
 	,attachChildPreCont:function(appendTo,index,elem,isNew){
 		elem = elem || new divi[this.answerKey]({parent:this,isNew:true,home:this.home});
 		if(isNew){
@@ -3074,12 +3077,12 @@ divi.question = divi.extend(divi.element,{
 			appendTo.parent().find('div.'+this.optionsKey).find('a').removeClass('disabled');
 		}
 	}
-	
+
 	,attachEditorContent:function(appendTo,editors){
 		if(appendTo){
 			for(var edt in editors){
 				if(editors.hasOwnProperty(edt)){
-					appendTo.append(editors[edt].editor);	
+					appendTo.append(editors[edt].editor);
 				}
 			}
 			appendTo.append("<div class='dottedLine padding5'></div>");
@@ -3087,14 +3090,14 @@ divi.question = divi.extend(divi.element,{
 			this.appendElem = appendTo =  appendTo.find('.mainElem');
 			appendTo.append("<div class=''>Answers</div>");
 			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
-			for(var i=0;i < childCnt;i++){ 
+			for(var i=0;i < childCnt;i++){
 				var elem = this.isNew ? null : this.elems[i];
 				this.attachChildPreCont(appendTo,i,elem,this.isNew);
 			}
 			editors = this.editors;
 		}
 	}
-	
+
 	,prepareForm:function(appendElem,showToggle){
 		if(this.isReference){
 			divi.elementbase.prototype.prepareForm.call(this,appendElem,showToggle);
@@ -3105,16 +3108,16 @@ divi.question = divi.extend(divi.element,{
 			appendElem.append('<div class="'+this.optionsKey+'"><a class="'+aCls+'">+Add More Options</a></div>');
 		}
 	}
-	
+
 	,attachpostContent:function(appendTo,showToggle){
 		this.initiateRating();
 		this.attachMoreLis(appendTo.find('div.'+this.optionsKey));
 	}
-	
+
 	,checkMax:function(){
-		return (this.maxansCnt && this.elems.length >= this.maxansCnt); 
+		return (this.maxansCnt && this.elems.length >= this.maxansCnt);
 	}
-	
+
 	,initiateRating:function(){
 		var scope = this.tagging;
 		$(".diff.rating").rating({'static': false,stars: 5,showHint: true,hints: ['bad', 'poor', 'regular', 'good', 'gorgeous'],score:(scope.getFieldValue('difficulty') || 1),
@@ -3129,13 +3132,13 @@ divi.question = divi.extend(divi.element,{
 			child.addToCount();
 		}
 	}
-	
+
 	,attachElement:function(appendTo,showToggle,index,elem,isNew){
 		if(!this.checkMax()){
 			this.attachChildPreCont(appendTo,index,elem,true);
 		}
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
 		var dataF = values[this.htmlValKey];
@@ -3147,7 +3150,7 @@ divi.question = divi.extend(divi.element,{
             child.appendChild(data);
 		}
 	}
-	
+
 	,persistChild:function(){
 		var editor = this.editor;
 		this.updateCount();
@@ -3168,20 +3171,20 @@ divi.question = divi.extend(divi.element,{
 		}
 		this.addToCount();
 	}
-	
+
 	,prepareFilePath:function(scope,url,action){
 		var url = divi.appBase.prototype.prepareFilePath.call(this,this,url,action);
 		url += "/"+this.getFieldValue('id');
 		return url;
 	}
-	
+
 	,htmlcallBack:function(val){
 		var scope = this;
 		var values = this.getValues();
 		values[this.htmlValKey] = val;
 		this.persistChildHtml(this.prssIndex);
 	}
-	
+
 	,persistChildHtml:function(index){
 		if(index+1 < this.elems.length){
 			var elem = this.elems[index+1];
@@ -3196,7 +3199,7 @@ divi.question = divi.extend(divi.element,{
 			this.persistElem();
 		}
 	}
-	
+
 	,persistElem:function(){
 		var scope = this;
 		if(scope && scope.fileName){
@@ -3224,7 +3227,7 @@ divi.question = divi.extend(divi.element,{
 			scope.persist({url:url,data:[file],succcb:this.drawOnSuccess});
 		}
 	}
-	
+
 	,prepareParentDom:function(dom,childdom,values,parent){
 		if(childdom){
 		}
@@ -3255,31 +3258,31 @@ divi.answer = divi.extend(divi.element,{
 		divi.answer.superclass.constructor.call(this);
 		this.btnListeners = {};this.listeners = {};this.doms = {};
 	}
-	
+
 	,attachfieldListeners:function(){
 		this.btnListeners = {'click':[this.removeAns]};
 		this.listeners[this.elemLisKey] = {'change':[this.changeListener],'mouseout':[this.changeListener],'keypress':[this.changeListener],'click':[this.changeListener]};
 		$.extend(this.evtDflts,{listeners:this.listeners[this.elemLisKey],scope:this});
 	}
-	
+
 	,removeAns:function(event,targetVal,target){
 		this.removeAnswerFromParent(this.getIndexForElem());
 	}
-	
+
 	,padCount:function(){
 		return this.getCount();
 	}
-	
+
 	,undrawAns:function(ans){
 		if(ans){
 			$(ans).remove();
 		}
 	}
-	
+
 	,retriveEditorDoms:function(){
 		return 	[this.doms[this.divs.elem]];
 	}
-	
+
 	,adjustIds1:function(index){
 		var elems = this.parent.elems;
 		for(var i = elems.length-1;i > index;i--){
@@ -3289,7 +3292,7 @@ divi.answer = divi.extend(divi.element,{
 			}
 		}
 	}
-	
+
 	,removeAnswerFromParent:function(index){
 		if(index > -1){
 			var elem = this.parent.elems[index];
@@ -3310,7 +3313,7 @@ divi.answer = divi.extend(divi.element,{
 	,loadAnswer:function(answer){
 		this.populateValues(answer);
 	}
-	
+
 	,validate:function(){
 		var values = this.getValues(),validateForm = true;
 		for(var key in values){
@@ -3320,38 +3323,38 @@ divi.answer = divi.extend(divi.element,{
 		}
 		return true;
 	}
-	
+
 	,htmlcallBack:function(val){
 		var scope = this;
 		var values = this.getValues();
 		values[this.htmlValKey] = val;
 		this.parent.persistChildHtml(this.getIndexForElem());
 	}
-	
+
 	,getSaveHtmlLoc:function(){
 		return this.parent.getSaveHtmlLoc();
 	}
-	
+
 	,getEquationsLoc:function(){
 		return this.parent.getEquationsLoc();
 	}
-	
+
 	,setFieldCount:function(fieldCount){
 		this.parent.fieldCount = fieldCount;
 	}
-	
+
 	,getFieldCount:function(){
 		return this.parent.fieldCount;
 	}
-	
+
 	,getSaveEquationsHtmlLoc:function(){
 		return this.parent.getSaveEquationsHtmlLoc();
 	}
-	
+
 	,getHtmlLoc:function(){
 		return this.parent.getHtmlLoc();
 	}
-	
+
 	,getIndexForElem:function(){
 		var matchedInd,elem,elems = this.parent.elems;
 		for(var i =0;elems && i < elems.length;i++){
@@ -3363,16 +3366,16 @@ divi.answer = divi.extend(divi.element,{
 		}
 		return matchedInd;
 	}
-	
+
 	,prepareSubmitValues:function(){
 		scope = scope || this;
 		return scope.getValues();
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		this.parent.addSplValues(dom,child,values,parent);
 	}
-	
+
 	,addAddValues:function(dom,childdom,values,parent){
 		if(childdom){
 			childdom.removeAttribute('thumb');
@@ -3380,7 +3383,7 @@ divi.answer = divi.extend(divi.element,{
 			childdom.setAttribute('isAnswer',this.getFieldValue('isAnswer'));
 		}
 	}
-	
+
 	,changeListener:function(event,val,jTarget,type,target){
 		var key = "data",val;
 		if(target && target.name == "isAnswer"){
@@ -3391,26 +3394,26 @@ divi.answer = divi.extend(divi.element,{
 		}
 		this.setValueForKey(key,val);
 	}
-	
+
 	,prepareCloseButton:function(parDom,fieldCount){
 		var button = this.doms[this.divs.button] = divi.domBase.create({events:['click'],tag:'button','class':'ui-cancelRemove',scope:this,value:'<i class="icon-remove-circle"></i>',listeners:this.btnListeners,tabIndex:++fieldCount,attachLis:true},parDom.dom);
 		$(button.dom).attr('id',button.id);
 	}
-	
+
 	,checkAndAttachLis:function(){
 		if(!this.listernsAttchd){
 			this.listernsAttchd = true;
 			this.attachfieldListeners();
 		}
 	}
-	
+
 	,draw:function(append){
 		this.checkAndAttachLis();
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var isAnswer = this.getFieldValue("isAnswer");
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var inptDflts = $.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control',tabIndex:++fieldCount},this.evtDflts); 
+		var inptDflts = $.extend({tag:'input',type:"checkbox",name:'isAnswer','data-transform':'input-control',tabIndex:++fieldCount},this.evtDflts);
 		if(isAnswer == "true"){
 			$.extend(inptDflts,{'checked':true});
 		}
@@ -3447,7 +3450,7 @@ divi.torfAns = divi.extend(divi.answer,{
 			matched.setValueForKey(key,!val);
 		}
 	}
-	
+
 	,getOtherTarget:function(jTarget){
 		var matched,elem,parent = this.parent;
 		var elems = parent.elems;
@@ -3467,7 +3470,7 @@ divi.torfAns = divi.extend(divi.answer,{
 		var isAnswer = this.getFieldValue("isAnswer");
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var inptDflts = $.extend({tag:'input',type:"radio",name:'r3','data-transform':'input-control',tabIndex:fieldCount++},this.evtDflts); 
+		var inptDflts = $.extend({tag:'input',type:"radio",name:'r3','data-transform':'input-control',tabIndex:fieldCount++},this.evtDflts);
 		if(isAnswer == "true"){
 			$.extend(inptDflts,{'checked':true});
 		}
@@ -3483,7 +3486,7 @@ divi.torfAns = divi.extend(divi.answer,{
 		$(parDom.dom).append(answerDom.dom);
 		this.setFieldCount(fieldCount);
 	}
-	
+
 });
 
 divi.fill_blankAns = divi.extend(divi.answer,{
@@ -3496,7 +3499,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 		this.listeners = {};
 		divi.fill_blankAns.superclass.constructor.call(this);
 	}
-	
+
 	,changeListener:function(event,val,jTarget,type,target){
 		this.setValueForKey(this.htmlValKey,val);
 		this.disableToolbar(event);
@@ -3510,7 +3513,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 			}
 		}
 	}
-	
+
 	,addAddValues:function(dom,childdom,values,parent){
 		if(childdom){
 			childdom.removeAttribute('thumb');
@@ -3522,12 +3525,12 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 	,addSplValues:function(dom,child,values,parent){
 		child.textContent = values[this.htmlValKey];
 	}
-	
+
 	,loadValues:function(currNode,values){
 		values[this.htmlValKey] = currNode.textContent;
 		return null;
 	}
-	
+
 	,draw:function(append,index){
 		this.checkAndAttachLis();
 		var values = this.getValues();
@@ -3540,7 +3543,7 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 		$(parDom.dom).append(elem.dom);
 		this.setFieldCount(fieldCount);
 	}
-	
+
 });
 
 divi.labelingAns = divi.extend(divi.answer,{
@@ -3562,14 +3565,14 @@ divi.labelingAns = divi.extend(divi.answer,{
 		imageField.draw({},parDom.dom);
 		this.setFieldCount(fieldCount);
 	}
-	
+
 	,addAddValues:function(dom,childdom,values,parent){
 		if(childdom){
 			childdom.removeAttribute('thumb');
 			childdom.removeAttribute('src');
 		}
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
 		var key = this.htmlValKey;
@@ -3596,7 +3599,7 @@ divi.matchAns = divi.extend(divi.answer,{
 	divs:{'left':'left','right':'right','main':'main'},
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		divi.matchAns.superclass.constructor.call(this);	
+		divi.matchAns.superclass.constructor.call(this);
 		this.listeners = {};
 	}
 
@@ -3609,7 +3612,7 @@ divi.matchAns = divi.extend(divi.answer,{
 	,retriveEditorDoms:function(){
 		return 	[this.doms[this.divs.left],this.doms[this.divs.right]];
 	}
-	
+
 	,addSplValues:function(dom,child,values,parent){
 		var values = this.cleanValues(values);
 		var key = this.htmlValKey;
@@ -3625,7 +3628,7 @@ divi.matchAns = divi.extend(divi.answer,{
 			}
 		}
 	}
-	
+
 	,htmlcallBack:function(val,key){
 		var scope = this;
 		var values = this.getValues();
@@ -3651,7 +3654,7 @@ divi.matchAns = divi.extend(divi.answer,{
 		$(parDom.dom).append(rightdom.dom);
 		this.setFieldCount(fieldCount);
 	}
-	
+
 });
 
 
@@ -3679,7 +3682,7 @@ divi.torf = divi.extend(divi.question,{
 	,updateChildDom:function(ansDom){
 		ansDom.find('input').attr('name',this.getFieldValue('id'));
 	}
-	
+
 	,attachpostContent:function(appendTo,showToggle){
 		divi.question.prototype.attachpostContent.call(this,appendTo,showToggle);
 		appendTo.find('div.'+this.optionsKey).addClass('hidden');
@@ -3731,7 +3734,7 @@ divi.match = divi.extend(divi.question,{
 		if(appendTo){
 			for(var edt in editors){
 				if(editors.hasOwnProperty(edt)){
-					appendTo.append(editors[edt].editor);	
+					appendTo.append(editors[edt].editor);
 				}
 			}
 			appendTo.append("<div class='dottedLine padding5'></div>");
@@ -3740,7 +3743,7 @@ divi.match = divi.extend(divi.question,{
 			this.appendElem = appendTo =  appendTo.find('.matchDiv');
 			appendTo.append("<div class=''>Answers</div>");
 			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
-			for(var i=0;i < childCnt;i++){ 
+			for(var i=0;i < childCnt;i++){
 				var elem = this.isNew ? null : this.elems[i];
 				this.attachChildPreCont(appendTo,i,elem,this.isNew);
 			}
@@ -3752,7 +3755,7 @@ divi.match = divi.extend(divi.question,{
 		if(index+1 < this.elems.length){
 			var elem,key,passKey;
 			elem = this.elems[index+1];
-			key = !key ? elem.leftKey : elem.rightKey; 
+			key = !key ? elem.leftKey : elem.rightKey;
 			passKey = (key ==  elem.leftKey) ? elem.leftKey : undefined;
 			var editorIn = this.editor.getEditorsForKey(key);
 			if(editorIn && elem){
@@ -3843,7 +3846,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.initialize();
 		//document.execCommand('useCSS', false, false);
 	}
-	
+
 	,removeEditor:function(key){
 		var editor = this.getEditorsForKey(key);
 		if(editor){
@@ -3851,16 +3854,16 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			delete this.getEditors()[key];
 		}
 	}
-	
+
 	,addEditors:function(editors){
 		this.editors = editors;
 		divi.listeners.attachElementListeners(this.initiateEditors(),this,null,this.listenerKey);
 	}
-	
+
 	,getEditors:function(){
 		return this._editors;
 	}
-	
+
 	,getEditorsForKey:function(ref){
 		var editors = this.getEditors();
 		var currEditor;
@@ -3869,13 +3872,13 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		}
 		return currEditor;
 	}
-	
+
 	,setActiveToolbar:function(event,target,jTarget){
 		var scope = event.data.scope;
 		var currEditor = jTarget.hasClass("."+this.editableDiv) ? jTarget : jTarget.closest("div."+this.editableDiv);
 		scope.activateToolBar(scope,currEditor.attr('id'));
 	}
-	
+
 	,deactivateToolBar:function(scope,refKey){
 		if(!scope.activeKey || scope.activeKey != refKey){
 			scope.removeActiveToolbar.call(scope);
@@ -3889,7 +3892,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,activateToolBar:function(scope,refKey){
 		if(!scope.activeKey || scope.activeKey != refKey || this.toolbarDisabled){
 			scope.removeActiveToolbar.call(scope);
@@ -3903,7 +3906,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,execCommand:function (commandWithArgs, valueArg) {
 		var commandArr = commandWithArgs.split(' '),command = commandArr.shift(),args = commandArr.join(' ') + (valueArg || '');
 		document.execCommand(command, 0, args);
@@ -3911,7 +3914,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		var par = this.parent ? this.parent : this;
 		par.updateToolbar();
 	}
-	
+
 	/*,getSelectionHtml:function() {
 	    var html = "";
 	    if (typeof window.getSelection != "undefined") {
@@ -3931,10 +3934,10 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	    }
 	   this.replaceSelectionWithHtml(this.cleanHTML(html));
 	}*/
-	
+
 	// removes MS Office generated guff
-	
-	
+
+
 	/*,replaceSelectionWithHtml:function(html) {
 	    var range, html;
 	    if (window.getSelection && window.getSelection().getRangeAt) {
@@ -3966,19 +3969,19 @@ divi.contentEditor = divi.extend(divi.appBase,{
 					document.body.createTextRange().select();
 					document.selection.empty();
 				}
-	
+
 				selection.addRange(selectedRange);
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	/*,getSel: function () {
 	     var e = window;
 	     return e.getSelection ? e.getSelection() : e.document.selection
 	}
-	
+
 	,getRoot: function () {
 	      var e = this,dom;
 	      if(this.activeKey){
@@ -3987,12 +3990,12 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	      }
 	      return dom;
 	}
-	
+
 	,processSel:function(){
 		 var t, n,x = this;
 		 t = x.getParent(this.getNode(), "ol,ul"), t && (n = t.parentNode, /^(H[1-6]|P|ADDRESS|PRE)$/.test(n.nodeName) && (b(), x.split(n, t), C()))
 	}
-	  
+
 	,getNode:function(){
 		var t = this,
         n = t.getRng(),
@@ -4002,16 +4005,16 @@ divi.contentEditor = divi.extend(divi.appBase,{
         s = n.endOffset;
 		return n ? n.setStart ? (r = n.commonAncestorContainer, !n.collapsed && (i == o && 2 > s - a && i.hasChildNodes() && (r = i.childNodes[a]), 3 === i.nodeType && 3 === o.nodeType && (i = i.length === a ? e(i.nextSibling, !0) : i.parentNode, o = 0 === s ? e(o.previousSibling, !1) : o.parentNode, i && i === o)) ? i : r && 3 == r.nodeType ? r.parentNode : r) : n.item ? n.item(0) : n.parentElement() : t.getRoot()
 	}
-	
+
 	 ,getParent: function (e, t, n) {
 	     return this.getParents(e, t, n, !1)
 	 }
-	 
+
 	 ,get: function (e) {
          var t;
          return e && this.doc && "string" == typeof e && (t = e, e = this.doc.getElementById(e), e && e.id !== t) ? this.doc.getElementsByName(t)[1] : e
      }
-	 
+
   	 ,getParents: function (e, n, r, i) {
 	      var o = this,t,
 	          a, s = [];
@@ -4028,7 +4031,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	      }
 	      return i ? s : null
 	  }
-	 
+
 	,getRng: function (e) {
        var t = this,n, r, i, o = window.document,a;
        if (!e && t.lastFocusBookmark) {
@@ -4056,7 +4059,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			});
 		}
 	}
-	
+
 	,updateToolbar:function () {
 		if (this.activeToolbarClass) {
 			var scope = this;
@@ -4070,7 +4073,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			});
 		}
 	}
-	
+
 	,removeActiveToolbar:function(){
 		if(this.activeEditor){
 			this.activeEditor.destroy();
@@ -4078,23 +4081,23 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			this.resetToolBar();
 		}
 	}
-	
+
 	,disableToolbar:function(){
 		var toolbar = this.getSelector(this.btnToolbar);
 		toolbar.prepend("<div class='"+this.dsbltoolbar+"'></div>");
 		this.toolbarDisabled = true;
 	}
-	
+
 	,startup:function(){
 		this.toolbarBtnSelector = 'a[data-' + this.commandRole + '],button[data-' + this.commandRole + '],input[type=button][data-' + this.commandRole + ']';
 		this.listeners[this.listenerKey] = {'click':[this.setActiveToolbar]};
 		this.disableToolbar();
 	}
-	
+
 	,setEditors:function(editors){
 		this._editors = editors;
 	}
-	
+
 	,initiateEditors:function(){
 		var editors = [],eachEdit,mainEditors = {};
 		var exsEditors = this.getEditors();
@@ -4112,13 +4115,13 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		this.setEditors(mainEditors);
 		return editors;
 	}
-	
+
 	,initialize:function(){
 		this.formuleImages = 'img[src*="' + EQUATION_ENGINE + '"],img[src*="' + this.equations + '"]';
 		divi.listeners.attachElementListeners(this.initiateEditors(),this,null,this.listenerKey);
 		this.bindToolbar();
 	}
-	
+
 	,setDefaultEditor:function(){
 		var editors = this.editors;
 		var sortedKeys = Object.keys(editors).sort();
@@ -4127,12 +4130,12 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			this.activateToolBar(this, $(first).attr('ref'));
 		}
 	}
-	
+
 	,getEditorDtls:function(scope,event){
 		var scope = event.data.scope;
 		return scope.parent ? scope : scope.activeEditor;
 	}
-	
+
 	,onToolBarclick:function(event){
 		var scope = event.data.scope;
 		var target = divi.util.getTarget(event);
@@ -4149,7 +4152,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}else if(editText){
 				scope.launchCommand($(event.currentTarget).data(scope.commandRole),editor);
 			}else{
-				
+
 				var checkforImg = jTarget.find(scope.formuleImages);
 				if(divi.util.isjQEmpty(checkforImg)){
 					checkforImg = jTarget.parent().find(scope.formuleImages);
@@ -4163,7 +4166,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,launchFormula:function(mainEditor,editor,editTarget){
 		var range = editor.getCurrentRange();
 		if(editTarget || range){
@@ -4171,7 +4174,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			editor.formula = new divi.formula({mainEditor:mainEditor,parent:editor,value:editTarget,currSel:range});
 		}
 	}
-	
+
 	,launchCommand:function(data,activeEditor){
 		if(activeEditor){
 			var scope = activeEditor.parent;
@@ -4181,11 +4184,11 @@ divi.contentEditor = divi.extend(divi.appBase,{
 				scope.execCommand(data);
 			}else{
 				this.updateToolbar();
-			}	
+			}
 			activeEditor.saveSelection();
 		}
 	}
-	
+
 	,onRestoreSel:function(event,target,scope){
 		var scope = event.data.scope;
 		var editor = scope.getEditorDtls(scope,event);
@@ -4193,7 +4196,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			editor.restoreSelection();
 		}
 	}
-	
+
 	,insertImage:function(fileInfo,event){
 		var file = fileInfo;
 		var scope = this;
@@ -4208,7 +4211,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			scope.fileUploadError("file-reader", e);
 		});
 	}
-	
+
 	,insertFiles:function (mainEditor,files,event) {
 		var scope = mainEditor;
 		var editor = scope.getEditorDtls(scope,event);
@@ -4220,7 +4223,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}
 		});
 	}
-	
+
 	,onFileChange:function(event,target,scope){
 		var scope = event.data.scope;
 		var editor = scope.getEditorDtls(scope,event);
@@ -4235,11 +4238,11 @@ divi.contentEditor = divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,attachEquationsListeners:function(){
 		$("div."+this.editableDiv).find(this.formuleImages).on('click',null,{scope:this},this.onToolBarclick);
 	}
-	
+
 	,bindToolbar:function () {
 		var toolbar = $(this.toolbarSelector);
 		toolbar.find(this.toolbarBtnSelector).on('click',null,{scope:this},this.onToolBarclick);
@@ -4270,18 +4273,18 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	}
 
 	,initialize:function(){// overriding the base initialize
-		
+
 	}
-	
+
 	,addImgFile:function(file){
 		if(file){
-			this.imgFiles[file.name] = file;	
+			this.imgFiles[file.name] = file;
 		}
 	}
-	
+
 	,addFile:function(file){
 		if(file){
-			this.files[file.name] = file;	
+			this.files[file.name] = file;
 		}
 	}
 
@@ -4291,11 +4294,11 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 			this.saveinlineImages(rtnScope,this.cleanHTML(this.editor.html()),callback,key);
 		}
 	}
-	
+
 	,cleanHTML:function(input) {
 		  var input = this.cleanStyles(input);
 		  // 1. remove line breaks / Mso classes
-		  var stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g; 
+		  var stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g;
 		  var output = input.replace(stringStripper, ' ');
 		  // 2. strip Word generated HTML comments
 		  var commentSripper = new RegExp('<!--(.*?)-->','g');
@@ -4305,7 +4308,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		  output = output.replace(tagStripper, '');
 		  // 4. Remove everything in between and including tags '<style(.)style(.)>'
 		  var badTags = ['style', 'script','applet','embed','noframes','noscript'];
-		  
+
 		  for (var i=0; i< badTags.length; i++) {
 		    tagStripper = new RegExp('<'+badTags[i]+'.*?'+badTags[i]+'(.*?)>', 'gi');
 		    output = output.replace(tagStripper, '');
@@ -4323,7 +4326,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		  }
 		  return output;
 	}
-	
+
 	,cleanStyles:function(output){
 		var elemDom = $('<div>').append(output);
 		var elems = elemDom.find("[style]");
@@ -4340,7 +4343,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		});
 		return elemDom.html();
 	}
-	
+
 	,updateInlineFiles:function(value,files){
 		var upfiles = {};
 		var val = $('<div>').append(value);
@@ -4351,7 +4354,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		}
 		return upfiles;
 	}
-	
+
 	,saveinlineImages:function(rtnScope,value,callback,key){
 		var scope = this;
 		var files = scope.files = this.updateInlineFiles(value,scope.files);
@@ -4374,7 +4377,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
         		isFiles = true;
         	}
         }
-        
+
         var imageFiles = this.fetchFormulas(value);
         var imageUrl = rtnScope.getSaveEquationsHtmlLoc();
         if(imageFiles && imageFiles.length > 0 && imageUrl){
@@ -4389,7 +4392,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
         	scope.saveInlineSucess.call(scope,value, filesList,imageFiles,callback,cbScope,key);
         }
 	}
-	
+
 	,fetchFormulas:function(val){
 		var files = [];
 		if (val) {
@@ -4406,7 +4409,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    }
 		return files;
 	}
-	
+
 	,upateFormulas:function (resData,respData) {
 	    var currLocation = "./equations/";
 	    var currData, location;
@@ -4418,7 +4421,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    }
 	    return val;
 	}
-	
+
 	,saveInlineSucess:function (val, files,imageFiles,callback,cbScope,key) {
 		var saveVal = val;
 		if(files && files.length > 0){
@@ -4434,15 +4437,15 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    	callback.apply(cbScope,[saveVal,key]);
 	    }
 	}
-	
-	
+
+
 	,activate:function(){
 		if(this.editor){
 			this.editor.attr('contenteditable', true);
 			this.editor.focus();
 		}
 	}
-	
+
 	,destroy:function(){
 		if(this.editor){
 			this.editor.attr('contenteditable', false);
@@ -4458,7 +4461,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		divi.listeners.attachElementListeners([this.editor],this,null,this.listenerKey);
 		this.activate();
 	}
-	
+
 	,pasteListener:function(evt,target,jTarget){
 		var items = evt.originalEvent.clipboardData.items, paste;
 		if( items[0].kind === 'string' && items[1].kind === 'file' && items[1].type.match( /^image/ ) ) {
@@ -4474,15 +4477,15 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 	    	document.execCommand("insertText", false, text);
 	    	$('.richtext-html').val('');
 	    }
-	}	
-	
+	}
+
 	,getCurrentRange:function () {
 		var sel = window.getSelection();
 		if (sel.getRangeAt && sel.rangeCount) {
 			return sel.getRangeAt(0);
 		}
 	}
-	
+
 	,triggerCommand:function(event,target,jTarget){
 		var scope = this;
 		var activeEditor = scope.activeEditor;
@@ -4501,7 +4504,7 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 				hotKey += char.toLowerCase();
 			}
 		}
-		
+
 		if(this.hotKeys[hotKey]){
 			var parent = scope.parent;
 			event.preventDefault();
@@ -4511,25 +4514,25 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 			}
 		}
 	}
-	
+
 	,editorListener:function(event,target,jTarget){
 		this.saveSelection(event);
 		this.parent.updateToolbar();
 	}
-	
+
 	,removeListeners:function(){
 		if(this.editor){
 			this.editor.off(this.events,null);
 		}
 	}
-	
+
 	,destroyFormula:function(){
 		this.formula.destroy();
 		delete this.formula;
 	}
-	 
-	
-	
+
+
+
 	,updateFormula:function(html,range,oldDom){
 		if(html){
 			this.destroyFormula();
@@ -4557,11 +4560,11 @@ divi.indEditor = divi.extend(divi.contentEditor,{
 		this.editor.find(this.parent.formuleImages).on('click',null,{scope:this.parent},this.parent.onToolBarclick);
 		$(this.parent.sel).closest(".ui-dialog").css('display','block');
 	}
-	
+
 	,saveSelection:function (event) {
 		this.selectedRange = this.getCurrentRange();
 	}
-	
+
 });
 
 divi.formula = divi.extend(divi.contentEditor,{
@@ -4575,7 +4578,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 	currSel:undefined,
 	value:undefined,
 	elems:['.insertWin','.cancelWin'],
-	tpl:undefined,	
+	tpl:undefined,
 	toolbar:'#toolbar',
 	value:undefined,
 	table:'formula',
@@ -4585,11 +4588,11 @@ divi.formula = divi.extend(divi.contentEditor,{
 		$.extend(this,cfg);
 		divi.formula.superclass.constructor.call(this);
 	}
-	
+
 	,overlayDflts:function(dflts){
 		$.extend(dflts,this.overDflts);
 	}
-	
+
 	,setValue:function(val){
 		if(val){
 			var jVal = $(val);
@@ -4604,7 +4607,7 @@ divi.formula = divi.extend(divi.contentEditor,{
 		this.tpl = divi.tpl[this.table];
 		this.show();
 	}
-	
+
 	,activate:function(){
 		$(this.toolbar).focus().removeAttr('readOnly');
 	}
@@ -4673,14 +4676,14 @@ divi.home =  divi.extend(divi.appBase,{
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
 	}
-	
+
 	,updateSelected:function(selected){
 		this.selected = selected;
 		this.enableTopBtns(selected);
 		this.enableTopEditBtns(selected);
 		this.previewContent(selected);
 	}
-	
+
 	,enableTopEditBtns:function(selected){
 		if(selected && selected.table == 'topic'){
 			this.getSelector(this.assessbtns).hide();
@@ -4695,7 +4698,7 @@ divi.home =  divi.extend(divi.appBase,{
 			divi.listeners.unbindListeners(this.editAssessListeners(selected),this);
 		}
 	}
-	
+
 	,previewContent:function(selected){
 		this.updateBcrumb(selected);
 		this.getSelector(this.contentPreview).empty();
@@ -4703,7 +4706,7 @@ divi.home =  divi.extend(divi.appBase,{
 			selected.loadFile();
 		}
 	}
-	
+
 	,updateBcrumb:function(selected){
 		if(this.isTopic(selected)){
 			var chapter = this.retrieveElem(selected,'chapter');
@@ -4717,18 +4720,18 @@ divi.home =  divi.extend(divi.appBase,{
 			this.getSelector(this.assessHolder).removeClass('hidden');
 			this.getSelector(this.chapTit).html(chapter.getFieldValue('name'));
 			this.getSelector(this.assessTit).html(selected.getFieldValue('name'));
-			
+
 		}else{
 			this.getSelector(this.editContent).addClass('hidden');
 			this.getSelector(this.assessHolder).addClass('hidden');
 		}
 	}
-	
+
 	,btnListeners:function(scope){
 		 return [{tag:'.addtopic',listType:'click',parent:this.book,listenerFn:'addcontent',key:'topic',mapTo:scope},
 	        {tag:'.addassessment',listType:'click',parent:this.book,listenerFn:'addcontent',key:'assessment',mapTo:scope}];
 	}
-	
+
 	,editBtnListeners:function(scope){
 		 return [{tag:'.addvideo',listType:'click',parent:this.book,listenerFn:'addelement',key:'video',mapTo:scope},
 		         {tag:'.addimage',listType:'click',parent:this.book,listenerFn:'addelement',key:'image',mapTo:scope},
@@ -4741,7 +4744,7 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addalert',listType:'click',parent:this.book,listenerFn:'addelement',key:'alert',mapTo:scope},
 		         {tag:'.addother',listType:'click',parent:this.book,listenerFn:'addelement',key:'other',mapTo:scope}];
 	}
-	
+
 	,editAssessListeners:function(scope){
 		 return [{tag:'.addmcq',listType:'click',parent:this.book,listenerFn:'addelement',key:'mcq',mapTo:scope},
 		         {tag:'.addtorf',listType:'click',parent:this.book,listenerFn:'addelement',key:'torf',mapTo:scope},
@@ -4749,7 +4752,7 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addmatch',listType:'click',parent:this.book,listenerFn:'addelement',key:'match',mapTo:scope},
 		         {tag:'.addlabeling',listType:'click',parent:this.book,listenerFn:'addelement',key:'labeling',mapTo:scope}];
 	}
-	
+
 	,enableTopBtns:function(selected){
 		var chapter;
 		if(selected){
@@ -4759,20 +4762,20 @@ divi.home =  divi.extend(divi.appBase,{
 			}
 		}
 	}
-	
+
 	,startup:function(){
 		this.book = new divi.book({home:this});
 		this.loadBook();
 		divi.listeners.attachListenersWS(this.defaultListeners(),this);
 	}
-	
+
 	,preparepopUp:function(elem){
 		var popupDiv = this.retrievePopUpDiv();
 		width = elem.popWdith || '60%';
 		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
 		popupDiv.empty().superDialog(dlgConfig);
 	}
-	
+
 	,readBook:function(data){
 		var master_json = {};
 		if(data){
@@ -4781,7 +4784,7 @@ divi.home =  divi.extend(divi.appBase,{
 		this.book.load(master_json);
 		this.prepareSideBar(home.book);
 	}
-	
+
 	,bookreadFail:function(r){
 		if(r.status == "404"){
 			this.book.persistData();
@@ -4790,14 +4793,14 @@ divi.home =  divi.extend(divi.appBase,{
 			alert("Unable to read the book. Please contact administrator");
 		}
 	}
-	
+
 	,tagsreadFail:function(r){
 		if(r.status == "404"){
 		}else{
 			alert("Unable to read the book. Please contact administrator");
 		}
 	}
-	
+
 	,loadBook:function(){
 		var scope = this;
 		var timest = (new Date()).getTime();
@@ -4807,11 +4810,11 @@ divi.home =  divi.extend(divi.appBase,{
 			masterFile += "?time="+timest;
 			tagFile += "?time="+timest;
 			this.firstLoad = false;
-		}	
+		}
 		$.ajax({url: divi.core.prepareUrl(this.getFileAction,masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
 		$.ajax({url: divi.core.prepareUrl(this.getFileAction,tagFile)}).done(function (data) {scope.readTags(data);}).fail(function (data) {scope.tagsreadFail(data);});
 	}
-	
+
 	,defaultListeners:function(){
 		return [{tag:'.btnAthr',listType:'click',mapTo:this.book,listenerFn:'prepareFormUp'},
 		        {tag:'.bkcover',listType:'click',mapTo:this.book,listenerFn:'drawitem'},
@@ -4819,39 +4822,39 @@ divi.home =  divi.extend(divi.appBase,{
 		        {tag:'.addchapter',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
 		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
 	}
-	
+
 	,addcontent:function(cfg){
 		var scope = cfg.mapTo;
 		if(scope){
 			scope.add(scope,null,null,cfg.key);
 		}
 	}
-	
+
 	,addelement:function(cfg){
 		var scope = cfg.mapTo;
 		if(scope){
 			scope.addElem(null,null,cfg.key);
 		}
 	}
-	
+
 	,drawitem:function(lstnCfg){
 		if(lstnCfg && lstnCfg.mapTo){
 			lstnCfg.mapTo.preview();
 			lstnCfg.mapTo.draw();
 		}
 	}
-	
+
 	,prepareFormUp:function(lstnCfg){
 		this.launchPopUp(lstnCfg.mapTo);
 	}
-	
+
 	,showEditor:function(lstnCfg){
 		if(lstnCfg && lstnCfg.mapTo){
 			this.launchEditor(lstnCfg.mapTo,lstnCfg.scope);
 		}
 	}
 	,insertContent:function(){
-		
+
 	}
 });
 var home = new divi.home({});
