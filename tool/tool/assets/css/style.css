@@ -102,14 +102,16 @@ div.bookdiv{
 }
 
 div.buttonsList nav{
-	width:60%;
+
+	width:56%;
 	float: left;
+
 }
 
 div.buttonsList .pvwBtns{
-	width:30%;
+	width:44%;
 	float:right;
-	top: 15%;
+	top: 21%;
 	position: relative;
 }
 
@@ -149,20 +151,7 @@ div.buttonsList .pvwBtns{
 
 .metro div.previewElem:hover {
 	border:dotted 1px;
-	background:#bebebe !important;
-	opacity: .7;
-	-webkit-transform: scale(1.02,1.02);
-	-webkit-transition-timing-function: ease-out;
-	-webkit-transition-duration: 250ms;
-	-moz-transform: scale(1.02,1.02);
-	-moz-transition-timing-function: ease-out;
-	-moz-transition-duration: 250ms;
-	position: relative;
 	z-index: 99;
-}
-.metro div.previewElem .ui-cancelRemove:hover{
-	opacity: .8;
-	z-index: 100;
 }
 
 .metro .ui-dialog .previewImages{
@@ -779,8 +768,31 @@ div.editableDiv.answer {
 	height: 20px;
 }
 
-.metro .previewElem .ui-cancelRemove{
-	margin-top: -30px;
+.metro .previewElem .prevBtns{
+	position: absolute;
+	right: .3em;
+	top: 1%;
+	padding: 1px;
+	height: 20px;
+	margin:0px;
+
+}
+
+.metro div.previewElem .prevBtns button{
+	border:0px;
+	z-index: 150;
+	margin:0sccpx;
+}
+
+.metro div.previewElem .prevBtns button:hover{
+	margin:1px;
+	height:23px;
+	width:42px;
+}
+
+
+.metro div.previewElem .prevBtns button{
+	margin:0 2px;
 }
 
 .metro .ui-dialog .ui-dialog-buttonpane{
@@ -899,6 +911,10 @@ div.editableDiv.answer {
 .metro div.formfield.points .input-control.text .btn-clear{
 	right:0px;
 	left:30px;
+}
+
+.metro .previewElem .carousel{
+	margin-top:2%;
 }
 
 .metro div.formfield.points div.input-control input {

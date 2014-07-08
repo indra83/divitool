@@ -203,7 +203,8 @@ divi.appBase = divi.extend(divi.base, {
 	imageLoc:"/htmlimages/",
 	data:{},
 	values:{},
-	dlgDflts:{shadow: true,overlay: false,icon: '',width: '100%',height:'100%',padding: 10,sysButtons: {btnClose: true}},
+
+	dlgDflts:{shadow: true,overlay: false,icon: '',width: '100%',height:'100%',padding: 10,sysButtons: {btnClose: true},overlayClickClose:false},
 
     constructor: function (cfg) {
     	$.extend(this, cfg);
@@ -945,6 +946,69 @@ divi.appBase = divi.extend(divi.base, {
 		}
 	}
 
+
+	,getSiblings:function(scope){
+		var children;
+		if(scope){
+			var parent = scope.parent;
+			if(parent){
+				children = parent.elements;
+			}
+		}
+		return children;
+	}
+
+	,rearrange:function(scope,pushUp,pushDown,event,jTarget){
+		$.showLoader({text:'Re-arranging'});
+		var siblings = this.getSiblings(scope);
+		if(siblings){
+			var index = siblings.indexOf(scope);
+			var frind = pushUp? index-1 : index+1;
+			console.log("index: "+frind);
+			siblings.remove(scope);
+			console.log("siblings: "+siblings.length);
+			siblings.splice(frind, 0, scope);
+			this.parent.persistData(null,null,null,{attachCb:true});
+			this.getSelector(this.contentPreview).empty();
+			jTarget.scrollintoview();
+		}
+		$.hideLoader();
+	}
+
+	,rearrangeElemClick:function(event,val,jTarget){
+		var scope = event.data.scope;
+		if(!jTarget.parent().hasClass('disabled')){
+
+			var pushUp = jTarget.hasClass('icon-arrow-up') || jTarget.children().hasClass('icon-arrow-up');
+			this.rearrange(scope,pushUp,!pushUp,event,jTarget);
+		}
+	}
+
+	,getchildrenForParent:function(scope){
+		return scope.elements;
+	}
+
+	,enableRearrange:function(scope){
+		var children = this.getchildrenForParent(scope);
+		var eachChild,elems = [],parent;
+		for(var ind in children){
+			if(children.hasOwnProperty(ind)){
+				elems = [];
+				eachChild = children[ind];
+				jdom = eachChild.doms[this.divs['preview']];
+				var index = children.indexOf(eachChild);
+				if(index != children.length-1){
+					parent = jdom.find('.icon-arrow-down').parent(),parent.removeClass('disabled'),elems.push(parent);
+				}
+				if(index != 0){
+					parent = jdom.find('.icon-arrow-up').parent(),parent.removeClass('disabled'),elems.push(parent);
+				}
+				divi.listeners.attachElementListeners(elems,eachChild,null,eachChild.rearrangeKey,eachChild.dlEvents);
+			}
+		}
+	}
+
+
 	,show:function(key){
 		var scope = this;
 		var dflts = scope.dlgDflts;
@@ -1037,8 +1101,9 @@ divi.appBase = divi.extend(divi.base, {
 					var key = eachChild.tagName;
 					var eachElem = new divi[key]({parent:selected,home:selected.home});
 					if(eachElem){
-						eachElem.loadElement(eachChild,parentCont);
 						eachElem.addChild(selected,'',eachElem);
+						eachElem.loadElement(eachChild,parentCont);
+
 					}
 				}
 			}
@@ -1048,6 +1113,7 @@ divi.appBase = divi.extend(divi.base, {
 
 	,activateElements:function(){
 		$('.carousel').carousel({auto: false,period: 3000,duration: 2000,height:'100%',markers: {type: "square",position:"bottom-center"}});
+		this.enableRearrange(this);
 	}
 
 	,readFileFail:function(data){
@@ -1127,21 +1193,26 @@ divi.elementbase = divi.extend(divi.appBase,{
 	table:'',
 	preview:'prev',
 	deleteKey:'deletekey',
+	rearrangeKey:'rearrangeKey',
 	deleteElem:'.ui-cancelRemove',
 	elemTable:'eachHeader',
 	ignoreFields:['id','src','thumb','references'],
 	referenceFields:['source','name','url','license','blooms','difficulty','languageLevel'],
+	doms:{},
+	divs:{'preview':'previewDom'},
 	tpl:undefined,
 	elemTpl:undefined,
 	listeners:{},
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.elementbase.superclass.constructor.call(this);
+		this.doms = {};
 		this.initialTpl();
 		this.initElemTpl();
-		this.listeners[this.editKey] = {};
-		this.listeners[this.editKey]=  {'click':[this.editElemClick]};
+		this.listeners[this.editKey] = {},this.listeners[this.deleteKey] = {};
+		this.listeners[this.editKey]=  {'click':[this.editElemClick]},
 		this.listeners[this.deleteKey]=  {'click':[this.deleteElemClick]};
+		this.listeners[this.rearrangeKey]=  {'click':[this.rearrangeElemClick]};
 	}
 
 	,initElemTpl:function(){
@@ -1273,7 +1344,8 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,loadElement:function(currNode,appendSel){
 		this.populateValues(currNode);
 		var elemDom = $.tmpl(this.elemTable,{});
-		var dom = this.drawElement(elemDom);
+		dom = this.drawElement(elemDom);
+		this.doms[this.divs['preview']] = elemDom;
 		appendSel.append(elemDom.append(dom));
 		this.enableEditList(elemDom);
 	}
@@ -1287,13 +1359,13 @@ divi.elementbase = divi.extend(divi.appBase,{
 	,deleteElemClick:function(event,val,jTarget){
 		var scope = event.data.scope;
 		var target = divi.util.getTarget(event);
-		this.deletefn(event,val,jTarget,"preview");
+		this.deletefn(event,val,jTarget);
 	}
 
 	,enableEditList:function(scope){
 		var insideElem = scope.find('div.insideElem');
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
-		var deleteBtn = scope.find('button.ui-cancelRemove');
+		var deleteBtn = scope.find('button.ui-cancel');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
 
@@ -1470,7 +1542,7 @@ divi.tags = divi.extend(divi.elementbase,{
 	isTagging:true,
 	evtDflts:{attachLis:true,events:['change']},
 	ignoreFields:['blooms','difficulty','languageLevel','points','tags'],
-	divs:{'diff':'diff','points':'points','level':'level','blooms':'blooms','tags':'tags'},
+	divs:{'diff':'diff','points':'points','level':'level','blooms':'blooms','tags':'tags','preview':'previewDom'},
 	bloomsValues:['None','Knowledge','Understanding','Application','Hots'],
 	doms:{},
 	blooms:{},
@@ -1493,6 +1565,15 @@ divi.tags = divi.extend(divi.elementbase,{
 		}
 		return values;
 	}
+
+
+	,editTags:function(){
+		var tagsata = this.getTagsData();
+		/*for(){
+
+		}*/
+	}
+
 
 	,modifyValues:function(values,updated){
 		values =  updated;
@@ -1914,8 +1995,9 @@ divi.imageset = divi.extend(divi.element,{
 		}
 		this.elems = images;
 		var elemDom = $.tmpl(this.elemTable,{});
-		var dom = this.drawElement(elemDom);
+		dom = this.drawElement(elemDom);
 		appendSel.append(elemDom.append(dom));
+		this.doms[this.divs['preview']] = elemDom;
 		this.enableEditList(elemDom);
 	}
 
@@ -2385,7 +2467,7 @@ divi.book = divi.extend(divi.bookBase,{
 	childrenKeys:['chapters'],
 	navDflts:{tag:'nav','class':'sidebar divi medium'},
 	ulDflts:{tag:'ul'},
-	divs:{'navDiv':'navDiv','ulDiv':'ul'},
+	divs:{'navDiv':'navDiv','ulDiv':'ul','preview':'previewDom'},
 	constructor : function (cfg) {
 		$.extend(this,cfg);
 		divi.book.superclass.constructor.call(this);
@@ -2495,7 +2577,7 @@ divi.chapter = divi.extend(divi.bookBase,{
 	idCount:1,
 	sequence:undefined,
 	comboKey:'chapter',
-	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','ulDiv':'iUlDiv'},
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','ulDiv':'iUlDiv','preview':'previewDom'},
 	childrenKeys:['topics','assessments'],
 	lidDefaults:{tag:"li",'class':"stick bg-yellow",prefix:'sidebar_'},
 	aDefaults:{tag:"a",'class':"slidedown-toggle",href:"#",prefix:'sidebar_',attachLis:true},
@@ -2575,7 +2657,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	counts:{},
 	idCount:1,
 	sequence:undefined,
-	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv','preview':'previewDom'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-yelp",prefix:'sidebar_'},
@@ -2676,7 +2758,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 	elements:[],
 	sequence:undefined,
 	getQuestions:'getQuestions',
-	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv'},
+	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv','preview':'previewDom'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
 	iconDefaults:{tag:'i','class':"icon-snowflake",prefix:'sidebar_'},
@@ -2823,6 +2905,11 @@ divi.assessment = divi.extend(divi.bookBase,{
 				}
 			}
 		}
+		this.enableRearrange(this);
+	}
+
+	,getchildrenForParent:function(scope){
+		return scope.children[this.childrenKeys[0]];
 	}
 });
 
@@ -2842,7 +2929,7 @@ divi.question = divi.extend(divi.element,{
 	isQuestion:true,
 	editorKey:undefined,
 	mainEditorCls:"question",
-	divs:{},
+	divs:{'preview':'previewDom'},
 	fileName:'question.xml',
 	editors:{},
 	answerKey:'answer',
@@ -2864,9 +2951,11 @@ divi.question = divi.extend(divi.element,{
 	}
 
 	,enableEditList:function(scope){
-		var insideElem = scope.find('div.preview.question');
+		var insideElem = scope.find('div').filter(function( index) {
+		    return this.className != 'prevBtns';
+		  });
 		divi.listeners.attachElementListeners([insideElem],this,null,this.editKey,this.dlEvents);
-		var deleteBtn = scope.find('button.ui-cancelRemove');
+		var deleteBtn = scope.find('button.ui-cancel');
 		divi.listeners.attachElementListeners([deleteBtn],this,null,this.deleteKey,this.dlEvents);
 	}
 
@@ -2940,6 +3029,7 @@ divi.question = divi.extend(divi.element,{
 		var childDom = this.drawChildren();
 		parentCont.append(elemDom.append(dom).append(childDom));
 		this.enableEditList(elemDom);
+		this.doms[this.divs['preview']] = elemDom;
 	}
 
 	,attachChildren:function(input,toClean,callback,initialize,addParams,skipChildren){
@@ -3232,6 +3322,18 @@ divi.question = divi.extend(divi.element,{
 		if(childdom){
 		}
 	}
+
+	,getSiblings:function(scope){
+		var children;
+		if(scope){
+			var parent = scope.parent;
+			if(parent){
+				var lookupKey = divi.assessment.prototype.childrenKeys[0];
+				children = parent.children[parent.childrenKeys[0]];
+			}
+		}
+		return children;
+	}
 });
 
 
@@ -3249,7 +3351,7 @@ divi.answer = divi.extend(divi.element,{
 	listernsAttchd:false,
 	evtDflts:{attachLis:true,events:['change','mouseout','keypress','click']},
 	doms:{},
-	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv'},
+	divs:{'check':'checkDom','elem':'elemDom','main':'answerDiv','button':'buttonDiv','preview':'previewDom'},
 	idCount:1,
 	editor:undefined,
 	editorKey:undefined,
@@ -4589,6 +4691,12 @@ divi.formula = divi.extend(divi.contentEditor,{
 		divi.formula.superclass.constructor.call(this);
 	}
 
+
+	,getDeleteElems:function(){
+		return this.elems;
+	}
+
+
 	,overlayDflts:function(dflts){
 		$.extend(dflts,this.overDflts);
 	}
@@ -4805,13 +4913,17 @@ divi.home =  divi.extend(divi.appBase,{
 		var scope = this;
 		var timest = (new Date()).getTime();
 		var masterFile = this.book.masterFile;
-		var tagFile = this.book.tagFile;
 		if(this.firstLoad){
 			masterFile += "?time="+timest;
-			tagFile += "?time="+timest;
 			this.firstLoad = false;
 		}
 		$.ajax({url: divi.core.prepareUrl(this.getFileAction,masterFile)}).done(function (data) {scope.readBook(data);}).fail(function (data) {scope.bookreadFail(data);});
+		this.loadTags();
+	}
+
+
+	,loadTags:function(){
+		scope = this,tagFile = this.book.tagFile+"?time="+(new Date()).getTime();
 		$.ajax({url: divi.core.prepareUrl(this.getFileAction,tagFile)}).done(function (data) {scope.readTags(data);}).fail(function (data) {scope.tagsreadFail(data);});
 	}
 
@@ -4820,6 +4932,7 @@ divi.home =  divi.extend(divi.appBase,{
 		        {tag:'.bkcover',listType:'click',mapTo:this.book,listenerFn:'drawitem'},
 		        {tag:'.bookEdit',listType:'click',mapTo:this.book,listenerFn:'showEditor'},
 		        {tag:'.addchapter',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
+		        {tag:'.mangeTags',listType:'click',parent:this.book,listenerFn:'addcontent',mapTo:this.book,key:'chapter'},
 		        {tag:'body',listType:'click',listenerFn:'closeCmMenu'}];
 	}
 
