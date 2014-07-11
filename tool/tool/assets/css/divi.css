@@ -10,8 +10,9 @@ html {
 
 body {
   margin: 0;
+  
 }
-
+*{font-family: 'Open Sans', sans-serif;}
 /* HTML5 display definitions
    ========================================================================== */
 
@@ -4353,7 +4354,7 @@ a {
 .metro .contextmenu {
   position: absolute;
   background-color: #FFFFFF;
-  border: 2.5px solid #2a2a2a;
+  border: 2.5px solid #aaa;
   padding: 2px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -6166,7 +6167,7 @@ a {
 .metro .sidebar > ul li {
   display: block;
   border: 0;
-  border-bottom: 1px #5c5c5c solid;
+  border-bottom: 1px #e1e1e1 solid;
   position: relative;
 }
 .metro .sidebar > ul li.title {
@@ -10242,6 +10243,9 @@ a {
 }
 .metro .bg-diviblue{
 	background-color: #0087C4 !important;
+}
+.metro .bg-divibackblue{
+	background-color:rgb(231,244,250)!important;
 }
 
 .metro .bg-diviplGray{

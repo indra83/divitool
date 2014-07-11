@@ -1,3 +1,4 @@
+*{font-family: 'Open Sans', sans-serif;}
 .metro .image-button.image-left {
   padding-right: 12px;
   padding-left: 35px;
@@ -55,14 +56,15 @@ text-decoration: none !important;
 .metro .bg-diviplblue {
 background-color: #E7F4FA !important;
 height: 75px;
-padding: 0px!important;
+padding-bottom: 10px!important;
+
 }
 
 .metro .buttonsSection.dottedLine{height:30px ;line-height:30px;}
 
 .metro .imageSection.contentPreview{padding:10px;text-align:center;height:auto;}
 
-.metro .imageSection.bookoverview.imageSection{padding:0px;text-align:left;line-height:50px;}
+.metro .imageSection.bookoverview.imageSection{padding:0px;margin-left:50px;text-align:left;line-height:50px;}
 .metro .imageSection.bookoverview{padding:0px;text-align:left;line-height:50px;}
 
 .metro .btnBkOverview.button.success.large.capsOn{margin-left:260px;}
@@ -96,14 +98,37 @@ background-color:rgb(203,234,249);
 height:100%;
 }
 
-.metro ul.dropdown-menu li button.button-set{ height:35px;font-size:20px; background-color:rgb(218,231,236);padding:0px;color:rgb(52,37,193)}
-.metro ul.dropdown-menu [class*="icon-"]{ height:35px;font-size:20px; background-color:rgb(218,231,236);padding:0px;color:rgb(52,37,193)}
-.metro .container .titlePreview .rightsec.imageSection{height:50px; padding-top: 5px;padding-bottom: 5px;}
+.metro ul.dropdown-menu li button.button-set{ 
+height:35px;
+font-size:10px;
+ padding:5px;
+ width:40px;
+background-color:rgb(231,244,250);
+
+}
+.metro .horizontal-menu ul.dropdown-menu {
+background-color:rgb(231,244,250);
+
+overflow:hidden;
+}
+.metro ul.dropdown-menu [class*="icon-"]{ 
+height:35px;
+font-size:20px;
+background-color:rgb(231,244,250);
+color:#0087C4;
+
+ }
+
+.metro .container .titlePreview .rightsec.imageSection{
+height:50px;
+ padding-top:5px;
+ padding-bottom: 5px;}
 
 
 
 .metro div.previewElem{
 overflow-y:auto;
+text-align:left;
 
 	border-bottom:1px dotted;
 	padding: 10px;
@@ -119,12 +144,13 @@ overflow-y:auto;
 }
 
 .metro .previewElem .carousel {
+text-align:center;
 	height:35%;
 }
 
 .metro div.previewElem:hover {
 	border:dotted 1px;
-	background:#fafafa!important;
+	
 
 	-webkit-transform: scale(1.02,1.02);
 	-webkit-transition-timing-function: ease-out;
@@ -165,12 +191,13 @@ overflow-y:auto;
 .previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video{
 	width:60%;
 }
-
-
+.previewElem h3, .previewElem h4{color:rgb(118,98,71);}
+.metro .contentElem.place-right{text-align:left;}
 
 .metro .ui-widget-overlay.ui-front{
 overflow:hidden;
 }
+
 
 .metro .popup.ui-dialog-content.ui-widget-content .editableDiv{
 position: relative;
@@ -189,3 +216,23 @@ max-height:250px!important;
 .metro.fix-body{
 	position: fixed;
 }
+
+ .metro .popup.ui-dialog-content.ui-widget-content{
+max-height:700px !important;
+}
+.metro .previewElem .mainElem img{
+height:150px;
+width:auto;
+}
+ .previewElem .mainElem audio{height:50px;}
+ .previewElem .mainElem video{
+ height:200px;
+ }
+  .metro .insideElem{padding-top:30px;}
+ .metro .carousel{height:230px!important;background:padding-top:20px;}
+.icon-plus-2 {background-color:rgb(191,134,40);}
+.metro .container .homeheader{border-bottom:2px solid #e1e1e1;height:auto;opacity:0.8;}
+.metro .container .homeheader .bookdiv {margin-top:20px;position:relative;height:30px;line-height:10px;}
+
+
+.metro .buttonsList .pvwBtns button{margin-right:20px;}
