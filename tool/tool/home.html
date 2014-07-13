@@ -11,7 +11,7 @@
       <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
    </head>
    <body class="metro">
-      <div class="container">
+      <div class="container" style="overflow:hidden;">
          <div class="topborder  bg-diviblue">
             <div class="place-right fg-white on-left-more">
                <small>Book Version :<span class="bookversion"></span> Book
@@ -44,11 +44,11 @@
          </div>
          <div class="bookcontent">
              <div class="leftsec lftsidebar">
-               <div class="main fg-white bg-diviblue titlePreview xlarge clickable capsOn bkcover">
-                  <span class="vmiddle"><i class="icon-book on-left"></i>Book Cover<span class="place-right on-left"><i class="icon-pencil"></i></span></span>
+               <div class="main fg-white bg-diviblue titlePreview xlarge clickable capsOn bkcover image_sidebar">
+                  <img src="./assets/images/bookcover.png" />
                </div>
-               <div class="main fg-white bg-drkbrown titlePreview xlarge capsOn">
-                  <span class="vmiddle"><i class="icon-lines on-left"></i>chapters</span>
+               <div class="main fg-white bg-drkbrown titlePreview xlarge capsOn image_sidebar">
+                  <img src="./assets/images/chapters.png" />
                </div>
              <div class="treepreview"></div>
            </div>
@@ -57,11 +57,11 @@
               <nav class="horizontal-menu compact topicbtns">
                         <ul>
                             <li><a href="#"><button class="shortcut link disabled addhtml"><img src="./assets/images/tool_text.png" /></button></a></li>
-                            <li><a href="#"><button class="shortcut link disabled addimage"><img src="./assets/images/tool_image.png" /></button></a></li>
+                            <li><a href="#"><button class="shortcut link disabled addimage"><img src="./assets/images/tool_image.png"  /></button></a></li>
                             <li><a href="#"><button class="shortcut link addvideo disabled"><img src="./assets/images/tool_video.png" /></a></li>
                             <li><a href="#"><button class="shortcut link disabled addaudio"><img src="./assets/images/tool_audio.png" /></button></a></li>
                             <li>
-                                <a class="dropdown-toggle" href="#"><button class="shortcut link"><img src="./assets/images/tool_box.png" /></button></a>
+                                <a class="dropdown-toggle" href="#"><button class="shortcut link "><img src="./assets/images/tool_box.png" /></button></a>
                                 <ul class="dropdown-menu" data-role="dropdown">
                                     <li><button class="button-set bg-divibackblue addinfo disabled"><img src="./assets/images/tool_left.png" /></button></li>
                                     <li><button class="button-set bg-divibackblue addalert disabled"><img src="./assets/images/tool_up.png" /></button></li>
@@ -107,7 +107,14 @@
             </div>
            </div>
          </div>
+          
       </div>
+      <div class="custom_footer bg-diviblue">
+          <a>ABOUT US </a>|
+          <a>CONTACT US</a>
+          <h5>  &#169;Divi Learning Solutions Inc.</h5>
+      </div>
+     
       <div class="popup hidden"></div>
       <div class="dialog-html hidden"></div>
       <textarea class="richtext-html hidden">

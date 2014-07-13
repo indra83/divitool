@@ -25,6 +25,8 @@ position: relative;
 top: 25%;
 width: 100%;
 color: #fff;
+overflow:visible;
+
 }
 
 .metro div, .metro span, .metro p {
@@ -42,10 +44,12 @@ padding-bottom:10px;}
 .metro .bookdiv.bg-divigray .vmiddle{padding-left:10px;}
 
 .metro nav.compact .shortcut.link {
-border-right: 1px #2e92cf solid;
-border-left: 0px;
-border-bottom: 0px;
-border-top: 0px;
+border:0px;
+
+margin-left:0px;
+
+padding-left:0px;
+
 
 
 height:75px;
@@ -62,7 +66,8 @@ padding-bottom: 10px!important;
 
 .metro .buttonsSection.dottedLine{height:30px ;line-height:30px;}
 
-.metro .imageSection.contentPreview{padding:10px;text-align:center;height:auto;}
+.metro .imageSection.contentPreview{padding:10px;text-align:center;height:300px; overflow: -moz-scrollbars-vertical;
+     overflow: scroll;}
 
 .metro .imageSection.bookoverview.imageSection{padding:0px;margin-left:50px;text-align:left;line-height:50px;}
 .metro .imageSection.bookoverview{padding:0px;text-align:left;line-height:50px;}
@@ -82,10 +87,17 @@ background-color:rgb(203,234,249);
 color: #686868;
 
 }
+
 .metro .sidebar.divi li a:hover {
 border-right: 0px;
 color: #686868;
 background-color:rgb(203,234,249);
+}
+.metro .sidebar.divi li.selected a:active{
+border-right: 5px solid rgb(203,234,249);
+background-color:rgb(203,234,249)!important;
+color: #686868;
+
 }
 
 .metro .sidebar.divi .slidedown-menu li a{background-color:tranparent;}
@@ -236,3 +248,28 @@ width:auto;
 
 
 .metro .buttonsList .pvwBtns button{margin-right:20px;}
+
+
+.metro  .image_sidebar img{margin-top:0px;display:inline-block;height:40px;width:90%;}
+
+.metro .shortcut.link:disabled, .metro .shortcut.link.disabled img{
+filter: grayscale(100%);
+filter: url(#greyscale);
+filter: gray;
+-webkit-filter: grayscale(1);
+}
+
+.metro .buttonset .bg-divibackblue :disabled{
+background-color: rgb(231,244,250)!important;
+
+}
+.metro .treepreview li:before
+{
+
+display:inline-block;
+list-style-image: url(/tool/assets/images/bullet.png);
+}
+.custom_footer{width:100%;position:fixed;bottom:0px;padding:5px;height:30px;line-height:20px;display:block;color:#fff;font-size:10px;}
+.custom_footer a{color:#fff;vertical-align:top;margin-left:10px;}
+.custom_footer h5{display:inline-block;float:right;color:#fff;margin-top:4px;vertical-align:top;font-size:10px;}
+
