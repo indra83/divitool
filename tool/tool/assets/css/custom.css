@@ -100,6 +100,12 @@ color: #686868;
 
 }
 
+.metro .shortcut:active{
+border-right: 5px solid rgb(203,234,249);
+background-color:rgb(203,234,249)!important;
+color: #686868;
+}
+
 .metro .sidebar.divi .slidedown-menu li a{background-color:tranparent;}
 .metro .sidebar.divi .slidedown-menu li.selected a:hover{background-color:rgb(218,231,236);}
 
