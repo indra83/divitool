@@ -79,7 +79,7 @@ padding-bottom: 10px!important;
 
 .metro .buttonsSection.dottedLine{height:30px ;line-height:30px;}
 
-.metro .imageSection.contentPreview{padding:10px;text-align:center;height:400px; overflow: -moz-scrollbars-vertical;
+.metro .imageSection.contentPreview{padding:10px;text-align:center;height:450px; overflow: -moz-scrollbars-vertical;
      overflow: scroll;}
 
 .metro .imageSection.bookoverview.imageSection{padding:0px;margin-left:50px;text-align:left;line-height:50px;}
@@ -276,7 +276,13 @@ width:auto;
 .metro .buttonsList .pvwBtns button{margin-right:20px;}
 
 
-.metro  .image_sidebar img{margin-top:0px;display:inline-block;height:40px;width:90%;}
+.metro  .image_sidebar img{margin-top:0px;display:inline-block;}
+
+.metro  .image_sidebar .icon-text{color: white;margin-top: 8px;}
+
+.bookcontent .lftsidebar div.main.xlarge{padding-left: 10px;padding-top: 2px;}
+
+.metro .pencil-edit{margin-left:12px;margin-bottom: 4px;}
 
 .metro .shortcut.link:disabled, .metro .shortcut.link.disabled img{
 filter: grayscale(100%);
