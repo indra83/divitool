@@ -233,19 +233,19 @@ text-align:center;
 .metro .contentElem.place-right{text-align:left;}
 
 .metro .ui-widget-overlay.ui-front{
-overflow:hidden;
+
 }
 
+.metro div.answerDiv input[type="checkbox"]{display:inline-block;padding-bottom:20px;margin:0px;vertical-align:top;}
 
-.metro .popup.ui-dialog-content.ui-widget-content .editableDiv{
-position: relative;
-border: 0;
-padding: .5em 1em;
-background: none;
+.metro div.answerDiv{display:inline-block;width:100%;vertical-align:top;}
+.metro .ui-cancelRemove{display:inline-block;}
+.metro div.editableDiv.answer{ width:85%;}
 
-max-height:250px!important;
-}
 
+
+.metro .place-left .mainElem{overflow:scroll}
+.metro .popup.ui-dialog-content.ui-widget-content .answerDiv.editableDiv{height:100px;}
 .metro .prvw-btn-adjt{
 	float: right;
 	right: 9px;
@@ -256,12 +256,16 @@ max-height:250px!important;
 }
 
  .metro .popup.ui-dialog-content.ui-widget-content{
-max-height:700px !important;
+height:400px !important;
+overflow:scroll!important;
+
 }
+.metro .contentElem.place-right {}
 .metro .previewElem .mainElem img{
 height:150px;
 width:auto;
 }
+.metro div.options a{position:fixed;bottom:200px;}
  .previewElem .mainElem audio{height:50px;}
  .previewElem .mainElem video{
  height:200px;
@@ -299,4 +303,3 @@ list-style-image: url(/tool/assets/images/bullet.png);
 .custom_footer{width:100%;position:fixed;bottom:0px;padding:5px;height:30px;line-height:20px;display:block;color:#fff;font-size:10px;}
 .custom_footer a{color:#fff;vertical-align:top;margin-left:10px;}
 .custom_footer h5{display:inline-block;float:right;color:#fff;margin-top:4px;vertical-align:top;font-size:10px;}
-
