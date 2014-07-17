@@ -2660,7 +2660,7 @@ divi.topic = divi.extend(divi.bookBase,{
 	divs:{'liDiv':'liDiv','aDiv':'oLinkDiv','iconDiv':'iconDiv','preview':'previewDom'},
 	lidDefaults:{tag:"li",prefix:'sidebar_'},
 	aDefaults:{tag:"a",href:"#",prefix:'sidebar_',attachLis:true},
-	iconDefaults:{tag:'i','class':"icon-yelp",prefix:'sidebar_'},
+	iconDefaults:{tag:'img',src:"/tool/assets/images/bullet.png",prefix:'sidebar_'},
 	comboKey:'topic',
 
 	constructor : function (cfg) {
