@@ -4469,9 +4469,9 @@ divi.indEditor = divi.extend(divi.contentEditor,{
         }
         var url = rtnScope.getSaveHtmlLoc();
         if (files && url) {
-        	for (var key in files) {
-	            if (files.hasOwnProperty(key)) {
-	                filesList.push(files[key]);
+        	for (var key1 in files) {
+	            if (files.hasOwnProperty(key1)) {
+	                filesList.push(files[key1]);
 	            }
 	        }
         	if(filesList.length > 0){
