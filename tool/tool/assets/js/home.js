@@ -941,8 +941,13 @@ divi.appBase = divi.extend(divi.base, {
 				tabi = instance.fieldCount+1;
 			}
 			$('.metro').addClass('fix-body');
+			
 			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
 			mydialog.superDialog("option", "buttons", newButtons);
+			
+			$('.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').first().prepend('<img src="/tool/assets/images/crux.png">');
+			$('.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').last().prepend('<img src="/tool/assets/images/graycross.png">');
+			
 		}
 	}
 

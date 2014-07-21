@@ -240,7 +240,7 @@ text-align:center;
 
 .metro div.answerDiv{display:inline-block;width:100%;vertical-align:top;}
 .metro .ui-cancelRemove{display:inline-block;}
-.metro div.editableDiv.answer{ width:85%;}
+.metro div.editableDiv.answer{ width:45%;}
 
 
 
@@ -256,7 +256,7 @@ text-align:center;
 }
 
  .metro .popup.ui-dialog-content.ui-widget-content{
-height:400px !important;
+max-height:500px !important;
 overflow:scroll!important;
 
 }
@@ -265,7 +265,7 @@ overflow:scroll!important;
 height:150px;
 width:auto;
 }
-.metro div.options a{position:fixed;bottom:200px;}
+.metro div.options a{position:fixed;bottom:317px;}
  .previewElem .mainElem audio{height:50px;}
  .previewElem .mainElem video{
  height:200px;
@@ -331,3 +331,65 @@ margin-bottom: 2px;
 min-width: 117px;
 }
 
+.metro .ui-dialog-titlebar.ui-widget-header .ui-dialog-titlebar-close{
+background-image:none;
+width:32px;
+height:32px;
+background-color:red;
+border-radius:16px;
+right: 3px;
+top: 10px;
+border: 2px solid white;
+}
+
+.metro .ui-dialog-titlebar.ui-widget-header .ui-dialog-titlebar-close .ui-icon-closethick{
+background-color: red ; 
+color: white ;
+background-image: url("/tool/assets/images/close.png") ;
+}
+
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:nth-of-type(1){
+background: none;
+background-color: rgb(235, 167, 35);
+border-radius: 8px;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 12px;
+padding-top: 0px;
+font-size: 18px;
+font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
+line-height: 16px;
+color: rgb(133, 96, 31);
+}
+
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:hover{
+border: 0.5px solid #eee;
+}
+
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:nth-of-type(2){
+background: none;
+background-color: #adadad;
+border-radius: 8px;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 12px;
+padding-top: 0px;
+font-size: 18px;
+font-family: 'Segoe UI Light_', 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
+line-height: 16px;
+color: #333;
+}
+
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:nth-of-type(2) .ui-button-text{color: #333;font-size: 18px;}
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:nth-of-type(1) .ui-button-text{color: rgb(133,96,31)!important;font-size: 18px;}
+
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only img{float:left;}
+.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only .ui-button-text{float:left;}
+
+.metro .popup.ui-dialog-content.ui-widget-content .formfield.larger{
+margin-bottom: 16px;
+}
+
+.metro .chosen-search input{
+padding:10px !important;
+}

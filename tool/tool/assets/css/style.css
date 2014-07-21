@@ -445,7 +445,7 @@ img.toggle{
 
 .metro div.formfield.larger label.labelStyle{
 	width:255px;
-	font-size: 13px;
+	font-size: 20px;
 }
 
 .metro div.formfield div.input-control{
@@ -467,9 +467,16 @@ img.toggle{
 .metro div.formfield.larger div.input-control input{
 	width:300px;
 	margin-right:30px;
+	padding: 20px;
+font-size: 20px;
+}
+
+.metro div.formfield.larger .input-control.file{
+height:50px ;
 }
 .metro div.formfield.larger div.input-control.text .btn-clear{
-	margin-right: 5px;
+	margin-right: -2px;
+	margin-top:7px;
 }
 
 .metro div.formfield.larger div.input-control input,.metro .input-control .combofield{

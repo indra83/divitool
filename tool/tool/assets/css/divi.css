@@ -12318,7 +12318,7 @@ div[data-role="editor-toolbar"] {
   position: relative;
   display: inline-block;
   vertical-align: middle;
-  font-size: 13px;
+  font-size: 16px;
   font-family: arial;
   zoom: 1;
   *display: inline;
@@ -12353,8 +12353,8 @@ div[data-role="editor-toolbar"] {
   position: relative;
   display: block;
   overflow: hidden;
-  padding: 0 0 0 8px;
-  height: 23px;
+  padding: 4px 0 0 8px;
+  height: 36px;
   border: 1px solid #aaa;
   border-radius: 5px;
   background-color: #fff;
