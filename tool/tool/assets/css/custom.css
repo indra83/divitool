@@ -221,7 +221,6 @@ text-align:center;
 
 .previewElem .mainElem img,.previewElem .mainElem audio,.previewElem .mainElem video,.mainElem div{
 	position:relative;
-
 	overflow-y:auto;
 }
 
@@ -253,13 +252,139 @@ text-align:center;
 
 .metro.fix-body{
 	position: fixed;
+
 }
+.metro input[type="file"]{
+padding-top:0px;
+
+}
+
+.metro input[type="file"]::-webkit-file-upload-button, button {
+background-color:rgb(0,136,204);
+border:0px;
+color:#fff;
+line-height:20px;
+display:inline-block;
+padding:5px;
+}
+.metro div.ui-dialog.ui-widget .chosen-select select{
+background-color:rgb(0,136,204);
+
+}
+
+
+
+.metro div.ui-dialog{
+padding:0px;
+position:absolute;
+top:10px!important;
+-webkit-box-shadow: 17px 12px 125px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 17px 12px 125px 0px rgba(0,0,0,0.75);
+box-shadow: 17px 12px 125px 0px rgba(0,0,0,0.75);
+}
+
+.metro .ui-dialog .ui-dialog-content {
+padding:0px;
+}
+
+
 
  .metro .popup.ui-dialog-content.ui-widget-content{
 max-height:500px !important;
 overflow:scroll!important;
+background-color:rgb(232,232,232);
 
 }
+.metro .popup.ui-dialog-content.ui-widget-content table{
+background-color:rgb(232,232,232);
+}
+
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger label.labelStyle{
+display:block;
+width:100%;
+color:rgb(88,88,88);
+
+}
+
+
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger div.input-control input, .metro .input-control .combofield{
+display:block;
+width:	100%;
+box-shadow: none;
+}
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger div.input-control select{
+display:block;
+float:left;
+width:	100%;
+box-shadow: none;
+
+background-color:rgb(232,232,232);
+
+}
+
+
+.metro .tab-control .frames .frame.tabs.tagging label.labelStyle{
+display:inline-block;
+
+}
+.metro .tab-control .frames .frame.tabs.tagging .input-control{
+display:inline-block;
+width:	65%;
+text-align:left;
+background-color:rgb(232,232,232);
+
+}
+
+.metro .tab-control .tabs > li.active a{
+
+background-color:rgb(232,232,232);
+border-top:1px solid rgb(88,88,88);
+border-left:1px solid rgb(88,88,88);
+border-right:1px solid rgb(88,88,88);
+border-bottom:1px solid rgb(232,232,232);
+
+
+}
+.metro .tab-control .tabs > li > a{
+
+background-color:rgb(186,186,186);
+border-bottom:1px solid rgb(88,88,88);
+}
+
+
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield div.input-control input{
+-webkit-border-radius: 0px;
+-moz-border-radius: 0px;
+border-radius: 0px;
+box-shadow: none;
+}
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield div.input-control{
+display:block;
+width:100%;
+box-shadow: none;
+
+}
+.metro .popup.ui-dialog-content.ui-widget-content .formfield.larger{
+display:block;
+width:100%;
+}
+table.tableDiv td.formContent{
+display:block;
+width:100%;
+}
+
+
+.metro .ui-dialog .ui-dialog-buttonpane{
+background-color:rgb(232,232,232);
+margin-top:-5px;
+text-align:center;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset{
+text-align:center;
+float:none;
+
+}
+
 .metro .contentElem.place-right {}
 .metro .previewElem .mainElem img{
 height:150px;
@@ -270,6 +395,7 @@ width:auto;
  .previewElem .mainElem video{
  height:200px;
  }
+ 
   .metro .insideElem{padding-top:30px;}
  .metro .carousel{height:230px!important;background:padding-top:20px;}
 .icon-plus-2 {background-color:rgb(191,134,40);}
@@ -335,15 +461,23 @@ min-width: 117px;
 background-image:none;
 width:32px;
 height:32px;
-background-color:red;
+background-color: rgb(207,84,83) ;
 border-radius:16px;
 right: 3px;
-top: 10px;
 border: 2px solid white;
+position:absolute;
+top: 10px;
+z-index:999999999;
+display:block;
+
+}
+.metro .tab-control .frames {
+border-top:1px solid rgb(88,88,88);
+padding:0px;
 }
 
 .metro .ui-dialog-titlebar.ui-widget-header .ui-dialog-titlebar-close .ui-icon-closethick{
-background-color: red ; 
+background-color: rgb(207,84,83) ; 
 color: white ;
 background-image: url("/tool/assets/images/close.png") ;
 }
