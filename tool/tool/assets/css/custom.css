@@ -303,28 +303,26 @@ background-color:rgb(232,232,232);
 display:block;
 width:100%;
 color:rgb(88,88,88);
+float:left;
 
 }
-
 
 .metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger div.input-control input, .metro .input-control .combofield{
 display:block;
 width:	100%;
 box-shadow: none;
-}
-.metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger div.input-control select{
-display:block;
-float:left;
-width:	100%;
-box-shadow: none;
-
 background-color:rgb(232,232,232);
-
 }
+.metro .input-control .chosen-container{
+display:block;
+width:100%;
+}
+
 
 
 .metro .tab-control .frames .frame.tabs.tagging label.labelStyle{
 display:inline-block;
+float:left;
 
 }
 .metro .tab-control .frames .frame.tabs.tagging .input-control{
@@ -352,16 +350,18 @@ border-bottom:1px solid rgb(88,88,88);
 }
 
 
-.metro .popup.ui-dialog-content.ui-widget-content div.formfield div.input-control input{
+.metro .popup.ui-dialog-content.ui-widget-content div.formfield div.input-control input[type='text']{
 -webkit-border-radius: 0px;
 -moz-border-radius: 0px;
 border-radius: 0px;
 box-shadow: none;
+background-color:#fff;
 }
 .metro .popup.ui-dialog-content.ui-widget-content div.formfield div.input-control{
 display:block;
-width:100%;
+width:80%;
 box-shadow: none;
+float:left;
 
 }
 .metro .popup.ui-dialog-content.ui-widget-content .formfield.larger{
