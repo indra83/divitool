@@ -287,16 +287,15 @@ box-shadow: 17px 12px 125px 0px rgba(0,0,0,0.75);
 padding:0px;
 }
 
-
-
- .metro .popup.ui-dialog-content.ui-widget-content{
+.metro .popup.ui-dialog-content.ui-widget-content{
 max-height:500px !important;
-overflow:scroll!important;
+overflow:auto!important;
 background-color:rgb(232,232,232);
-
 }
+
 .metro .popup.ui-dialog-content.ui-widget-content table{
 background-color:rgb(232,232,232);
+font-size:1.5em;
 }
 
 .metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger label.labelStyle{
@@ -304,7 +303,7 @@ display:block;
 width:100%;
 color:rgb(88,88,88);
 float:left;
-
+font-size:1.5em;
 }
 
 .metro .popup.ui-dialog-content.ui-widget-content div.formfield.larger div.input-control input, .metro .input-control .combofield{
@@ -312,10 +311,12 @@ display:block;
 width:	100%;
 box-shadow: none;
 background-color:rgb(232,232,232);
+font-size:1.5em;
 }
 .metro .input-control .chosen-container{
 display:block;
 width:100%;
+font-size:1em;
 }
 
 
@@ -323,6 +324,7 @@ width:100%;
 .metro .tab-control .frames .frame.tabs.tagging label.labelStyle{
 display:inline-block;
 float:left;
+font-size:1.5em;
 
 }
 .metro .tab-control .frames .frame.tabs.tagging .input-control{
@@ -468,7 +470,7 @@ border: 2px solid white;
 position:absolute;
 top: 10px;
 z-index:999999999;
-display:block;
+display:none;
 
 }
 .metro .tab-control .frames {
