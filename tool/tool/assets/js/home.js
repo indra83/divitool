@@ -1122,7 +1122,6 @@ divi.appBase = divi.extend(divi.base, {
 	}
 
 	,readFileFail:function(data){
-		alert('Issue with the file. Please contact administrator');
 	}
 
 	,prepareEditableDom:function(ops,editors,value,isQuestion){
@@ -2877,7 +2876,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 		var ids = "";
 		for(var i=0;children && children && i < children.length;i++){
 			rchild = children[i];
-			if(divi[rchild['type']] && ids.indexOf(rchild['id']) == -1){
+			if(divi[rchild['type']]){
 				ids += rchild['id'];
 				if(i != children.length-1){
 					ids += ",";
