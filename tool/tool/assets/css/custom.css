@@ -529,3 +529,16 @@ margin-bottom: 16px;
 .metro .chosen-search input{
 padding:10px !important;
 }
+
+
+
+.toolbarCls{background-color:#fff;}
+.richtext_icons{
+display:block;
+height:14px;
+
+padding:0px;
+}
+.rich_button {
+padding:5px!important;
+}
