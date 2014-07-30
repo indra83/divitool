@@ -4885,7 +4885,28 @@ divi.home =  divi.extend(divi.appBase,{
 	,preparepopUp:function(elem){
 		var popupDiv = this.retrievePopUpDiv();
 		width = elem.popWdith || '60%';
+		var title="";
+		if(elem.table == "subtopic"){
+			title="Add Subtopic";
+		}else if(elem.table == "topic"){
+		title="Add Topic";
+		}else if(elem.table == "html"){
+		title="Add Text";
+		}else if(elem.table == "image"){
+		title="Add Image";
+		}else if(elem.table == "video"){
+		title="Add Video";
+		}else if(elem.table == "audio"){
+		title="Add Audio";
+		}else if(elem.table == "imageset"){
+		title="Add Slides";
+		}
+		if(title!=""){
+		var dlgConfig  = {title: title,position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
+		}else{
 		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
+		}
+		
 		popupDiv.empty().superDialog(dlgConfig);
 	}
 

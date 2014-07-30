@@ -529,3 +529,7 @@ margin-bottom: 16px;
 .metro .chosen-search input{
 padding:10px !important;
 }
+
+.metro .ui-dialog-title{
+color:white;
+}
