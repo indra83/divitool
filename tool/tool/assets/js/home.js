@@ -1085,11 +1085,12 @@ divi.appBase = divi.extend(divi.base, {
 		fileName = fileName || scope.fileName;
 		ops = ops || {};
 		var dataType = ops.dataType ? ops.dataType : "xml";
+		var requestType = ops.requestType ? ops.requestType : "GET";
 		var data = {};
 		if(ops){
 			$.extend(data,ops.data);
 		}
-		$.ajax({dataType: dataType,url:divi.core.prepareUrl(url,fileName),data:data}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
+		$.ajax({dataType: dataType,type:requestType,url:divi.core.prepareUrl(url,fileName),data:data}).done(function (data) {scope.readFile(data);}).fail(function (data) {scope.readFileFail(data);});
 	}
 
 	,readFile:function(data){
@@ -2832,7 +2833,7 @@ divi.assessment = divi.extend(divi.bookBase,{
 			var questIds = this.questIds;
 			if(questIds && questIds.length > 0){
 				url = this.prepareFilePath(this,null,'/');
-				divi.appBase.prototype.loadFile.call(this,'../'+this.getQuestions,{data:{url:url,ids:questIds},dataType:'json'},divi.question.prototype.fileName);
+				divi.appBase.prototype.loadFile.call(this,'../'+this.getQuestions,{data:{url:url,ids:questIds},dataType:'json',requestType:'POST'},divi.question.prototype.fileName);
 			}
 		}
 	}
