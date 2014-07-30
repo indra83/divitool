@@ -530,20 +530,15 @@ margin-bottom: 16px;
 padding:10px !important;
 }
 
-<<<<<<< HEAD
-
-
 .toolbarCls{background-color:#fff;}
 .richtext_icons{
 display:block;
 height:14px;
-
 padding:0px;
 }
 .rich_button {
 padding:5px!important;
-=======
+}
 .metro .ui-dialog-title{
 color:white;
->>>>>>> a4b97986c0f78d49539b8f3410b57c77854b671b
 }
