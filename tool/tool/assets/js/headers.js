@@ -152,7 +152,7 @@ divi.app.image = new divi.pageBase({
 		         {name:"title", "desc": "Title", "type": "textfield","isRequired": true},
 		         {name:"description", "desc": "Description", "type": "textfield"},
 		         {name:"allowFullscreen","desc": "Allow FullScreen", "type": "bool"},
-		         {name:"hasText","desc": "Has Text", "type": "bool"},
+		         {name:"hasText","desc": "Has Text", "type": "bool",value:'true'},
 		         {name:"showBorder","desc": "Show Border", "type": "bool"}];
 		 
 	}
