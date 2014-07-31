@@ -2048,6 +2048,7 @@ divi.imageset = divi.extend(divi.element,{
 			var key = children[index];
 			childDom = $(key);
 			childDom.removeAttr('allowfullscreen');
+			childDom.removeAttr('hasText');
 			childDom.removeAttr('showborder');
 			childDom.find('title').remove();
 		}
@@ -2114,6 +2115,8 @@ divi.imageset = divi.extend(divi.element,{
 		elem.formPanel.relaxRequired('title');
 		elem.formPanel.hideField('allowFullscreen');
 		elem.formPanel.relaxRequired('allowFullscreen');
+		elem.formPanel.hideField('hasText');
+		elem.formPanel.relaxRequired('hasText');
 		elem.formPanel.hideField('showBorder');
 		elem.formPanel.relaxRequired('showBorder');
 		this.attachCloseLis(parentDom.find('.closeIcon'),elem);
@@ -2123,7 +2126,7 @@ divi.imageset = divi.extend(divi.element,{
 
 divi.image = divi.extend(divi.element,{
 	tag:'img',
-	ignoreFields:['id','src','allowFullscreen','showBorder'],
+	ignoreFields:['id','src','allowFullscreen','showBorder','hasText'],
 	table:'image',
 	idCount:1,
 	idPrefix:'img',
@@ -2136,6 +2139,7 @@ divi.image = divi.extend(divi.element,{
 		if(childdom){
 			childdom.removeAttribute('thumb', values['thumb']);
 			childdom.setAttribute('allowFullscreen', values['allowFullscreen']);
+			childdom.setAttribute('hasText', values['hasText']);
 			childdom.setAttribute('showBorder', values['showBorder']);
 		}
 	}
