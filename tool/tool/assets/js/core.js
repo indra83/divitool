@@ -1,3 +1,9 @@
+String.prototype.toCamel = function(){
+	var s = this;
+	var first = s.charAt(0).toUpperCase()+s.substring(1);
+    return first;
+};
+
 (function(){
     // Default methods
     function DefaultEqualityComparer(a, b) {

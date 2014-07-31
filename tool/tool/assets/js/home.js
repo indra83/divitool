@@ -177,6 +177,7 @@ divi.appBase = divi.extend(divi.base, {
     title: '',
     countKey:'_count',
     padMax:3,
+    modalKey:'',
     editKey:'editElem',
     editableDiv:'editableDiv',
     contentPreview:'.contentPreview',
@@ -1761,6 +1762,7 @@ divi.video = divi.extend(divi.element,{
 
 divi.heading3 = divi.extend(divi.element,{
 	table:'heading3',
+	modalKey:'Heading',
 	idCount:1,
 	idPrefix:'heading',
 	tag:'span',
@@ -1845,6 +1847,7 @@ divi.html = divi.extend(divi.element,{
 	ignoreFields:['data','references'],
 	table:'html',
 	htmlValKey:'data',
+	modalKey:'Text',
 	idCount:1,
 	supressFields:['boxType','boxTitle'],
 	editor:undefined,
@@ -1965,6 +1968,7 @@ divi.audio = divi.extend(divi.element,{
 divi.imageset = divi.extend(divi.element,{
 	table:'imageset',
 	idCount:1,
+	modalKey:'Slides',
 	isImageSet:true,
 	ignoreFields:['id','src','title'],
 	prevElem:'previewImages',
@@ -3351,6 +3355,7 @@ divi.answer = divi.extend(divi.element,{
 	ansCnt:2,
 	maxansCnt:2,
 	idPrefix:'A',
+	modalKey:'True or False',
 	table:'answer',
 	htmlValKey:'data',
 	noreference:true,
@@ -3773,6 +3778,7 @@ divi.matchAns = divi.extend(divi.answer,{
 divi.mcq = divi.extend(divi.question,{
 	type:'mcq',
 	table:'mcq',
+	modalKey:'MCQ',
 	constructor: function (cfg) {
 		$.extend(this,cfg);
 		divi.mcq.superclass.constructor.call(this);
@@ -3783,6 +3789,7 @@ divi.mcq = divi.extend(divi.question,{
 divi.torf = divi.extend(divi.question,{
 	type:'torf',
 	table:'torf',
+	modalKey:'True/False',
 	answerKey:'torfAns',
 	ansCnt:2,
 	maxansCnt:2,
@@ -3805,6 +3812,7 @@ divi.torf = divi.extend(divi.question,{
 divi.fill_blank = divi.extend(divi.question,{
 	type:'fill_blank',
 	table:'fill_blank',
+	modalKey:'Fill in Blanks',
 	answerKey:'fill_blankAns',
 	optionsKey:'blanks',
 	optionKey:'blank',
@@ -3833,6 +3841,7 @@ divi.fill_blank = divi.extend(divi.question,{
 divi.match = divi.extend(divi.question,{
 	type:'match',
 	table:'match',
+	modalKey:'Matching',
 	mainEditorCls:'question matchthefol',
 	optionsKey:'matches',
 	optionKey:'match',
@@ -4890,28 +4899,9 @@ divi.home =  divi.extend(divi.appBase,{
 	,preparepopUp:function(elem){
 		var popupDiv = this.retrievePopUpDiv();
 		width = elem.popWdith || '60%';
-		var title="";
-		if(elem.table == "subtopic"){
-			title="Add Subtopic";
-		}else if(elem.table == "topic"){
-		title="Add Topic";
-		}else if(elem.table == "html"){
-		title="Add Text";
-		}else if(elem.table == "image"){
-		title="Add Image";
-		}else if(elem.table == "video"){
-		title="Add Video";
-		}else if(elem.table == "audio"){
-		title="Add Audio";
-		}else if(elem.table == "imageset"){
-		title="Add Slides";
-		}
-		if(title!=""){
+		var title = elem.modalKey ? elem.modalKey : elem.table.toCamel();
+		title = "Add "+title;
 		var dlgConfig  = {title: title,position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
-		}else{
-		var dlgConfig  = {position: "top",autoOpen: false,modal: true,width: width, buttons: {},close:{scope:this,fn:'cancelDailog'}};
-		}
-		
 		popupDiv.empty().superDialog(dlgConfig);
 	}
 

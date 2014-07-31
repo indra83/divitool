@@ -409,6 +409,8 @@ width:auto;
 
 
 .metro  .image_sidebar img{margin-top:0px;display:inline-block;}
+.metro  .image_sidebar img.pencil-edit{margin-left:40%;}
+.ui-widget .ui-dialog-title {font-size: 1.2em;}
 
 .metro  .image_sidebar .icon-text{color: white;margin-top: 8px;}
 
