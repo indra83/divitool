@@ -847,6 +847,7 @@ div.editableDiv.answer {
 .metro .sidebar.divi {
   background-color: #F3F3F3;
   border: 1px #eaeaea solid;
+  overflow-y: auto;
 }
 .metro .sidebar.divi li{
   border-right:0px;
