@@ -852,7 +852,7 @@ divi.util = {
 	}
 	
 	,isEmpty : function(v){
-	    return v === null || v === undefined || v == "" || ($.isFunction(v.trim) && v.trim() == "");
+	    return v === null || v === undefined || v == "";
 	}
 
 	,callSections:function(multiForm,sections,callBack,options){
