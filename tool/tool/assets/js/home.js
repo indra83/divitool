@@ -3855,14 +3855,15 @@ divi.match = divi.extend(divi.question,{
 		if(appendTo){
 			for(var edt in editors){
 				if(editors.hasOwnProperty(edt)){
+					appendTo.append("<div class='colheaders'><div class='place-left padding5 colHead'>Title</div></div>");
 					appendTo.append(editors[edt].editor);
 				}
 			}
 			appendTo.append("<div class='dottedLine padding5'></div>");
+			appendTo.append("<div class='colheaders'><div class='place-left padding5 colHead'>Left Column</div><div class='place-left padding5 colHead'>Right Column</div></div>");
 			appendTo.append("<div class='place-left matchDiv'></div>");
 			appendTo.append("<div class='place-left contentElem'></div>");
 			this.appendElem = appendTo =  appendTo.find('.matchDiv');
-			appendTo.append("<div class=''>Answers</div>");
 			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
 			for(var i=0;i < childCnt;i++){
 				var elem = this.isNew ? null : this.elems[i];

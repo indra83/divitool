@@ -949,4 +949,13 @@ div.editableDiv.answer {
 	margin-right:30px;
 }
 
+.metro .colheaders{
+	width:100%;
+	display:inline-block;
+}
+.metro .colheaders .colHead{
+	width:50%;
+	color: red;
+}
+
 .modal_close { position: absolute; top: 12px; right: 12px; display: block; width: 14px; height: 14px; background: url(../img/modal_close.png); z-index: 2; }
