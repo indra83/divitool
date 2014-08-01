@@ -409,7 +409,7 @@ width:auto;
 
 
 .metro  .image_sidebar img{margin-top:0px;display:inline-block;}
-.metro  .image_sidebar img.pencil-edit{margin-left:40%;}
+.metro  .image_sidebar img.pencil-edit{margin-left:36%;}
 .ui-widget .ui-dialog-title {font-size: 1.2em;}
 
 .metro  .image_sidebar .icon-text{color: white;margin-top: 8px;}
@@ -425,6 +425,8 @@ filter: gray;
 -webkit-filter: grayscale(1);
 
 }
+
+.metro .popup.ui-dialog-content.ui-widget-content .formfield.larger.hidden {display:none;}
 
 .metro .buttonset .bg-divibackblue :disabled{
 background-color: rgb(231,244,250)!important;
@@ -532,7 +534,7 @@ margin-bottom: 16px;
 padding:10px !important;
 }
 
-.toolbarCls{background-color:#fff;}
+.toolbarCls{background-color:#fff;padding: 1px;margin-bottom: 10px;}
 .richtext_icons{
 display:block;
 height:14px;
