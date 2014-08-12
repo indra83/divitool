@@ -228,7 +228,7 @@ div.answerDiv textarea.answer{
 
 }
 .leftsec{
-	width:269px;
+	width:21%;
 	float: left;
 }
 
@@ -249,7 +249,7 @@ div.answerDiv textarea.answer{
 }
 
 .rightsec{
-	width:1005px;
+	width:78.5%;
 	float:right;
 }
 
