@@ -80,7 +80,7 @@ padding-bottom: 10px!important;
 .metro .buttonsSection.dottedLine{height:30px ;line-height:30px;}
 
 .metro .imageSection.contentPreview{padding:10px;text-align:center;height:450px; overflow: -moz-scrollbars-vertical;
-     overflow: scroll;}
+     overflow: auto;}
 
 .metro .imageSection.bookoverview.imageSection{padding:0px;margin-left:50px;text-align:left;line-height:50px;}
 .metro .imageSection.bookoverview{padding:0px;text-align:left;line-height:50px;}
@@ -413,7 +413,7 @@ width:auto;
 
 .bookcontent .lftsidebar div.main.xlarge{padding-left: 10px;padding-top: 2px;}
 
-.metro .pencil-edit{margin-left:12px;margin-bottom: 4px;}
+.metro .pencil-edit{margin-left:12px;margin-bottom: 4px;display:none !important;}
 
 .metro .shortcut.link:disabled, .metro .shortcut.link.disabled img{
 filter: grayscale(100%);
