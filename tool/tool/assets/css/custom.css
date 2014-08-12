@@ -541,7 +541,7 @@ margin-bottom: 16px;
 padding:10px !important;
 }
 
-.toolbarCls{background-color:#fff;padding: 1px;margin-bottom: 10px;}
+.toolbarCls{padding: 1px;margin-bottom: 10px;}
 .richtext_icons{
 display:block;
 height:14px;
@@ -579,3 +579,5 @@ color:white;
 .metro div.buttonsList .pvwBtns{width:390px;}
 
 .metro div.buttonsList nav.topicbtns{width:600px;}
+
+.metro .popup .tab-control {margin-top:8px;}
