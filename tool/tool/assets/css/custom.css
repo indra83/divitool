@@ -187,16 +187,7 @@ text-align:center;
 }
 
 .metro div.previewElem:hover {
-	border:dotted 1px;
-	
-
-	-webkit-transform: scale(1.02,1.02);
-	-webkit-transition-timing-function: ease-out;
-	-webkit-transition-duration: 250ms;
-	-moz-transform: scale(1.02,1.02);
-	-moz-transition-timing-function: ease-out;
-	-moz-transition-duration: 250ms;
-	position: relative;
+	border-bottom:1px dotted;
 	z-index: 99;
 }
 
@@ -581,3 +572,12 @@ color:white;
 .metro div.buttonsList nav.topicbtns{width:600px;}
 
 .metro .popup .tab-control {margin-top:8px;}
+
+.metro .firstdiv .rating{margin-left:6px;}
+
+.metro div.formfield.points label{font-size:13px !important;}
+
+.metro .blanks a{text-decoration:underline;cursor:pointer;}
+
+.metro .sidebar > ul li a [class*="icon-"] {margin-right:0px;}
+.metro .sidebar > ul li a i {font-size:19px;position: relative;top: 3px;}
