@@ -222,16 +222,6 @@ divi.appBase = divi.extend(divi.base, {
 
 
 	,initiliazeEditor:function(){
-		var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
-		             'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
-		             'Times New Roman', 'Verdana'],
-         fontTarget = $('[title=Font]').siblings('.dropdown-menu');
-       $.each(fonts, function (idx, fontName) {
-           fontTarget.append($('<li><a data-edit="fontName ' + fontName +'" style="font-family:\''+ fontName +'\'">'+fontName + '</a></li>'));
-       });
-     	$('.dropdown-menu input').click(function() {return false;})
- 		    .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
-         .keydown('esc', function () {this.value='';$(this).change();});
 
 	}
 
@@ -3761,7 +3751,7 @@ divi.matchAns = divi.extend(divi.answer,{
 		this.checkAndAttachLis();
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
-		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
+		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv matchAns',scope:this},append);
 		this.prepareCloseButton(parDom,fieldCount);
 		var leftdom = this.doms[this.divs.left] = this.prepareEditableDom($.extend({cls:"answer place-left",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('left'));
 		var rightdom = this.doms[this.divs.right] = this.prepareEditableDom($.extend({cls:"answer place-right",tabIndex:fieldCount++},this.evtDflts),this.parent.editors,this.getFieldValue('right'));
@@ -3957,6 +3947,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	toolbarSelector: '[data-role=editor-toolbar]',
 	dailogKey:'.dialog-html',
 	commandRole: 'edit',
+	fileCmds:'imageInsert',
 	activeToolbarClass: 'btn-info',
 	selectionMarker: 'edit-focus-marker',
 	selectionColor: 'darkgrey',
@@ -4211,7 +4202,7 @@ divi.contentEditor = divi.extend(divi.appBase,{
 	}
 
 	,startup:function(){
-		this.toolbarBtnSelector = 'a[data-' + this.commandRole + '],button[data-' + this.commandRole + '],input[type=button][data-' + this.commandRole + ']';
+		this.toolbarBtnSelector = 'a[data-' + this.commandRole + '],button[data-' + this.commandRole + '],input[type=button][data-' + this.commandRole + ']:not(input[type=file])';
 		this.listeners[this.listenerKey] = {'click':[this.setActiveToolbar]};
 		this.disableToolbar();
 	}
@@ -4369,8 +4360,18 @@ divi.contentEditor = divi.extend(divi.appBase,{
 		var toolbar = $(this.toolbarSelector);
 		toolbar.find(this.toolbarBtnSelector).on('click',null,{scope:this},this.onToolBarclick);
 		toolbar.find('[data-toggle=dropdown]').on('click',null,{scope:this},this.onRestoreSel);
-		toolbar.find('input[type=file][data-' + this.commandRole + ']').on('change',null,{scope:this},this.onFileChange);
+		toolbar.find('a[data-edit=' + this.fileCmds + ']').on('click',null,{scope:this,toolbar:toolbar},this.fileOpener);
 		this.attachEquationsListeners();
+	}
+	
+	
+	,fileOpener:function(e){
+		var toolbar = e.data ? e.data.toolbar : undefined;
+		if(toolbar){
+			var scope = e.data.scope;
+			var fileCmd = toolbar.find('input[type=file]');
+			fileCmd.on('change',null,{scope:scope},scope.onFileChange).trigger('click');
+		}
 	}
 });
 
@@ -4993,3 +4994,7 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 });
 var home = new divi.home({});
+
+$("#uploadIcon").click(function(){
+    $(this).next().trigger('click');
+});

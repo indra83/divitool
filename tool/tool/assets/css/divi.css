@@ -12928,6 +12928,7 @@ button.btn.btn-mini,input[type="submit"].btn.btn-mini{*padding-top:1px;*padding-
 	opacity: 0;
 	filter: alpha(opacity=0);
 	width:40px;
+	height:40px;
 }
 .metro .dropdown-menu {
   margin: 0;

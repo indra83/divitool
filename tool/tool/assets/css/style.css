@@ -240,7 +240,7 @@ div.answerDiv textarea.answer{
 	width:100%;
 	margin:1px 0px;
 }
-.bookcontent .lftsidebar div.main.xlarge{
+.bookcontent .lftsidebar div.main.xlarge,.titlePreview .leftsec div.main.xlarge{
 	height:47px;
 	cursor: pointer;
 }

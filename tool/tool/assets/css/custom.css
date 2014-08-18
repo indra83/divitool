@@ -230,7 +230,8 @@ text-align:center;
 
 .metro div.answerDiv{display:inline-block;width:100%;vertical-align:top;}
 .metro .ui-cancelRemove{display:inline-block;}
-.metro div.editableDiv.answer{ width:45%;}
+.metro div.editableDiv.answer{ width:85%;}
+.metro div.answerDiv.matchAns div.editableDiv.answer{ width:45%;}
 
 
 
@@ -411,7 +412,7 @@ width:auto;
 
 
 
-.bookcontent .lftsidebar div.main.xlarge{padding-left: 10px;padding-top: 2px;}
+.bookcontent .lftsidebar div.main.xlarge,.titlePreview .leftsec div.main.xlarge{padding-left: 10px;padding-top: 2px;}
 
 .metro .pencil-edit{margin-left:12px;margin-bottom: 4px;display:none !important;}
 
@@ -556,7 +557,7 @@ a.rich_button.btn-info {
 color:white;
 }
 
-.metro .leftsec.lftsidebar{margin-top:6px;}
+
 
 .metro .homeheader .bookdiv.bg-divigray{margin-left: 53px;}
 
