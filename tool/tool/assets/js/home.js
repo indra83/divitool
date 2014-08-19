@@ -4994,7 +4994,3 @@ divi.home =  divi.extend(divi.appBase,{
 	}
 });
 var home = new divi.home({});
-
-$("#uploadIcon").click(function(){
-    $(this).next().trigger('click');
-});
