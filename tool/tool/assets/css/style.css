@@ -835,8 +835,12 @@ div.editableDiv.answer {
 
 
 .metro .sidebar.divi li.selected  a {
-  background-color: #E7F4FA ;
+  background-color:#E7F4FA ;
 }
+.metro .sidebar.divi ul ul li.selected a {
+  background-color:gray;
+}
+
 .metro .sidebar.divi li.selected{
   border-right: 1px solid #E7F4FA ;
 }

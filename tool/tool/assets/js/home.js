@@ -1929,7 +1929,6 @@ divi.html = divi.extend(divi.element,{
 		values[this.htmlValKey] = val;
 		delete values.boxType;
 		delete values.boxTitle;
-		this.setValues(values);
 		divi.appBase.prototype.persistChild.call(scope,true);
 	}
 
@@ -4825,6 +4824,18 @@ divi.home =  divi.extend(divi.appBase,{
 		}else{
 			divi.listeners.unbindListeners(this.editBtnListeners(selected),this);
 			divi.listeners.unbindListeners(this.editAssessListeners(selected),this);
+		}
+		var liDiv = selected.doms[selected.divs['liDiv']];
+		if(liDiv && liDiv.dom){
+			currDom = $(liDiv.dom);
+			if(selected && (selected.table == 'topic' || selected.table == 'assessment')){
+				currDom.parent('slidedown-toggle').find('li.selected').removeClass('selected');
+				currDom.addClass('selected');
+			}else{
+				if(currDom.hasClass('stick')){
+					currDom.find('li.selected').removeClass('selected');
+				}
+			}
 		}
 	}
 
