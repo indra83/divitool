@@ -388,7 +388,12 @@ float:none;
 height:150px;
 width:auto;
 }
-.metro div.options a{position:fixed;top:347px;}
+.metro div.options a{
+position: absolute;
+top: 290px;
+font-weight: bold;
+font-size: 16px;
+}
  .previewElem .mainElem audio{height:50px;}
  .previewElem .mainElem video{
  height:200px;
