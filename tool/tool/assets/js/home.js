@@ -964,11 +964,15 @@ divi.appBase = divi.extend(divi.base, {
 			siblings.remove(scope);
 			console.log("siblings: "+siblings.length);
 			siblings.splice(frind, 0, scope);
-			this.parent.persistData(null,null,null,{attachCb:true});
-			this.getSelector(this.contentPreview).empty();
+			this.loadPostRearrange();
 			jTarget.scrollintoview();
 		}
 		$.hideLoader();
+	}
+	
+	,loadPostRearrange:function(){
+		this.parent.persistData(null,null,null,{attachCb:true});
+		this.getSelector(this.contentPreview).empty();
 	}
 
 	,rearrangeElemClick:function(event,val,jTarget){
@@ -2411,15 +2415,55 @@ divi.bookBase = divi.extend(divi.appBase,{
 		this.launchPopUp(this,true);
 	}
 
-
-	,confirmDelete:function(event,scope,target,text){
-		this.beforeDelete(event);
+	,rearrange:function(event,val,jTarget){
+		var scope = event.data.scope;
+		var text = jTarget.html();
+		var pushUp = text == "Move Up" ? true : false;
+		divi.appBase.prototype.rearrange.call(scope,scope,pushUp,!pushUp,event,jTarget);
+	}
+	
+	,loadPostRearrange:function(){
+		var parent = this.parent;
+		parent.persistData(null,null,null,{attachCb:true});
+		var siblings = this.getSiblings(this);
+		for(var eachSib in siblings){
+			if(siblings.hasOwnProperty(eachSib)){
+				siblings[eachSib].destorySideBar();
+			}
+		}
+		this.getSelector(this.contentPreview).empty();
+		var ulDiv = parent.doms[parent.divs['ulDiv']]
+		if(ulDiv){
+			parent.prepareSideBarChildren(ulDiv.dom,true);
+		}
+		var book = this.retrieveBook();
+		book.home.updateBcrumb(book);
+		$.hideLoader();
+	}
+	
+	,getSiblings:function(scope){
+		var children;
+		if(scope){
+			var parent = scope.parent;
+			if(parent){
+				children = parent.children[this.pluralize(this.table)];
+			}
+		}
+		return children;
+	}
+	
+	,reloadParent:function(event,scope,target,text){
 		this.parent.persistData(null,null,null,{attachCb:true});
 		this.getSelector(this.contentPreview).empty();
 		var book = this.retrieveBook();
 		book.draw();
 		book.home.updateBcrumb(book);
 		$.hideLoader();
+	}
+	
+	,confirmDelete:function(event,scope,target,text){
+		this.beforeDelete(event);
+		this.reloadParent();
 	}
 
 	,beforeDelete:function(event){
@@ -2644,8 +2688,12 @@ divi.chapter = divi.extend(divi.bookBase,{
 		aDiv.dom.setAttribute('id',aDiv.id);
 		ulDiv = this.doms[this.divs['ulDiv']] = divi.domBase.create($.extend(this.ulDefaults,{scope:this}),livDiv.dom);
 		if(this.hasChildren){
-			this.attachChildren(ulDiv.dom,toClean,'prepareSideBar',false,false);
+			this.prepareSideBarChildren(ulDiv.dom,toClean);
 		}
+	}
+	
+	,prepareSideBarChildren:function(ulDivDom,toClean){
+		this.attachChildren(ulDivDom,toClean,'prepareSideBar',false,false);
 	}
 });
 
@@ -2672,10 +2720,11 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.listeners[this.rclickKey] = {'click':[this.onCmClick]};
 		divi.topic.superclass.constructor.call(this);
 		var parent = $('.contextmenu');
-		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn},'Move Up':{fn:this.rearrange},'Move Down':{fn:this.rearrange}};
 		this.createContextMenu(this.cmItems);
 		this.elements = [];
 	}
+	
 
 	,launchElem:function(elem,key){
 		divi.appBase.prototype.launchElem.call(this,elem,key);
@@ -2714,12 +2763,16 @@ divi.topic = divi.extend(divi.bookBase,{
 		if(children){
 			children.remove(this);
 		}
+		this.destorySideBar();
+	}
+
+	,destorySideBar:function(event,val,jTarget){
 		var doms = this.doms[this.divs['liDiv']];
 		var currDom = $(doms.dom);
 		currDom.remove();
 		this.destroydoms();
 	}
-
+	
 	,getValues:function(edit){
 		var values = {};
 		$.extend(values,this.values);
@@ -4829,7 +4882,7 @@ divi.home =  divi.extend(divi.appBase,{
 		if(liDiv && liDiv.dom){
 			currDom = $(liDiv.dom);
 			if(selected && (selected.table == 'topic' || selected.table == 'assessment')){
-				currDom.parent('slidedown-toggle').find('li.selected').removeClass('selected');
+				currDom.parent().find('li.selected').removeClass('selected');
 				currDom.addClass('selected');
 			}else{
 				if(currDom.hasClass('stick')){
