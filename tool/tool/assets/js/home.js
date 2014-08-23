@@ -2424,11 +2424,15 @@ divi.bookBase = divi.extend(divi.appBase,{
 	
 	,loadPostRearrange:function(){
 		var parent = this.parent;
-		parent.persistData(null,null,null,{attachCb:true});
-		var siblings = this.getSiblings(this);
-		for(var eachSib in siblings){
-			if(siblings.hasOwnProperty(eachSib)){
-				siblings[eachSib].destorySideBar();
+		parent.persistData(null,null,null);
+		var childKeys = parent.childrenKeys;
+		for(var i=0;childKeys && i< childKeys.length;i++){
+			currKey = childKeys[i];
+			var siblings = this.getSiblings(this,currKey);
+			for(var eachSib in siblings){
+				if(siblings.hasOwnProperty(eachSib)){
+					siblings[eachSib].destorySideBar();
+				}
 			}
 		}
 		this.getSelector(this.contentPreview).empty();
@@ -2441,12 +2445,13 @@ divi.bookBase = divi.extend(divi.appBase,{
 		$.hideLoader();
 	}
 	
-	,getSiblings:function(scope){
+	,getSiblings:function(scope,key){
 		var children;
 		if(scope){
+			key = key || this.pluralize(this.table);
 			var parent = scope.parent;
 			if(parent){
-				children = parent.children[this.pluralize(this.table)];
+				children = parent.children[key];
 			}
 		}
 		return children;
@@ -2829,8 +2834,24 @@ divi.assessment = divi.extend(divi.bookBase,{
 		this.questIds = [];
 		this.elements = [];
 		var parent = $('.contextmenu');
-		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn},'Move Up':{fn:this.rearrange},'Move Down':{fn:this.rearrange}};
 		this.createContextMenu(this.cmItems);
+	}
+	
+	,beforeDelete:function(event,val,jTarget){
+		var lookupKey = this.pluralize(this.table);
+		var children = this.parent.children[lookupKey];
+		if(children){
+			children.remove(this);
+		}
+		this.destorySideBar();
+	}
+
+	,destorySideBar:function(event,val,jTarget){
+		var doms = this.doms[this.divs['liDiv']];
+		var currDom = $(doms.dom);
+		currDom.remove();
+		this.destroydoms();
 	}
 
 	,modifyForm:function(formPanel){
