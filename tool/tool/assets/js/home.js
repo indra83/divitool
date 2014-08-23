@@ -178,6 +178,8 @@ divi.appBase = divi.extend(divi.base, {
     countKey:'_count',
     padMax:3,
     modalKey:'',
+    moveUp:'Move Up',
+    moveDown:'Move Down',
     editKey:'editElem',
     editableDiv:'editableDiv',
     contentPreview:'.contentPreview',
@@ -2247,13 +2249,44 @@ divi.bookBase = divi.extend(divi.appBase,{
             c.hide()
         }
     }
+    
 
+	
+	,retrieveCmChild:function(dom,text){
+		var children = dom.children(),textDom,currDom;
+		$.each(children,function(key,value){
+			currDom = $(value);
+			if(currDom.html() == text){
+				textDom = currDom;
+			}
+		});
+		return textDom;
+	}
+	
+	,filterContextMenu:function(dom){
+		var siblings = this.getSiblings(this);
+		var index = siblings.indexOf(this),length = siblings.length-1;
+		$(dom).children().removeClass('hidden');
+		if(index != -1 && (index == 0 || index == length)){
+			var key = index == 0 ? this.moveUp : this.moveDown;
+			parDom = $(dom);
+			currDom = this.retrieveCmChild(parDom,key);
+			currDom.addClass('hidden');
+			if(length == index){
+				currDom = this.retrieveCmChild(parDom,this.moveDown);
+				currDom.addClass('hidden');	
+			}
+		}
+    	return dom;
+    }
+	
+    
 	,toggleContextMenu:function(event,val,jTarget){
 		event.preventDefault();
 		event.stopPropagation();
 		var text = jTarget.val();
 		if(this.cmDom){
-			this.getSelector(this.cmKey).hide().empty().append(this.cmDom.dom).css({top: event.pageY + "px", left: event.pageX + "px"}).show();
+			this.getSelector(this.cmKey).hide().empty().append(this.filterContextMenu(this.cmDom.dom)).css({top: event.pageY + "px", left: event.pageX + "px"}).show();
 		}
 	}
 
@@ -2418,7 +2451,7 @@ divi.bookBase = divi.extend(divi.appBase,{
 	,rearrange:function(event,val,jTarget){
 		var scope = event.data.scope;
 		var text = jTarget.html();
-		var pushUp = text == "Move Up" ? true : false;
+		var pushUp = text == this.moveUp ? true : false;
 		divi.appBase.prototype.rearrange.call(scope,scope,pushUp,!pushUp,event,jTarget);
 	}
 	
@@ -2494,8 +2527,6 @@ divi.bookBase = divi.extend(divi.appBase,{
 		if(items){
 			for(var ech in items){
 				if(items.hasOwnProperty(ech)){
-					// childDom =
-					// divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,events:['click'],attachLis:true,listeners:this.listeners[this.defaultKey]}),parDom.dom);
 					childDom = divi.domBase.create($.extend(this.cmItemDflts,{tag:'div',scope:this,prefix:'sidebar_',value:ech,attachLis:true,listeners:this.listeners[this.rclickKey]}),parDom.dom);
 					childDom.dom.setAttribute('id',childDom.id);
 				}
@@ -2644,7 +2675,11 @@ divi.chapter = divi.extend(divi.bookBase,{
 		this.cmItems = {'Add Topic':{fn:this.add,key:'topic'},'Add Assessment':{fn:this.add,key:'assessment'},'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
 		this.createContextMenu(this.cmItems);
 	}
-
+    
+    ,filterContextMenu:function(dom){
+    	return dom;
+    }
+    
 	,beforeDelete:function(event){
 		var lookupKey = this.pluralize(this.table);
 		var children = this.parent.children[lookupKey];
@@ -2727,12 +2762,13 @@ divi.topic = divi.extend(divi.bookBase,{
 		this.listeners[this.rclickKey] = {'click':[this.onCmClick]};
 		divi.topic.superclass.constructor.call(this);
 		var parent = $('.contextmenu');
-		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn},'Move Up':{fn:this.rearrange},'Move Down':{fn:this.rearrange}};
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.cmItems[this.moveUp] = {fn:this.rearrange};
+		this.cmItems[this.moveDown] = {fn:this.rearrange};
 		this.createContextMenu(this.cmItems);
 		this.elements = [];
 	}
 	
-
 	,launchElem:function(elem,key){
 		divi.appBase.prototype.launchElem.call(this,elem,key);
 		if(elem && elem.key == 'html' && !key){
@@ -2834,7 +2870,9 @@ divi.assessment = divi.extend(divi.bookBase,{
 		this.questIds = [];
 		this.elements = [];
 		var parent = $('.contextmenu');
-		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn},'Move Up':{fn:this.rearrange},'Move Down':{fn:this.rearrange}};
+		this.cmItems = {'Edit':{fn:this.edit},'Delete':{fn:this.deletefn}};
+		this.cmItems[this.moveUp] = {fn:this.rearrange};
+		this.cmItems[this.moveDown] = {fn:this.rearrange};
 		this.createContextMenu(this.cmItems);
 	}
 	
