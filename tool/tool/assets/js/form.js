@@ -1370,7 +1370,7 @@ divi.formPanel = divi.extend(divi.panelBase,{
 	}
 	
 	,getToggleText:function(parent){
-		 var buttons = [{tag:'button',defaultCss:'place-right',baseCss:'imgButton',value:'<img class="toggle"/>',hidden:this.editMode,listeners:{'click':[this.toggleForm]}}];
+		 var buttons = [{tag:'button',defaultCss:'place-right',baseCss:'imgButton',value:'<i class="icon-pencil"></i>',hidden:this.editMode,listeners:{'click':[this.toggleForm]}}];
    		 this.createButtons(buttons,parent);
 	}
 	

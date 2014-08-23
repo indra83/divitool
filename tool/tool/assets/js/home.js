@@ -2526,7 +2526,8 @@ divi.book = divi.extend(divi.bookBase,{
 	}
 
 	,bookListeners:function(){
-		return [{tag:'.btnBkOverview',listType:'click',mapTo:this,listenerFn:'showEditor'}];
+		return [{tag:'.btnBkOverview',listType:'click',mapTo:this,listenerFn:'showEditor'},
+		        {tag:'.bookEdit',listType:'click',mapTo:this,listenerFn:'showEditor'}];
 	}
 
 	,preview:function(){
@@ -2605,6 +2606,7 @@ divi.book = divi.extend(divi.bookBase,{
 	,modifyForm:function(formPanel){
 		if(formPanel){
 			formPanel.setReadOnly();
+			$(formPanel.dom).addClass('marginbtm');
 		}
 	}
 
