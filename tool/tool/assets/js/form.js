@@ -2133,6 +2133,15 @@ divi.form.audiofield  = divi.extend(divi.form.file, {
 	}
 });
 
+divi.form.apkfield  = divi.extend(divi.form.file, {
+	validTypes:[''],
+	isFormField:true,
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.apkfield.superclass.init.call(this);
+	}
+});
+
 divi.form.imagefield  = divi.extend(divi.form.file, {
 	validTypes:['image/png','image/jpg','image/jpeg'],
 	init:function(cfg){

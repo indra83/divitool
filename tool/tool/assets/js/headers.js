@@ -135,6 +135,27 @@ divi.app.subtopic = new divi.pageBase({
 	}
 });
 
+divi.app.application = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"title", "desc": "Title", "type": "textfield","isRequired": true},
+		         {name:"description", "desc": "Description", "type": "textfield"},
+		         {name:"id", "desc": "App ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"appPackage", "desc": "Package", "type": "textfield","isRequired": true},
+		         {name:"activityName", "desc": "Activity Name", "type": "textfield"},
+		         {name:"src", "desc": "Source", "type": "apkfield"},
+		         {name:"appVersionCode", "desc": "Version Code", "type": "numberfield"}];
+	}
+});
+
+divi.app.youtube = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"title", "desc": "Title", "type": "textfield","isRequired": true},
+		         {name:"description", "desc": "Description", "type": "textfield"},
+		         {name:"id", "desc": "ID", "type": "textfield","isRequired": true,isReadOnly:true},
+		         {name:"youtubeId", "desc": "Youtube ID", "type": "textfield","isRequired": true}];
+	}
+});
+
 divi.app.video = new divi.pageBase({
 	fieldconfig:function(){
 		 return [{name:"src", "desc": "Video File", "type": "videofield","isRequired": true},
@@ -178,11 +199,13 @@ divi.namespace("divi.tpl");
 divi.namespace("divi.tpl.prev");
 divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Author Name/ID/Organization Name:</span><span class="lblValue">${source}</span></div><div class="formfield larger"><span class="labelStyle">Name:</span><span class="lblValue">${name}</span></div><div class="formfield larger"><span class="labelStyle">Website URL:</span><span class="lblValue">${url}</span></div><div class="formfield larger"><span class="labelStyle">License:</span><span class="lblValue">${license}</span></div>';
 divi.tpl.video = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
+divi.tpl.youtube = '<div><embed  width="420" height="315" src="http://www.youtube.com/v/${youtubeId}"></div>';
 divi.tpl.audio = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.image = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.html = '<div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div>';
 divi.tpl.heading3 = '<h3>${heading}</h3>';
 divi.tpl.subtopic = '<h4>${subtopic}</h4>';
+divi.tpl.application = '<div class="formfield larger"><a class="labelStyle" src="https://play.google.com/store/apps/details?id=${appPackage}">Click here to open Package</a></div><div class="formfield larger"><span class="labelStyle">Title:</span><span class="lblValue">${title}</span></div><div class="formfield larger"><span class="labelStyle">Description:</span><span class="lblValue">${description}</span></div>';
 divi.tpl.book = '<div class="bg-drkbrown fg-white button large capsOn"><span>manage tags</span></div><div class="bookheader hidden">BOOK OVERVIEW<div class="place-right"><button class="imgButton bookEdit"><i class="icon-pencil"></i></button></div></div><br/><br/><div  class="imageSection bookoverview">Welcome to Divis content editor to create books to be read on the DIVI platform.Please enter an overview for the book you are creating.<br/><div class="btnBkOverview button success large capsOn"><span>book overview</span></div></div><div class="btnAthr button success large capsOn"><span>add authoring and licensing details</span></div>';
 divi.tpl.eachHeader = '<div class="previewElem"><div class="prevBtns"><button class="disabled"><i class=" icon-arrow-down fg-green"></i></button><button class="disabled"><i class=" icon-arrow-up fg-green"></i></button><button class="ui-cancel"><i class="icon-cancel"></i></button></div></div>'
 divi.tpl.formula = '<div class="formula"><div class="formulaUploadContainer"><div class="formulaUploadContainerInner"><div class="toolbarContainer container"><div id="toolbar"></div></div><div class="formulapreviewCon"><div class="formulaTextContainer stdContainer stcontainer" tabindex="1"><div><h4>Enter Formula</h4></div><div><textarea name="formula" id="formulaText" class="textareacontainer" autofocus></textarea></div></div><div class="previewCon stcontainer"><div class="prContainerHeader"><h4>Formula Preview</h4></div><div class="prContainer stdContainer" style="overflow-y:auto;"><img src="" name="prFormula" id="prFormula"/></div></div></div></div></div></div><div class="form-actions place-right"><button class="button primary insertWin">Insert</button>&nbsp;<button class="button cancelWin" type="button">Cancel</button></div>';
@@ -198,3 +221,4 @@ divi.tpl.question = '<div class="preview question">Q. </div>';
 divi.tpl.slide = '<div class="slide"></div>';
 divi.tpl.prev.video = "<video controls poster='${thumb}'><source src='${src}' type='video/mp4' /></video>";
 divi.tpl.prev.audio = "<audio controls src='${src}'/></audio>";
+divi.tpl.prev.youtube = '<object  width="420" height="315" data="http://www.youtube.com/v/${youtubeId}"></object>';

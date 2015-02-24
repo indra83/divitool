@@ -1756,6 +1756,75 @@ divi.video = divi.extend(divi.element,{
 	}
 });
 
+divi.youtube = divi.extend(divi.element,{
+	ignoreFields:['youtubeId','id'],
+	table:'youtube',
+	idCount:1,
+	idPrefix:'yt',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.youtube.superclass.constructor.call(this);
+	}
+
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.removeAttribute('src');
+			childdom.setAttribute('youtubeId', values['youtubeId']);
+		}
+	}
+});
+
+
+divi.application = divi.extend(divi.element,{
+	ignoreFields:['appVersionCode','appPackage','id','src'],
+	table:'application',
+	idCount:1,
+	idPrefix:'app',
+	noreference:true,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.application.superclass.constructor.call(this);
+	}
+
+	,validateForm:function(form){
+		var elem,isValidForm = false;
+		if(form){
+			isValidForm = form.validateForm();
+			var srcField = form.elementsMap['src'];
+			if(srcField.getValue()){
+				var appVersionCode = form.elementsMap['appVersionCode'].getValue();
+				if(!appVersionCode){
+					isValidForm = false;
+					alert('Please enter the app version code.');
+				}
+			}
+		}
+		return isValidForm;
+	}
+
+
+	,drawElement:function(){
+		var currSel = $('<div class="insideElem"></div>');
+		var results = $.tmpl(this.table,this.getValues());
+		currSel.append(results);
+		return currSel;
+	}
+	
+	,prepareLoadValues:function(currNode,values){
+		values[this.idPrefix] = currNode.textContent;
+		return values;
+	}
+	
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+			childdom.removeAttribute('thumb');
+			childdom.setAttribute('appVersionCode', values['appVersionCode']);
+			childdom.setAttribute('appPackage', values['appPackage']);
+		}
+	}
+});
+
 divi.heading3 = divi.extend(divi.element,{
 	table:'heading3',
 	modalKey:'Heading',
@@ -4996,7 +5065,9 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addimageset',listType:'click',parent:this.book,listenerFn:'addelement',key:'imageset',mapTo:scope},
 		         {tag:'.addinfo',listType:'click',parent:this.book,listenerFn:'addelement',key:'info',mapTo:scope},
 		         {tag:'.addalert',listType:'click',parent:this.book,listenerFn:'addelement',key:'alert',mapTo:scope},
-		         {tag:'.addother',listType:'click',parent:this.book,listenerFn:'addelement',key:'other',mapTo:scope}];
+		         {tag:'.addother',listType:'click',parent:this.book,listenerFn:'addelement',key:'other',mapTo:scope},
+		         {tag:'.addapp',listType:'click',parent:this.book,listenerFn:'addelement',key:'application',mapTo:scope},
+		         {tag:'.addyoutube',listType:'click',parent:this.book,listenerFn:'addelement',key:'youtube',mapTo:scope}];
 	}
 
 	,editAssessListeners:function(scope){
