@@ -2005,12 +2005,16 @@ divi.form.file = divi.extend(divi.baseField, {
 	lbldfts:{tag:"label","class":"labelStyle",attachLis:false},
 	spnDefaults:{tag:"span","class": 'bg-darkCobalt fg-white upload'},
 	spanText:'Upload a File',
+	isMultiple:false,
 	outputDvDflts:{tag:"div","class":"fileUploadbox"},
 	innerDvDflts:{tag:"div","class":"fileUpload file"},
 	innerDiv:'innerDiv',
 	isFileField:true,
 	init:function(cfg){
 		$.extend(this,cfg);
+		if(this.isMultiple){
+			$.extend(this.defaults,{'multiple':'multiple'});
+		}
 		divi.form.file.superclass.init.call(this);
 	}
 	
@@ -2049,13 +2053,29 @@ divi.form.file = divi.extend(divi.baseField, {
 		var isValid = this.checkValid(target,jTarget,value);
 		if(isValid){
 			this.readData(event,value,jTarget,target);
-			this.setValue(this.files[0].name);
+			this.setValue(this.retrieveNames());
 		}
 		return isValid;
 	}
 	
+	,retrieveNames:function(){
+		var baseFile,name="";
+		for(var filecnt=0;filecnt < this.files.length;filecnt++){
+			baseFile = this.files[filecnt];
+			name += baseFile.name;
+		}
+		return name;
+	}
+	
 	,readData:function(event,targetVal,jTarget,target){
-		this.files = [target.files[0]];
+		if(this.isMultiple){
+			this.files = [];
+			for(var i = 0;i < target.files.length;i++){
+				this.files.push(target.files[i]);
+			}
+		}else{
+			this.files = [target.files[0]];
+		}
 	}
 	
 	,checkValid:function(target,jTarget,value){
@@ -2065,17 +2085,20 @@ divi.form.file = divi.extend(divi.baseField, {
 		if(target){
 			var files = target.files;
 			if(files && files.length > 0){
-				var baseFile = files[0];
-				if(baseFile && !$.isEmptyObject(this.validTypes)){
-					if(this.validTypes.indexOf(baseFile.type) == -1){
-						isValid = false;
-					}
-					if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
-						jTarget.remove();
-						var inputDiv = this.doms[this.inputDiv];
-						this.createField({},inputDiv.dom);
-						this.setProperties({});
-						alert('File format is not expected.Please select relevent file');
+				var baseFile;
+				for(var filecnt=0;isValid && filecnt < files.length;filecnt++){
+					baseFile = files[filecnt];
+					if(baseFile && !$.isEmptyObject(this.validTypes)){
+						if(this.validTypes.indexOf(baseFile.type) == -1){
+							isValid = false;
+						}
+						if(!isValid && this.isRequired && !divi.util.isjQEmpty(target)){
+							jTarget.remove();
+							var inputDiv = this.doms[this.inputDiv];
+							this.createField({},inputDiv.dom);
+							this.setProperties({});
+							alert('File format is not expected.Please select relevent file');
+						}
 					}
 				}
 			}else if(this.isRequired){
@@ -2149,6 +2172,16 @@ divi.form.imagefield  = divi.extend(divi.form.file, {
 		divi.form.imagefield.superclass.init.call(this);
 	}
 });
+
+divi.form.multipleimagefield  = divi.extend(divi.form.file, {
+	validTypes:['image/png','image/jpg','image/jpeg'],
+	isMultiple:true,
+	init:function(cfg){
+		$.extend(this,cfg);
+		divi.form.imagefield.superclass.init.call(this);
+	}
+});
+
 
 
 

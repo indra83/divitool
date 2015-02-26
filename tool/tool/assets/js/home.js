@@ -2029,6 +2029,7 @@ divi.audio = divi.extend(divi.element,{
 
 });
 
+
 divi.imageset = divi.extend(divi.element,{
 	table:'imageset',
 	idCount:1,
@@ -2123,7 +2124,6 @@ divi.imageset = divi.extend(divi.element,{
 	}
 
 	,prepareSubmitValues:function(scope,form){
-		divi.appBase.prototype.prepareSubmitValues.call(this,scope,form);
 		var files = [];
 		for(var i=0;i< this.elems.length;i++){
 			elem = this.elems[i];
@@ -2153,7 +2153,8 @@ divi.imageset = divi.extend(divi.element,{
 
 	,attachpostContent:function(appendTo,showToggle){
 		this.showToggle = showToggle;
-		var elem;
+		var elem,backUp = appendTo;
+		
 		appendTo.append("<div class='"+this.prevElem+"'></div>").append("<div class='addmore place-right icon-plus-sign'></div>");
 		this.appendElem = appendTo = appendTo.find("."+this.prevElem);
 		if(this.isNew){
@@ -2192,6 +2193,57 @@ divi.imageset = divi.extend(divi.element,{
 
 });
 
+divi.mslides = divi.extend(divi.imageset,{
+	table:'mslides',
+	ignoreFields:['id','title','images'],
+	idCount:1,
+	noreference:false,
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.mslides.superclass.constructor.call(this);	
+	}
+
+	,attachpostContent:function(appendTo,showToggle){
+		divi.element.prototype.attachpostContent.call(this,appendTo,showToggle);
+	}
+	
+	,prepareSubmitValues:function(scope,form){
+		var values = divi.appBase.prototype.prepareSubmitValues.call(this,scope,form);
+		this.setValues(values);
+		var files = this.files = form.files;
+		var eachFile,eachElem;
+		for(var i=0;i< files.length;i++){
+			eachFile = files[i];
+			eachElem = this.prepareImageElement(true);
+			if(eachElem){
+				eachElem.setValueForKey('src',eachFile.name);
+				eachElem.reference.setValues(this.reference.getValues());
+			}
+		}
+		this.noreference = true;
+		this.reference = null;
+	}
+	
+	,getPersistValues:function(dom,parent,attachParent,tag){
+		divi.elementbase.prototype.getPersistValues.call(this,dom,parent,attachParent,"imageset");
+	}
+	
+	,prepareImageElement:function(isNew){
+		var elem = new divi.image({parent:this,isNew:true,home:this.home});
+		if(isNew){
+			var count =	this.elems.length;
+			this.elems[count] = elem;
+		}
+		elem.setValueForKey('id', elem.guid());
+		elem.setValueForKey('allowFullscreen',false);
+		elem.setValueForKey('showBorder',false);
+		return elem;
+	}
+	
+});
+
+
+
 divi.image = divi.extend(divi.element,{
 	tag:'img',
 	ignoreFields:['id','src','allowFullscreen','showBorder','hasText'],
@@ -2221,6 +2273,18 @@ divi.image = divi.extend(divi.element,{
 		}
 		var elemDom = $('<div class="mainElem place-left elemPreview"></div>').append(tag);
 		return elemDom;
+	}
+});
+
+
+divi.multipleImage = divi.extend(divi.element,{
+	tag:'img',
+	table:'mulImage',
+	idCount:1,
+	idPrefix:'mulImage',
+	constructor: function (cfg) {
+		$.extend(this,cfg);
+		divi.multipleImage.superclass.constructor.call(this);
 	}
 });
 
@@ -5067,7 +5131,8 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addalert',listType:'click',parent:this.book,listenerFn:'addelement',key:'alert',mapTo:scope},
 		         {tag:'.addother',listType:'click',parent:this.book,listenerFn:'addelement',key:'other',mapTo:scope},
 		         {tag:'.addapp',listType:'click',parent:this.book,listenerFn:'addelement',key:'application',mapTo:scope},
-		         {tag:'.addyoutube',listType:'click',parent:this.book,listenerFn:'addelement',key:'youtube',mapTo:scope}];
+		         {tag:'.addyoutube',listType:'click',parent:this.book,listenerFn:'addelement',key:'youtube',mapTo:scope},
+		         {tag:'.addmslides',listType:'click',parent:this.book,listenerFn:'addelement',key:'mslides',mapTo:scope}];
 	}
 
 	,editAssessListeners:function(scope){

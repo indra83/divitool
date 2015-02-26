@@ -179,6 +179,15 @@ divi.app.image = new divi.pageBase({
 	}
 });
 
+divi.app.mslides = new divi.pageBase({
+	fieldconfig:function(){
+		 return [{name:"id", "desc": "ImageSet ID", "type": "textfield","isRequired": true,isReadOnly:true},
+			        {name:"title","desc": "Title", "type": "textfield","isRequired": true},
+			        {name:"images", "desc": "Select Multiple Files", "type": "multipleimagefield"}];
+		 
+	}
+});
+
 divi.app.imageset = new divi.pageBase({
 	fieldconfig:function(){
 		return [ {name:"id", "desc": "ImageSet ID", "type": "textfield","isRequired": true,isReadOnly:true},
@@ -195,6 +204,7 @@ divi.app.html = new divi.pageBase({
 	}
 });
 
+divi.imageAccordin = '<div class="accordion" data-role="accordion"><div class="accordion-frame active"><a href="#" class="heading">Multiple Files</a><div class="content multiple"></div></div><div class="accordion-frame"><a href="#" class="heading">Individual Files</a><div class="content individual"></div></div></div>';
 divi.namespace("divi.tpl");
 divi.namespace("divi.tpl.prev");
 divi.tpl.references = '<div class="formfield larger"><span class="labelStyle">Author Name/ID/Organization Name:</span><span class="lblValue">${source}</span></div><div class="formfield larger"><span class="labelStyle">Name:</span><span class="lblValue">${name}</span></div><div class="formfield larger"><span class="labelStyle">Website URL:</span><span class="lblValue">${url}</span></div><div class="formfield larger"><span class="labelStyle">License:</span><span class="lblValue">${license}</span></div>';
