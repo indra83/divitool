@@ -5051,18 +5051,8 @@ divi.home =  divi.extend(divi.appBase,{
 	previewSel:'.treepreview',
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
-		this.modifyCss();
 	}
 
-	,modifyCss:function(){
-		var avalWidth = window.screen.availWidth;
-		if(avalWidth <= 1300){
-			var images = $('.metro nav.topicbtns button.varwidth');
-			images.find('span').hide();
-			images.width(50);
-		}
-	}
-	
 	,updateSelected:function(selected){
 		this.selected = selected;
 		this.enableTopBtns(selected);
