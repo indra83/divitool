@@ -1777,7 +1777,7 @@ divi.youtube = divi.extend(divi.element,{
 
 
 divi.application = divi.extend(divi.element,{
-	ignoreFields:['appVersionCode','appPackage','id','src'],
+	ignoreFields:['appVersionCode','appPackage','id','src','activityName'],
 	table:'application',
 	idCount:1,
 	idPrefix:'app',
@@ -1821,6 +1821,7 @@ divi.application = divi.extend(divi.element,{
 			childdom.removeAttribute('thumb');
 			childdom.setAttribute('appVersionCode', values['appVersionCode']);
 			childdom.setAttribute('appPackage', values['appPackage']);
+			childdom.setAttribute('activityName', values['activityName']);
 		}
 	}
 });
