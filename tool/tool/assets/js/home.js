@@ -5051,7 +5051,7 @@ divi.home =  divi.extend(divi.appBase,{
 	previewSel:'.treepreview',
 	constructor : function (cfg) {
 		divi.home.superclass.constructor.call(this);
-		this.modifyCss();
+	//	this.modifyCss();
 	}
 
 	,modifyCss:function(){
