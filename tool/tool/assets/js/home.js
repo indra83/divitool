@@ -934,8 +934,8 @@ divi.appBase = divi.extend(divi.base, {
 				tabi = instance.fieldCount+1;
 			}
 			$('.metro').addClass('fix-body');
-			
-			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:instance.home,fn:instance.home.cancelDailog,tabindex:tabi+1}});
+			var cancelScope = instance.cancelDailog ? instance : instance.home;
+			$.extend(newButtons,{ 'Submit':{scope:instance,fn:instance.submitForm,tabindex:tabi},'Cancel':{scope:cancelScope,fn:cancelScope.cancelDailog,tabindex:tabi+1}});
 			mydialog.superDialog("option", "buttons", newButtons);
 			
 			$('.metro .ui-dialog .ui-dialog-buttonset .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').first().prepend('<img src="/tool/assets/images/crux.png">');
@@ -1172,6 +1172,7 @@ divi.appBase = divi.extend(divi.base, {
 		var xhr;
 		if(url){
 			 xhr = new XMLHttpRequest();
+			 xhr.reqOps = {cb:callback,scope:context};
 		     xhr.open('POST', url, true);
 		     xhr.send(formData);
 			if(!skipLoader){
@@ -1180,8 +1181,9 @@ divi.appBase = divi.extend(divi.base, {
 		}
 		 xhr.onreadystatechange=function(){
         	if (xhr.readyState==4 && xhr.status==200){
-    			if(callback){
-    				callback.call(context,xhr.responseText);
+        		var cbOps = xhr.reqOps;
+    			if(cbOps && cbOps.cb){
+    				cbOps.cb.call(cbOps.scope,xhr.responseText);
     				$.hideLoader();
     			}
         	}
@@ -3298,6 +3300,10 @@ divi.question = divi.extend(divi.element,{
 		var values = this.getValues();
 		delete values[this.optionsKey];
 		delete values['html'];
+		this.loadAnswers(questionChild,self,answers);
+	}
+	
+	,loadAnswers:function(questionChild,self,answers){
 		var eachAns,elem;
 		for(var i=0;i < answers.length;i++){
 			eachAns = answers[i];
@@ -3429,7 +3435,7 @@ divi.question = divi.extend(divi.element,{
 			appendTo.append("<div class='dottedLine padding5'></div>");
 			appendTo.append("<div class='place-left mainElem'></div><div class='place-right contentElem'></div>");
 			this.appendElem = appendTo =  appendTo.find('.mainElem');
-			appendTo.append("<div class=''>Answers</div>");
+			appendTo.append("<div class='answersTag'>Answers</div>");
 			var childCnt = this.isNew ? this.ansCnt : this.elems.length;
 			for(var i=0;i < childCnt;i++){
 				var elem = this.isNew ? null : this.elems[i];
@@ -3901,47 +3907,76 @@ divi.fill_blankAns = divi.extend(divi.answer,{
 });
 
 divi.labelingAns = divi.extend(divi.answer,{
-	ignoreFields:['id','data','right','left','left,right'],
-	divs:{'text':'text','upload':'upload'},
+	ignoreFields:['id','image','labels'],
+	imageKey:'image',
+	labelsKey:'labels',
+	divs:{'formDom':'formDom','control':'controlDom','label':'labelDom','elem':'elemDom','main':'answerDiv','preview':'previewDom'},
 	table:'labelingAns',
+	labels:{},
+	table:'label',
+	imageField:null,
+	files:{},
 	constructor: function (cfg) {
 		$.extend(this,cfg);
+		this.imageField = null;
 		this.listeners = {};
+		this.labels = {};
 		divi.labelingAns.superclass.constructor.call(this);
 	}
+	
+	,addAddValues:function(dom,childdom,values,parent){
+		if(childdom){
+		}
+	}
 
+	,prepareLoadValues:function(currNode,values){
+		var lbls = this.getFieldValue('labels');
+		values.text = currNode.textContent;
+		if(!this.getFieldValue('labels') || divi.util.isEmpty(this.getFieldValue('labels'))){
+			lbls = [values];
+		}else{
+			var newLbls = [values];
+			lbls = lbls.concat(newLbls);
+		}
+		this.setValueForKey('labels',lbls);
+		return this.values;
+	}
+		
+	,addSplValues:function(dom,child,values,parent){
+		var values = this.cleanValues(values);
+		var key = this.labelsKey;
+		var eachElem,lbl,labelVals = values[key];
+		
+		child.removeAttribute('thumb');
+		child.removeAttribute('id');
+		child.removeAttribute('src');
+		
+		for(var i=0;i < labelVals.length;i++){
+			eachElem = labelVals[i];
+			if(eachElem){
+				lbl = (i == 0) ? child : dom.createElement('label');
+	            cdata = dom.createCDATASection(unescape(eachElem.text));
+				lbl.appendChild(cdata);
+				lbl.setAttribute('x',eachElem.x);
+				lbl.setAttribute('y',eachElem.y);
+				if(i != 0){
+					parent.appendChild(lbl);
+				}
+			}
+		}
+	}
+	
 	,draw:function(append,index){
 		var values = this.getValues();
 		var fieldCount = this.getFieldCount();
 		var parDom = this.doms[this.divs.main] = divi.domBase.create({tag:'div','class':'answerDiv',scope:this},append);
-		var imageField = divi.form.imagefield({desc: "Image File",isRequired: true,larger: true,name: "src",scope: this,type: "imagefield",tabIndex:fieldCount++});
-		this.dom[this.divs.text] = imageField.doms[this.inputdom];
+		var imageField = this.imageField = new divi.form.imagefield({name:"image", "desc": "image", "type": "textfield","isRequired": true});
+		$.extend(imageField.lbldfts,{"class":"labelStyle hidden"});
+		$.extend(imageField,{"defaultCss":"formfield medium"});
 		imageField.draw({},parDom.dom);
-		this.setFieldCount(fieldCount);
 	}
 
-	,addAddValues:function(dom,childdom,values,parent){
-		if(childdom){
-			childdom.removeAttribute('thumb');
-			childdom.removeAttribute('src');
-		}
-	}
-
-	,addSplValues:function(dom,child,values,parent){
-		var values = this.cleanValues(values);
-		var key = this.htmlValKey;
-		var eachElem,keys =  this.htmlValKey.split(',');
-		for(var i=0;i < keys.length;i++){
-			eachElem = keys[i];
-			var dataF = values[eachElem];
-			if(dataF){
-				data = dom.createElement(eachElem);
-	            cdata = dom.createCDATASection(unescape(dataF));
-	            data.appendChild(cdata);
-	            child.appendChild(data);
-			}
-		}
-	}
+	
 });
 
 divi.matchAns = divi.extend(divi.answer,{
@@ -4148,16 +4183,173 @@ divi.match = divi.extend(divi.question,{
 });
 
 
-divi.labeling = divi.extend(divi.question,{
-	type:'labeling',
-	table:'labeling',
+divi.label = divi.extend(divi.question,{
+	type:'label',
+	table:'label',
+	submitCount:0,
+	imageLoc:'',
+	optionsKey:'labels',
+	optionKey:'label',
 	mainEditorCls:'question matchthefol',
 	answerKey:'labelingAns',
+	divs:{'labels':'labelsDiv','lblImage':'lblImageDiv'},
 	constructor: function (cfg) {
 		$.extend(this,cfg);
-		divi.labeling.superclass.constructor.call(this);
+		this.resetSubmitCount();
+		divi.label.superclass.constructor.call(this);
 	}
 
+	,imageSubmit:function(scope,form,event){
+		divi.question.prototype.submit.call(this,scope,form,event);
+		
+	}
+	
+	,loadAnswers:function(questionChild,self,answers){
+		var eachAns,elem = new divi[this.answerKey]({parent:this,home:this.home});;
+		for(var i=0;i < answers.length;i++){
+			eachAns = answers[i];
+			elem.loadAnswer(eachAns);
+		}
+		this.addAnswer(this,elem);
+	}
+	
+	
+	,getChild:function(){
+		return this.elems[0];
+	}
+	
+	,hasNewImage:function(){
+		var baseElement = this.getChild();
+		var hasImage = false;
+		if(baseElement.imageField){
+			hasImage = baseElement.imageField.files.length > 0;
+		}
+		return hasImage;
+	}
+	
+	,persistChildHtml:function(index){
+		var child = this.getChild();
+		if(this.hasNewImage()){
+			var url = this.prepareFilePath(this,url);
+			var ops = {url:url,data:child.imageField.files,succcb:this.imageSaveCb};
+			this.persist(ops);
+		}else{
+			this.imageSaveCb();
+		}
+	}
+	
+	,imageSaveCb:function(){
+		divi.question.prototype.persistChildHtml.call(this,0);
+	}
+	
+	,submit:function(scope,form,event){
+		if(this.submitCount == 0){
+			this.submitCount++;
+			divi.home.prototype.cancelDailog(event);
+			var values = this.prepareSubmitValues(scope,form);
+			divi.appBase.prototype.launchPopUp.call(this,scope,form,event);
+		}else{
+			this.imageSubmit(scope,form,event);
+			this.resetSubmitCount();
+		}
+	}
+	
+	,resetSubmitCount:function(){
+		this.submitCount = 0;
+	}
+	
+	,showContent:function(appendTo,showToggle,edit){
+		if(this.submitCount == 0){
+			divi.elementbase.prototype.showContent.call(this,appendTo,showToggle,edit);
+		}else{
+			this.labelContent(appendTo,showToggle,edit);
+		}
+	}
+	
+	,cancelDailog:function(b,e){
+		this.resetSubmitCount();
+		divi.appBase.prototype.cancelDailog.call(this,b,e);
+	}
+	
+	,labelContent:function(appendTo,showToggle,edit){
+		var mainDivDom =this.doms[this.divs.lblImage] =  divi.domBase.create({tag:'div','class':'lblImage'},appendTo);
+		var mainJdom = $(mainDivDom.dom);
+		var baseElement = this.getChild();
+		if(this.hasNewImage()){
+			 while (mainJdom.children().length) {
+				 mainJdom.children().remove();
+		      }
+			var imageFile = baseElement.imageField.files.length > 0 ? baseElement.imageField.files[0] : null;
+			if(imageFile){
+				img = document.createElement("img");
+				mainJdom.append(img);
+				reader = new FileReader();
+				reader.onload = (function (theImg) {
+					return function (evt) {
+						theImg.src = evt.target.result;
+					};
+				}(img));
+				reader.readAsDataURL(imageFile);
+			}
+		}else{
+			img = document.createElement("img");
+			mainJdom.append(img);
+			img.src =baseElement.getHtmlLoc()+"/"+this.getValues()['src'];
+		}
+        var taggd = mainJdom.children().taggd(this.getOptions(), []);
+        taggd.setData(baseElement.getFieldValue('labels'));
+        taggd.on('change', function() {
+            this.data = taggd.data;
+            baseElement.setValueForKey('labels',taggd.data);
+        });
+	}
+	
+	,getOptions:function() {
+	    return {
+	        align: {
+	            x: 'center',
+	            y: 'center'
+	        },
+	        offset: {
+	            left: 0,
+	            top: 24
+	        },
+	        edit: true
+	    };
+	}
+
+	,drawChildren:function(){
+		var currSSel =$('<div>');
+		var currAns,ansDom,answers = this.elems;
+		var tmpl = divi.tpl[this.answerKey];
+		for(var i=0;answers && i < answers.length;i++){
+			currAns = answers[i];
+			ansDom = $(tmpl);
+			ansDom.find('label').append(currAns.getFieldValue('data'));
+			currSSel.append(ansDom);
+		}
+		return currSSel;
+	}
+	
+	,attachpostContent:function(appendTo,showToggle){
+		divi.question.prototype.attachpostContent.call(this,appendTo,showToggle);
+		appendTo.find('div.'+this.optionsKey).addClass('hidden');
+		appendTo.find('div.answersTag').addClass('hidden');
+	}
+	
+	,updateChildDom:function(ansDom){
+	}
+	
+	,prepareParentDom:function(dom,childdom,values,parent){
+		var imgName;
+		if(childdom){
+			var baseElement = this.elems[0];
+			if(baseElement.imageField){
+				imgName = baseElement.imageField.files.length > 0 ? baseElement.imageField.files[0].name : this.getFieldValue('src');
+			}
+			childdom.setAttribute('src',imgName);
+		}
+	}
 });
 
 
@@ -5151,7 +5343,7 @@ divi.home =  divi.extend(divi.appBase,{
 		         {tag:'.addtorf',listType:'click',parent:this.book,listenerFn:'addelement',key:'torf',mapTo:scope},
 		         {tag:'.addfill_blank',listType:'click',parent:this.book,listenerFn:'addelement',key:'fill_blank',mapTo:scope},
 		         {tag:'.addmatch',listType:'click',parent:this.book,listenerFn:'addelement',key:'match',mapTo:scope},
-		         {tag:'.addlabeling',listType:'click',parent:this.book,listenerFn:'addelement',key:'labeling',mapTo:scope}];
+		         {tag:'.addlabeling',listType:'click',parent:this.book,listenerFn:'addelement',key:'label',mapTo:scope}];
 	}
 
 	,enableTopBtns:function(selected){
