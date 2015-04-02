@@ -4297,7 +4297,9 @@ divi.label = divi.extend(divi.question,{
 			img.src =baseElement.getHtmlLoc()+"/"+this.getValues()['src'];
 		}
         var taggd = mainJdom.children().taggd(this.getOptions(), []);
-        taggd.setData(baseElement.getFieldValue('labels'));
+        if(baseElement.getFieldValue('labels') && baseElement.getFieldValue('labels').length > 0){
+        	taggd.setData(baseElement.getFieldValue('labels'));
+        }
         taggd.on('change', function() {
             this.data = taggd.data;
             baseElement.setValueForKey('labels',taggd.data);
