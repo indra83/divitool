@@ -4,14 +4,30 @@ import java.awt.TextArea;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.security.AlgorithmParameters;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -23,8 +39,6 @@ import co.in.divi.tool.validation.BookDefinition.TopicDefinition;
 import com.google.gson.Gson;
 
 public class ValidationWorker extends SwingWorker<Integer, String> {
-
-	public static final String	BOOK_DEFINITION_FILE_NAME	= "master.json";
 
 	TextArea					logArea;
 	ArrayList<File>				toDelete;
@@ -42,9 +56,9 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 		File bookDir = ToolServer.getBooksDir();
 		publish("Reading book at - " + bookDir.getAbsolutePath());
 		// Validate master.json
-		File bookDefFile = new File(bookDir, BOOK_DEFINITION_FILE_NAME);
+		File bookDefFile = new File(bookDir, Util.BOOK_DEFINITION_FILE_NAME);
 		try {
-			BookDefinition bookDef = gson.fromJson(openJSONFile(bookDefFile), BookDefinition.class);
+			BookDefinition bookDef = gson.fromJson(Util.openJSONFile(bookDefFile), BookDefinition.class);
 			publish("Begin validation of " + bookDef.name);
 			HashSet<String> chapterIds = new HashSet<String>();
 			for (ChapterDefinition chDef : bookDef.chapters) {
@@ -62,7 +76,7 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 						publish("Delete folder - " + bookDir.toURI().relativize(f.toURI()).getPath());
 					}
 				} else {
-					if (!f.getName().equals(BOOK_DEFINITION_FILE_NAME)) {
+					if (!f.getName().equals(Util.BOOK_DEFINITION_FILE_NAME)) {
 						toDelete.add(f);
 						publish("Delete file - " + f.getName());
 					}
@@ -227,7 +241,8 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 
 		} catch (Exception e) {
 			publish(sb.toString());
-
+			e.printStackTrace();
+			return 1;
 		}
 
 		return 0;
@@ -244,7 +259,7 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 			publish("!!Assessment def missing - " + assDefFile.getName());
 			return 1;
 		}
-		AssessmentFileModel assFileDef = new Gson().fromJson(openJSONFile(assDefFile), AssessmentFileModel.class);
+		AssessmentFileModel assFileDef = new Gson().fromJson(Util.openJSONFile(assDefFile), AssessmentFileModel.class);
 		HashSet<String> qIds = new HashSet<String>();
 		qIds.add(assDefFile.getName());
 		for (AssessmentFileModel.Question q : assFileDef.questions) {
@@ -266,29 +281,4 @@ public class ValidationWorker extends SwingWorker<Integer, String> {
 
 		return 0;
 	}
-
-	// Helper methods
-	static String openJSONFile(File jsonFile) {
-		String ret = null;
-		BufferedReader rd = null;
-		try {
-			InputStream is = new FileInputStream(jsonFile);
-			String line = "";
-			StringBuilder total = new StringBuilder();
-
-			// Wrap a BufferedReader around the InputStream
-			rd = new BufferedReader(new InputStreamReader(is));
-
-			// Read response until the end
-			while ((line = rd.readLine()) != null) {
-				total.append(line);
-			}
-			ret = total.toString();
-			rd.close();
-		} catch (IOException ioe) {
-			return null;
-		}
-		return ret;
-	}
-
 }
